@@ -1,0 +1,4037 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="CodeX Arena PRO - محرر أكواد متطور مجاني يعمل داخل المتصفح ويدعم لغات البرمجة مع الإكمال التلقائي والمعاينة الحية ومشاركة المشروع.">
+  <title>CodeX Arena PRO — محرر أكواد متطور</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material-darker.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/eclipse.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/hint/show-hint.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/fold/foldgutter.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/dialog/dialog.min.css">
+
+  <style>
+    :root {
+      --bg: #0a0d14;
+      --bg2: #0d111a;
+      --panel: #111622;
+      --panel2: #0d121d;
+      --border: #1e2638;
+      --text: #e2e8f0;
+      --muted: #7c8aa5;
+      --accent: #00ffcc;
+      --blue: #00b0ff;
+      --purple: #7c3aed;
+      --danger: #ff0055;
+      --warn: #ffbb00;
+      --ok: #22c55e;
+      --hover: rgba(255, 255, 255, 0.055);
+      --shadow: 0 18px 50px rgba(0, 0, 0, 0.55);
+      --font-code: 'Fira Code', ui-monospace, monospace;
+      --font-ui: 'Tajawal', system-ui, sans-serif;
+      --editor-font: 14px;
+    }
+
+    html[data-theme="light"] {
+      --bg: #e9eef6;
+      --bg2: #f7f9fc;
+      --panel: #ffffff;
+      --panel2: #f1f5f9;
+      --border: #d6dfeb;
+      --text: #1e293b;
+      --muted: #64748b;
+      --accent: #0f9d7a;
+      --blue: #2563eb;
+      --purple: #7c3aed;
+      --danger: #dc2626;
+      --warn: #b45309;
+      --ok: #15803d;
+      --hover: rgba(15, 23, 42, 0.06);
+      --shadow: 0 18px 50px rgba(30, 41, 59, 0.18);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-ui);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      height: 100dvh;
+      overflow: hidden;
+    }
+    button, input, textarea, select { font-family: inherit; }
+    ::-webkit-scrollbar { width: 10px; height: 10px; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 8px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+
+    /* Header */
+    .app-header {
+      flex: 0 0 auto;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 12px;
+      background: color-mix(in srgb, var(--panel) 92%, transparent);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(12px);
+      z-index: 60;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; white-space: nowrap; min-width: 0; }
+    .brand-logo {
+      width: 34px; height: 34px; border-radius: 10px;
+      display: grid; place-items: center;
+      background: linear-gradient(135deg, var(--accent), var(--blue));
+      color: #04121a; font-size: 16px;
+      box-shadow: 0 0 18px rgba(0, 176, 255, 0.35);
+      flex: 0 0 auto;
+    }
+    .brand-name {
+      font-weight: 800; font-size: 1.05rem; letter-spacing: 0.2px;
+      background: linear-gradient(90deg, var(--accent), var(--blue));
+      -webkit-background-clip: text; background-clip: text;
+      color: transparent;
+    }
+    .brand-badge {
+      font-size: 0.65rem; font-weight: 700; color: var(--accent);
+      border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+      background: color-mix(in srgb, var(--accent) 10%, transparent);
+      padding: 2px 7px; border-radius: 999px;
+    }
+    .toolbar {
+      margin-inline-start: auto;
+      display: flex; align-items: center; gap: 6px;
+      overflow-x: auto; scrollbar-width: none; padding: 4px 0;
+    }
+    .toolbar::-webkit-scrollbar { display: none; }
+
+    .btn {
+      appearance: none; border: 1px solid var(--border);
+      background: var(--panel2); color: var(--text);
+      height: 34px; padding: 0 12px; border-radius: 8px;
+      display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+      font-size: 0.82rem; font-weight: 700; cursor: pointer; white-space: nowrap;
+      transition: transform .15s ease, border-color .15s ease, background .15s ease, box-shadow .15s ease;
+      flex: 0 0 auto;
+    }
+    .btn:hover { border-color: var(--blue); transform: translateY(-1px); }
+    .btn:active { transform: translateY(0); }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--blue), var(--purple));
+      border-color: transparent; color: #fff;
+      box-shadow: 0 8px 24px rgba(0, 176, 255, 0.28);
+    }
+    .btn-primary:hover { box-shadow: 0 10px 28px rgba(0, 176, 255, 0.42); }
+    .btn-icon { width: 34px; padding: 0; }
+    .btn-danger { border-color: color-mix(in srgb, var(--danger) 55%, var(--border)); color: var(--danger); }
+    .btn.active { background: color-mix(in srgb, var(--accent) 16%, var(--panel2)); border-color: var(--accent); color: var(--accent); }
+
+    /* Layout */
+    .main-container { flex: 1 1 auto; display: flex; min-height: 0; position: relative; overflow: hidden; }
+
+    /* Sidebar */
+    .sidebar {
+      flex: 0 0 258px; width: 258px; min-width: 0;
+      background: var(--panel);
+      border-inline-end: 1px solid var(--border);
+      display: flex; flex-direction: column; min-height: 0;
+    }
+    .sidebar.collapsed { display: none; }
+    .sidebar-header { padding: 10px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 8px; }
+    .sidebar-title { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: .78rem; font-weight: 800; color: var(--muted); }
+    .sidebar-title span { display: inline-flex; align-items: center; gap: 7px; }
+    .sidebar-actions { display: flex; gap: 3px; }
+    .icon-btn {
+      width: 28px; height: 28px; border: 0; border-radius: 7px;
+      background: transparent; color: var(--muted);
+      display: inline-flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: background .15s, color .15s; flex: 0 0 auto;
+    }
+    .icon-btn:hover { background: var(--hover); color: var(--text); }
+    .search-box {
+      width: 100%; height: 32px; border-radius: 7px;
+      border: 1px solid var(--border); background: var(--bg2);
+      color: var(--text); padding: 0 10px; font-size: .78rem; outline: none;
+    }
+    .search-box:focus { border-color: var(--blue); }
+    .file-tree { flex: 1 1 auto; overflow: auto; padding: 6px; }
+    .tree-row {
+      display: flex; align-items: center; gap: 7px;
+      min-height: 29px; border-radius: 7px; cursor: pointer;
+      font-size: .82rem; color: var(--text); white-space: nowrap;
+      padding-inline: 8px; margin-bottom: 1px; border: 1px solid transparent;
+    }
+    .tree-row:hover { background: var(--hover); }
+    .tree-row.active { background: color-mix(in srgb, var(--blue) 16%, transparent); color: var(--blue); border-color: color-mix(in srgb, var(--blue) 28%, transparent); }
+    .tree-row .chevron { width: 12px; font-size: .6rem; color: var(--muted); transition: transform .18s; flex: 0 0 auto; }
+    .tree-row.expanded .chevron { transform: rotate(-90deg); }
+    .tree-row .file-icon { width: 16px; text-align: center; flex: 0 0 auto; }
+    .tree-row .name { overflow: hidden; text-overflow: ellipsis; flex: 1 1 auto; }
+    .tree-empty { padding: 22px 10px; text-align: center; color: var(--muted); font-size: .8rem; line-height: 1.8; }
+
+    /* Workspace */
+    .workspace { flex: 1 1 auto; display: flex; flex-direction: column; min-width: 0; min-height: 0; background: var(--bg2); }
+    .workspace-tabs {
+      flex: 0 0 auto; display: flex; min-height: 38px;
+      background: var(--panel); border-bottom: 1px solid var(--border);
+      overflow-x: auto; scrollbar-width: thin;
+    }
+    .tab {
+      display: flex; align-items: center; gap: 7px;
+      padding: 0 10px; min-width: 0; max-width: 210px;
+      font-size: .78rem; color: var(--muted);
+      background: var(--panel2); border-inline-end: 1px solid var(--border);
+      cursor: pointer; white-space: nowrap; user-select: none;
+    }
+    .tab.active { background: var(--bg2); color: var(--text); box-shadow: inset 0 -2px 0 var(--accent); }
+    .tab .tab-name { overflow: hidden; text-overflow: ellipsis; }
+    .tab.dirty .tab-name::after { content: '●'; color: var(--warn); font-size: .55rem; margin-inline-start: 5px; vertical-align: middle; }
+    .tab-close {
+      width: 18px; height: 18px; border: 0; border-radius: 5px;
+      background: transparent; color: inherit; opacity: .55; cursor: pointer;
+      display: grid; place-items: center; flex: 0 0 auto;
+    }
+    .tab-close:hover { background: var(--danger); color: #fff; opacity: 1; }
+    .tab-add { width: 32px; border: 0; background: transparent; color: var(--muted); cursor: pointer; font-size: .8rem; flex: 0 0 auto; }
+    .tab-add:hover { color: var(--text); background: var(--hover); }
+
+    .status-bar {
+      flex: 0 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      padding: 4px 10px; min-height: 28px;
+      background: var(--panel2); border-bottom: 1px solid var(--border);
+      color: var(--muted); font-size: .71rem;
+    }
+    .status-left, .status-right { display: flex; align-items: center; gap: 10px; min-width: 0; }
+    .status-left { overflow: hidden; }
+    .status-right { flex-wrap: wrap; justify-content: flex-end; }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--warn); flex: 0 0 auto; }
+    .status-dot.saved { background: var(--ok); box-shadow: 0 0 8px color-mix(in srgb, var(--ok) 70%, transparent); }
+    .status-chip { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
+    .status-chip i { opacity: .8; }
+
+    .editor-wrapper { flex: 1 1 auto; position: relative; min-height: 0; min-width: 0; }
+    .CodeMirror {
+      height: 100%;
+      font-family: var(--font-code);
+      font-size: var(--editor-font);
+      line-height: 1.55;
+      direction: ltr;
+      text-align: left;
+    }
+    .CodeMirror-scroll { min-height: 100%; }
+    .CodeMirror-hints {
+      background: var(--panel); border: 1px solid var(--border);
+      border-radius: 9px; box-shadow: var(--shadow);
+      padding: 4px; max-height: 230px;
+      font-family: var(--font-code); font-size: .8rem;
+      direction: ltr; text-align: left;
+    }
+    .CodeMirror-hint { color: var(--text); padding: 5px 9px; border-radius: 5px; }
+    li.CodeMirror-hint-active { background: var(--blue); color: #fff; }
+    .CodeMirror-dialog { background: var(--panel); color: var(--text); border-color: var(--border); font-family: var(--font-ui); }
+    .CodeMirror-dialog input { color: var(--text); font-family: var(--font-code); }
+
+    .empty-state {
+      position: absolute; inset: 0; z-index: 5;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 12px; text-align: center; padding: 24px;
+      background: radial-gradient(circle at 50% 35%, color-mix(in srgb, var(--blue) 12%, transparent), transparent 55%), var(--bg2);
+    }
+    .empty-state.hidden { display: none; }
+    .empty-logo {
+      width: 64px; height: 64px; border-radius: 18px; display: grid; place-items: center;
+      font-size: 26px; color: #04121a;
+      background: linear-gradient(135deg, var(--accent), var(--blue));
+      box-shadow: 0 14px 40px rgba(0, 176, 255, 0.3);
+    }
+    .empty-state h2 { margin: 4px 0 0; font-size: 1.25rem; }
+    .empty-state p { margin: 0; max-width: 430px; color: var(--muted); font-size: .86rem; line-height: 1.8; }
+    .empty-actions { display: flex; flex-wrap: wrap; gap: 7px; justify-content: center; margin-top: 6px; }
+    .empty-hints { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 8px; color: var(--muted); font-size: .72rem; }
+    .empty-hints span { font-family: var(--font-code); border: 1px solid var(--border); background: var(--panel); border-radius: 5px; padding: 2px 6px; color: var(--text); }
+
+    /* Splitter */
+    .splitter { flex: 0 0 6px; width: 6px; cursor: col-resize; background: var(--border); opacity: .55; transition: opacity .15s, background .15s; }
+    .splitter:hover, body.resizing .splitter { opacity: 1; background: var(--blue); }
+    body.resizing { cursor: col-resize; user-select: none; }
+
+    /* Output */
+    .output-panel {
+      flex: 0 0 42%; width: 42%; min-width: 250px; max-width: 72%;
+      background: var(--panel); border-inline-start: 1px solid var(--border);
+      display: flex; flex-direction: column; min-height: 0;
+    }
+    .output-panel.fullscreen { position: fixed; inset: 0; z-index: 300; width: 100% !important; max-width: none; flex-basis: auto !important; border: 0; }
+    .output-tabs {
+      flex: 0 0 auto; display: flex; align-items: center; gap: 2px;
+      min-height: 38px; padding: 0 6px;
+      background: var(--panel2); border-bottom: 1px solid var(--border);
+      overflow-x: auto; scrollbar-width: none;
+    }
+    .output-tabs::-webkit-scrollbar { display: none; }
+    .output-tab {
+      appearance: none; border: 0; background: transparent; color: var(--muted);
+      height: 38px; padding: 0 11px; font-size: .78rem; font-weight: 700;
+      display: inline-flex; align-items: center; gap: 6px; cursor: pointer;
+      border-bottom: 2px solid transparent; white-space: nowrap;
+    }
+    .output-tab:hover { color: var(--text); }
+    .output-tab.active { color: var(--blue); border-bottom-color: var(--blue); }
+    .output-actions { margin-inline-start: auto; display: flex; gap: 2px; padding-inline-start: 6px; }
+    .output-content { flex: 1 1 auto; position: relative; min-height: 0; }
+    .output-view { position: absolute; inset: 0; display: none; }
+    .output-view.active { display: flex; flex-direction: column; }
+    #tab-preview { background: #fff; }
+    #preview-frame { flex: 1 1 auto; width: 100%; min-height: 0; border: 0; background: #fff; }
+
+    .console-toolbar {
+      flex: 0 0 auto; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+      padding: 5px 7px; border-bottom: 1px solid var(--border); background: var(--panel);
+    }
+    .console-filters { display: flex; align-items: center; gap: 3px; flex-wrap: wrap; }
+    .console-filter {
+      display: inline-flex; align-items: center; gap: 4px; padding: 4px 7px;
+      border: 1px solid transparent; border-radius: 6px; background: transparent;
+      color: var(--muted); font-family: var(--font-ui); font-size: .67rem; font-weight: 700;
+      cursor: pointer; white-space: nowrap;
+    }
+    .console-filter span {
+      min-width: 16px; padding: 0 4px; border-radius: 8px; background: var(--hover);
+      color: var(--muted); font-family: var(--font-code); font-size: .6rem; text-align: center;
+    }
+    .console-filter:hover { background: var(--hover); color: var(--text); }
+    .console-filter.active { color: var(--blue); border-color: color-mix(in srgb, var(--blue) 32%, transparent); background: color-mix(in srgb, var(--blue) 12%, transparent); }
+    .console-filter.active span { color: var(--blue); background: color-mix(in srgb, var(--blue) 16%, transparent); }
+    .console-tools { display: flex; align-items: center; gap: 2px; margin-inline-start: auto; }
+    .console-search {
+      width: 150px; height: 26px; border: 1px solid var(--border); border-radius: 6px;
+      background: var(--bg2); color: var(--text); padding: 0 8px; font-size: .68rem; outline: none;
+    }
+    .console-search:focus { border-color: var(--blue); }
+    .console-logs {
+      flex: 1 1 auto; overflow: auto; padding: 7px;
+      display: flex; flex-direction: column; gap: 4px;
+      font-family: var(--font-code); font-size: .78rem;
+      direction: ltr; text-align: left; background: var(--bg2);
+    }
+    .console-empty { margin: auto; padding: 22px; text-align: center; color: var(--muted); font-size: .78rem; line-height: 1.7; }
+    .console-entry {
+      display: grid; grid-template-columns: auto auto minmax(0, 1fr); gap: 7px; align-items: start;
+      padding: 4px 7px; border-radius: 5px; border-inline-start: 3px solid var(--blue);
+      background: var(--hover); color: var(--text);
+    }
+    .console-entry .c-time { color: var(--muted); font-size: .62rem; white-space: nowrap; padding-top: 2px; }
+    .console-entry .c-level { width: 14px; padding-top: 2px; text-align: center; font-size: .65rem; color: var(--blue); }
+    .console-entry .c-body { min-width: 0; }
+    .console-entry .c-text { white-space: pre-wrap; word-break: break-word; }
+    .console-entry details { margin-top: 3px; }
+    .console-entry summary { cursor: pointer; color: var(--blue); font-size: .68rem; }
+    .console-entry pre {
+      margin: 5px 0 0; padding: 7px; border-radius: 5px; border: 1px solid var(--border);
+      background: var(--bg); color: var(--text); overflow: auto; max-height: 220px;
+      font-family: var(--font-code); font-size: .7rem; direction: ltr; text-align: left; white-space: pre;
+    }
+    .console-entry.warn { border-color: var(--warn); background: color-mix(in srgb, var(--warn) 9%, transparent); }
+    .console-entry.warn .c-level { color: var(--warn); }
+    .console-entry.error { border-color: var(--danger); background: color-mix(in srgb, var(--danger) 9%, transparent); color: var(--danger); }
+    .console-entry.error .c-level { color: var(--danger); }
+    .console-entry.ok { border-color: var(--ok); }
+    .console-entry.ok .c-level { color: var(--ok); }
+    .console-entry.info { border-color: var(--muted); }
+    .console-entry.info .c-level { color: var(--muted); }
+    .console-entry.input { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent); color: var(--accent); }
+    .console-entry.input .c-level { color: var(--accent); }
+    .console-input-row { flex: 0 0 auto; display: flex; align-items: center; border-top: 1px solid var(--border); background: var(--panel2); padding: 0 8px; }
+    .console-prompt-sign { color: var(--accent); font-family: var(--font-code); }
+    .console-input-row input {
+      flex: 1 1 auto; border: 0; outline: none; background: transparent;
+      color: var(--text); padding: 9px 7px; font-family: var(--font-code); font-size: .8rem; direction: ltr;
+    }
+    .console-run-btn { width: 28px; height: 28px; border: 0; border-radius: 5px; background: transparent; color: var(--accent); cursor: pointer; flex: 0 0 auto; }
+    .console-run-btn:hover { background: var(--hover); }
+    .problems-list { flex: 1 1 auto; overflow: auto; padding: 8px; background: var(--bg2); display: flex; flex-direction: column; gap: 5px; }
+    .problem-item { padding: 7px 9px; border-radius: 6px; font-family: var(--font-code); font-size: .76rem; border-inline-start: 3px solid var(--danger); background: color-mix(in srgb, var(--danger) 8%, transparent); color: var(--text); direction: ltr; text-align: left; white-space: pre-wrap; word-break: break-word; }
+    .problems-empty { padding: 24px; text-align: center; color: var(--muted); font-size: .82rem; }
+
+    /* Footer & mobile nav */
+    .app-footer {
+      flex: 0 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 10px;
+      min-height: 24px; padding: 2px 10px; font-size: .68rem; color: var(--muted);
+      background: var(--panel); border-top: 1px solid var(--border);
+      white-space: nowrap; overflow: hidden;
+    }
+    .app-footer span { overflow: hidden; text-overflow: ellipsis; }
+    .mobile-nav { display: none; flex: 0 0 auto; background: var(--panel); border-top: 1px solid var(--border); padding-bottom: env(safe-area-inset-bottom); z-index: 40; }
+    .mobile-nav-btn { flex: 1 1 0; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 7px 2px; border: 0; background: transparent; color: var(--muted); font-size: .68rem; font-weight: 700; cursor: pointer; }
+    .mobile-nav-btn i { font-size: 1rem; }
+    .mobile-nav-btn.active { color: var(--blue); }
+
+    /* Context menu */
+    .context-menu { position: fixed; display: none; z-index: 900; min-width: 190px; background: var(--panel); border: 1px solid var(--border); border-radius: 9px; box-shadow: var(--shadow); padding: 5px; }
+    .context-menu-item { display: flex; align-items: center; gap: 9px; width: 100%; padding: 8px 10px; border: 0; border-radius: 6px; background: transparent; color: var(--text); font-size: .82rem; text-align: start; cursor: pointer; }
+    .context-menu-item:hover { background: var(--hover); }
+    .context-menu-item.danger { color: var(--danger); }
+
+    /* Modals */
+    .modal-overlay { position: fixed; inset: 0; z-index: 1000; display: none; align-items: flex-start; justify-content: center; padding: 8vh 14px 20px; background: rgba(3, 6, 12, 0.62); backdrop-filter: blur(5px); }
+    .modal-overlay.open { display: flex; }
+    .modal { width: 100%; max-width: 470px; background: var(--panel); border: 1px solid var(--border); border-radius: 15px; box-shadow: var(--shadow); overflow: hidden; animation: pop .16s ease-out; }
+    @keyframes pop { from { opacity: 0; transform: translateY(-8px) scale(.985); } to { opacity: 1; transform: none; } }
+    .modal.wide { max-width: 620px; }
+    .palette-modal { max-width: 580px; }
+    .modal-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 14px; border-bottom: 1px solid var(--border); }
+    .modal-header h3 { margin: 0; font-size: .95rem; display: inline-flex; align-items: center; gap: 8px; }
+    .modal-body { padding: 14px; max-height: 68vh; overflow: auto; }
+    .modal-footer { display: flex; align-items: center; justify-content: flex-end; gap: 7px; padding: 11px 14px; border-top: 1px solid var(--border); }
+    .muted { color: var(--muted); }
+    .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 13px; }
+    .field:last-child { margin-bottom: 0; }
+    .field-label { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: .8rem; font-weight: 700; color: var(--text); }
+    .field-hint { font-size: .72rem; color: var(--muted); line-height: 1.7; }
+    .field-hint.danger { color: var(--danger); }
+    .text-input { width: 100%; min-height: 36px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg2); color: var(--text); padding: 8px 10px; font-size: .84rem; outline: none; resize: vertical; }
+    .text-input:focus { border-color: var(--blue); }
+    textarea.text-input { font-family: var(--font-code); direction: ltr; text-align: left; font-size: .76rem; }
+    select.text-input { height: 38px; padding: 0 8px; }
+    .switch-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 9px 0; border-bottom: 1px dashed var(--border); }
+    .switch-row:last-of-type { border-bottom: 0; }
+    .switch-row .switch-text { display: flex; flex-direction: column; gap: 2px; }
+    .switch-row small { color: var(--muted); font-size: .7rem; }
+    .switch { position: relative; width: 42px; height: 23px; flex: 0 0 auto; }
+    .switch input { position: absolute; opacity: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
+    .switch span { position: absolute; inset: 0; border-radius: 999px; background: var(--border); transition: .18s; pointer-events: none; }
+    .switch span::after { content: ''; position: absolute; width: 17px; height: 17px; border-radius: 50%; top: 3px; inset-inline-start: 3px; background: #fff; transition: .18s; }
+    .switch input:checked + span { background: var(--blue); }
+    .switch input:checked + span::after { transform: translateX(-19px); }
+    .range-row { display: flex; align-items: center; gap: 10px; }
+    .range-row input[type="range"] { flex: 1 1 auto; accent-color: var(--blue); }
+    .range-value { font-family: var(--font-code); font-size: .78rem; color: var(--blue); min-width: 45px; text-align: center; }
+    .kbd { font-family: var(--font-code); font-size: .68rem; border: 1px solid var(--border); background: var(--bg2); border-radius: 5px; padding: 2px 6px; color: var(--muted); }
+    .shortcut-grid { display: grid; grid-template-columns: 1fr auto; gap: 9px 14px; align-items: center; font-size: .8rem; }
+    .shortcut-grid .kbd { justify-self: end; }
+    .share-actions { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 12px; }
+
+    .palette-input { width: 100%; height: 50px; border: 0; border-bottom: 1px solid var(--border); background: transparent; color: var(--text); padding: 0 15px; font-size: .95rem; outline: none; }
+    .palette-list { max-height: 350px; overflow: auto; padding: 6px; }
+    .palette-item { display: flex; align-items: center; gap: 10px; width: 100%; padding: 9px 11px; border: 0; border-radius: 8px; background: transparent; color: var(--text); font-size: .84rem; text-align: start; cursor: pointer; }
+    .palette-item i { width: 18px; text-align: center; color: var(--muted); }
+    .palette-item .kbd { margin-inline-start: auto; }
+    .palette-item.active { background: var(--blue); color: #fff; }
+    .palette-item.active i { color: #fff; }
+    .palette-empty { padding: 22px; text-align: center; color: var(--muted); font-size: .82rem; }
+
+    #toasts { position: fixed; left: 50%; bottom: calc(18px + env(safe-area-inset-bottom)); transform: translateX(-50%); z-index: 2100; display: flex; flex-direction: column; align-items: center; gap: 8px; pointer-events: none; width: min(92vw, 520px); }
+    .toast { max-width: 100%; padding: 9px 15px; border-radius: 9px; background: var(--panel); border: 1px solid var(--border); border-inline-start: 4px solid var(--blue); color: var(--text); box-shadow: var(--shadow); font-size: .82rem; font-weight: 600; pointer-events: auto; animation: toastIn .18s ease-out; }
+    .toast.ok { border-inline-start-color: var(--ok); }
+    .toast.error { border-inline-start-color: var(--danger); }
+    .toast.info { border-inline-start-color: var(--blue); }
+    @keyframes toastIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+    body.dragging-files::after {
+      content: 'أفلت الملفات لاستيرادها إلى المشروع';
+      position: fixed; inset: 10px; z-index: 2500;
+      display: grid; place-items: center;
+      border: 3px dashed var(--blue); border-radius: 20px;
+      background: color-mix(in srgb, var(--bg) 78%, transparent);
+      color: var(--blue); font-size: 1.1rem; font-weight: 800;
+      pointer-events: none;
+    }
+
+    @media (max-width: 1180px) {
+      .sidebar { flex-basis: 220px; width: 220px; }
+      .btn .btn-label { display: none; }
+      .btn { padding: 0 9px; }
+    }
+    @media (max-width: 900px) {
+      .app-header { height: 52px; padding: 0 8px; gap: 8px; }
+      .brand-badge { display: none; }
+      .splitter { display: none; }
+      .sidebar, .workspace, .output-panel { display: none; }
+      .output-panel { flex: 1 1 auto; width: 100%; max-width: none; min-width: 0; border-inline-start: 0; }
+      .output-panel.fullscreen { display: flex; }
+      body.mobile-mode-files .sidebar { display: flex; width: 100%; flex-basis: auto; border: 0; }
+      body.mobile-mode-editor .workspace { display: flex; }
+      body.mobile-mode-output .output-panel { display: flex; }
+      .mobile-nav { display: flex; }
+      .app-footer { display: none; }
+      .modal-overlay { padding-top: 4vh; }
+      .modal-body { max-height: 76vh; }
+    }
+    @media (max-width: 620px) {
+      .brand-name { font-size: .95rem; }
+      .brand-logo { width: 31px; height: 31px; font-size: 14px; }
+      .btn { height: 32px; }
+      .status-meta-hide { display: none; }
+      .output-tab .tab-text { display: none; }
+      .empty-state h2 { font-size: 1.08rem; }
+      .empty-state p { font-size: .8rem; }
+      .toast { font-size: .78rem; }
+      .console-filter { padding: 3px 5px; font-size: .62rem; }
+      .console-search { width: 96px; }
+      .console-toolbar { padding: 4px 5px; gap: 4px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="app-header">
+    <div class="brand">
+      <div class="brand-logo"><i class="fa-solid fa-code"></i></div>
+      <span class="brand-name">CodeX Arena PRO</span>
+      <span class="brand-badge">v3</span>
+    </div>
+
+    <div class="toolbar">
+      <button class="btn btn-primary" id="btn-run" title="تشغيل الملف الحالي (Ctrl+Enter)">
+        <i class="fa-solid fa-play"></i><span class="btn-label">تشغيل</span>
+      </button>
+      <button class="btn" id="btn-save" title="حفظ المشروع محلياً (Ctrl+S)">
+        <i class="fa-solid fa-floppy-disk"></i><span class="btn-label">حفظ</span>
+      </button>
+      <button class="btn" id="btn-format" title="تنسيق الكود (Shift+Alt+F)">
+        <i class="fa-solid fa-wand-magic-sparkles"></i><span class="btn-label">تنسيق</span>
+      </button>
+      <button class="btn" id="btn-share" title="مشاركة مجلد المشروع">
+        <i class="fa-solid fa-share-nodes"></i><span class="btn-label">مشاركة</span>
+      </button>
+      <button class="btn btn-icon" id="btn-export" title="تصدير المشروع كـ ZIP"><i class="fa-solid fa-file-zipper"></i></button>
+      <button class="btn btn-icon" id="btn-import" title="استيراد ملفات"><i class="fa-solid fa-file-import"></i></button>
+      <button class="btn btn-icon" id="btn-palette" title="لوحة الأوامر (Ctrl+K)"><i class="fa-solid fa-terminal"></i></button>
+      <button class="btn btn-icon" id="btn-theme" title="تبديل الثيم"><i class="fa-solid fa-circle-half-stroke"></i></button>
+      <button class="btn btn-icon" id="btn-settings" title="الإعدادات (Ctrl+,)"><i class="fa-solid fa-gear"></i></button>
+      <button class="btn btn-icon" id="btn-help" title="الاختصارات (F1)"><i class="fa-solid fa-keyboard"></i></button>
+      <button class="btn btn-icon" id="btn-sidebar-toggle" title="إظهار/إخفاء الملفات (Ctrl+B)"><i class="fa-solid fa-table-columns"></i></button>
+    </div>
+  </header>
+
+  <main class="main-container" id="main-container">
+    <aside class="sidebar" id="sidebar-panel">
+      <div class="sidebar-header">
+        <div class="sidebar-title">
+          <span><i class="fa-solid fa-folder-tree"></i> ملفات المشروع</span>
+          <div class="sidebar-actions">
+            <button class="icon-btn" id="btn-new-file" title="ملف جديد"><i class="fa-solid fa-file-circle-plus"></i></button>
+            <button class="icon-btn" id="btn-new-folder" title="مجلد جديد"><i class="fa-solid fa-folder-plus"></i></button>
+            <button class="icon-btn" id="btn-import-side" title="استيراد ملفات/مجلد"><i class="fa-solid fa-upload"></i></button>
+          </div>
+        </div>
+        <input class="search-box" id="tree-search" type="search" placeholder="بحث في الملفات…" autocomplete="off">
+      </div>
+      <div class="file-tree" id="file-tree"></div>
+    </aside>
+
+    <section class="workspace" id="editor-panel">
+      <div class="workspace-tabs" id="workspace-tabs"></div>
+
+      <div class="status-bar">
+        <div class="status-left">
+          <span class="status-dot saved" id="status-dot"></span>
+          <span id="status-text">جاهز</span>
+        </div>
+        <div class="status-right">
+          <span class="status-chip" id="status-lang"><i class="fa-solid fa-code"></i> —</span>
+          <span class="status-chip status-meta-hide" id="status-position"><i class="fa-solid fa-location-dot"></i> Ln 1, Col 1</span>
+          <span class="status-chip status-meta-hide" id="status-size"><i class="fa-solid fa-ruler"></i> 0</span>
+        </div>
+      </div>
+
+      <div class="editor-wrapper" id="editor-wrapper">
+        <div class="empty-state" id="empty-state">
+          <div class="empty-logo"><i class="fa-solid fa-code"></i></div>
+          <h2>مرحباً في CodeX Arena PRO</h2>
+          <p>بيئة تطوير متكاملة تعمل بالكامل داخل المتصفح، مجانية 100%، وتدعم عشرات اللغات مع الإكمال التلقائي والمعاينة الحية ومشاركة المشروع.</p>
+          <div class="empty-actions">
+            <button class="btn btn-primary" id="empty-new-file"><i class="fa-solid fa-file-circle-plus"></i> ملف جديد</button>
+            <button class="btn" id="empty-import"><i class="fa-solid fa-upload"></i> استيراد مشروع</button>
+            <button class="btn" id="empty-palette"><i class="fa-solid fa-terminal"></i> لوحة الأوامر</button>
+          </div>
+          <div class="empty-hints"><span>Ctrl+K</span> الأوامر <span>Ctrl+Enter</span> تشغيل <span>Ctrl+S</span> حفظ <span>Ctrl+Space</span> إكمال</div>
+        </div>
+        <textarea id="code-editor" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea>
+      </div>
+    </section>
+
+    <div class="splitter" id="splitter" title="اسحب لتغيير الحجم"></div>
+
+    <aside class="output-panel" id="output-panel">
+      <div class="output-tabs">
+        <button class="output-tab active" data-tab="preview"><i class="fa-solid fa-eye"></i><span class="tab-text">المعاينة</span></button>
+        <button class="output-tab" data-tab="console"><i class="fa-solid fa-terminal"></i><span class="tab-text">Console</span></button>
+        <button class="output-tab" data-tab="problems"><i class="fa-solid fa-triangle-exclamation"></i><span class="tab-text">المشاكل</span></button>
+        <div class="output-actions">
+          <button class="icon-btn" id="btn-clear-console" title="مسح السجلات"><i class="fa-solid fa-broom"></i></button>
+          <button class="icon-btn" id="btn-open-preview" title="فتح المعاينة في نافذة جديدة"><i class="fa-solid fa-arrow-up-right-from-square"></i></button>
+          <button class="icon-btn" id="btn-fullscreen" title="ملء الشاشة"><i class="fa-solid fa-expand"></i></button>
+        </div>
+      </div>
+
+      <div class="output-content">
+        <div class="output-view active" id="tab-preview">
+          <iframe id="preview-frame" title="معاينة المشروع" sandbox="allow-scripts allow-forms allow-modals allow-popups allow-downloads allow-pointer-lock"></iframe>
+        </div>
+        <div class="output-view" id="tab-console">
+          <div class="console-toolbar">
+            <div class="console-filters" role="group" aria-label="تصفية السجلات">
+              <button type="button" class="console-filter active" data-level="all">الكل <span id="console-count-all">0</span></button>
+              <button type="button" class="console-filter" data-level="error">أخطاء <span id="console-count-error">0</span></button>
+              <button type="button" class="console-filter" data-level="warn">تحذيرات <span id="console-count-warn">0</span></button>
+              <button type="button" class="console-filter" data-level="info">معلومات <span id="console-count-info">0</span></button>
+              <button type="button" class="console-filter" data-level="log">سجلات <span id="console-count-log">0</span></button>
+            </div>
+            <div class="console-tools">
+              <input id="console-filter-input" class="console-search" type="search" placeholder="بحث في السجلات…" autocomplete="off" spellcheck="false">
+              <button class="icon-btn" id="btn-console-copy" title="نسخ السجلات"><i class="fa-solid fa-copy"></i></button>
+              <button class="icon-btn" id="btn-console-clear" title="مسح السجلات"><i class="fa-solid fa-broom"></i></button>
+            </div>
+          </div>
+          <div class="console-logs" id="console-logs">
+            <div class="console-empty">لا توجد سجلات بعد — شغّل الكود أو اكتب في الطرفية بالأسفل.</div>
+          </div>
+          <div class="console-input-row">
+            <span class="console-prompt-sign">&gt;</span>
+            <input id="console-prompt" type="text" placeholder="اكتب كود JavaScript واضغط Enter…" autocomplete="off" spellcheck="false">
+            <button class="console-run-btn" id="btn-console-run" type="button" title="تنفيذ الأمر (Enter)"><i class="fa-solid fa-play"></i></button>
+          </div>
+        </div>
+        <div class="output-view" id="tab-problems">
+          <div class="problems-list" id="problems-list">
+            <div class="problems-empty">لا توجد مشاكل حالياً — شغّل الكود لبدء الفحص.</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <nav class="mobile-nav">
+    <button class="mobile-nav-btn" data-view="files"><i class="fa-solid fa-folder-tree"></i><span>الملفات</span></button>
+    <button class="mobile-nav-btn active" data-view="editor"><i class="fa-solid fa-code"></i><span>المحرر</span></button>
+    <button class="mobile-nav-btn" data-view="output"><i class="fa-solid fa-eye"></i><span>الناتج</span></button>
+    <button class="mobile-nav-btn" id="mobile-run"><i class="fa-solid fa-play"></i><span>تشغيل</span></button>
+  </nav>
+
+  <footer class="app-footer">
+    <span id="footer-files">0 ملف</span>
+    <span><i class="fa-solid fa-bolt"></i> CodeX Arena PRO Engine — مجاني ومفتوح</span>
+    <span>جميع الحقوق محفوظة @ مهندس Islam Hamdy</span>
+  </footer>
+
+  <div class="context-menu" id="context-menu"></div>
+  <div id="toasts"></div>
+
+  <input type="file" id="file-input" multiple hidden>
+  <input type="file" id="folder-input" webkitdirectory directory multiple hidden>
+  <input type="file" id="json-input" accept=".json,application/json" hidden>
+
+  <div class="modal-overlay" id="palette-modal">
+    <div class="modal palette-modal">
+      <input class="palette-input" id="palette-input" type="text" placeholder="اكتب أمراً أو اسم ملف…" autocomplete="off" spellcheck="false">
+      <div class="palette-list" id="palette-list"></div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="share-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-share-nodes"></i> مشاركة مجلد المشروع</h3>
+        <button class="icon-btn" data-close title="إغلاق"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <p class="muted" style="margin-top:0;font-size:.82rem;line-height:1.8">
+          شارك كل ملفات ومجلدات المشروع برابط واحد يُفتح على أي جهاز. الرابط يعمل بدون سيرفر، ويمكنك أيضاً مشاركة المشروع كملف ZIP.
+        </p>
+        <div class="field">
+          <label class="field-label" for="share-link">رابط المشاركة</label>
+          <textarea id="share-link" class="text-input" rows="3" readonly spellcheck="false"></textarea>
+          <div class="field-hint" id="share-size"></div>
+          <div class="field-hint" id="share-note"></div>
+        </div>
+        <div class="share-actions">
+          <button class="btn btn-primary" id="btn-copy-link"><i class="fa-solid fa-copy"></i> نسخ الرابط</button>
+          <button class="btn" id="btn-native-share"><i class="fa-solid fa-share"></i> مشاركة</button>
+          <button class="btn" id="btn-share-zip"><i class="fa-solid fa-file-zipper"></i> مشاركة كـ ZIP</button>
+          <button class="btn" id="btn-share-json"><i class="fa-solid fa-download"></i> نسخة JSON</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="settings-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-gear"></i> الإعدادات</h3>
+        <button class="icon-btn" data-close title="إغلاق"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="field">
+          <label class="field-label" for="setting-theme">المظهر</label>
+          <select class="text-input" id="setting-theme">
+            <option value="dark">داكن (Material)</option>
+            <option value="light">فاتح (Eclipse)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="field-label" for="setting-font">حجم خط المحرر <span class="range-value" id="setting-font-val">14px</span></label>
+          <div class="range-row"><input type="range" id="setting-font" min="12" max="22" step="1"></div>
+        </div>
+        <div class="field">
+          <label class="field-label" for="setting-tab">حجم المسافة البادئة</label>
+          <select class="text-input" id="setting-tab">
+            <option value="2">مسافتان</option>
+            <option value="4">4 مسافات</option>
+            <option value="8">8 مسافات</option>
+          </select>
+        </div>
+        <div class="switch-row">
+          <div class="switch-text"><strong>التفاف الأسطر</strong><small>عرض الأسطر الطويلة دون تمرير أفقي</small></div>
+          <label class="switch"><input type="checkbox" id="setting-wrap"><span></span></label>
+        </div>
+        <div class="switch-row">
+          <div class="switch-text"><strong>الحفظ التلقائي</strong><small>حفظ المشروع في المتصفح بعد كل تعديل</small></div>
+          <label class="switch"><input type="checkbox" id="setting-autosave"><span></span></label>
+        </div>
+        <div class="switch-row">
+          <div class="switch-text"><strong>المعاينة التلقائية</strong><small>تحديث معاينة HTML/CSS/JS أثناء الكتابة</small></div>
+          <label class="switch"><input type="checkbox" id="setting-live"><span></span></label>
+        </div>
+        <div class="field" style="margin-top:14px">
+          <label class="field-label" for="setting-piston">عنوان Piston API</label>
+          <input class="text-input" id="setting-piston" type="url" dir="ltr" autocomplete="off" spellcheck="false" placeholder="https://emkc.org/api/v2/piston">
+          <div class="field-hint"><i class="fa-solid fa-circle-info"></i> الـ API العام لمحرك Piston أصبح محظوراً للاستخدام العام (401). ضع عنوان نسخة Piston خاصة بك، أو استخدم اللغات المحلية مثل JavaScript وPython.</div>
+        </div>
+        <div class="field">
+          <label class="field-label" for="setting-piston-key">مفتاح Piston (اختياري)</label>
+          <input class="text-input" id="setting-piston-key" type="password" dir="ltr" autocomplete="off" spellcheck="false" placeholder="Authorization token">
+          <div class="field-hint"><i class="fa-solid fa-key"></i> يُرسل في ترويسة Authorization عند تشغيل اللغات السحابية. لا يُصدَّر داخل ZIP أو JSON.</div>
+        </div>
+        <div class="share-actions">
+          <button class="btn" id="btn-restore-backup"><i class="fa-solid fa-clock-rotate-left"></i> استعادة المشروع السابق</button>
+          <button class="btn btn-danger" id="btn-reset"><i class="fa-solid fa-trash-can"></i> إعادة ضبط المشروع</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="shortcuts-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-keyboard"></i> اختصارات لوحة المفاتيح</h3>
+        <button class="icon-btn" data-close title="إغلاق"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="shortcut-grid">
+          <span>لوحة الأوامر</span><span class="kbd">Ctrl + K</span>
+          <span>تشغيل الملف الحالي</span><span class="kbd">Ctrl + Enter</span>
+          <span>حفظ المشروع</span><span class="kbd">Ctrl + S</span>
+          <span>تنسيق الكود</span><span class="kbd">Shift + Alt + F</span>
+          <span>فتح/إغلاق الملفات</span><span class="kbd">Ctrl + B</span>
+          <span>الإكمال التلقائي</span><span class="kbd">Ctrl + Space</span>
+          <span>بحث داخل الملف</span><span class="kbd">Ctrl + F</span>
+          <span>استبدال داخل الملف</span><span class="kbd">Ctrl + H</span>
+          <span>تعليق/إلغاء تعليق</span><span class="kbd">Ctrl + /</span>
+          <span>الإعدادات</span><span class="kbd">Ctrl + ,</span>
+          <span>الطرفية (Console)</span><span class="kbd">Ctrl + Shift + J</span>
+          <span>هذه النافذة</span><span class="kbd">F1</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="prompt-modal">
+    <form class="modal" id="prompt-form">
+      <div class="modal-header">
+        <h3 id="prompt-title">إدخال</h3>
+        <button type="button" class="icon-btn" data-close title="إغلاق"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="field">
+          <label class="field-label" id="prompt-label" for="prompt-input">القيمة</label>
+          <input class="text-input" id="prompt-input" type="text" autocomplete="off" spellcheck="false">
+          <div class="field-hint" id="prompt-hint"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn" data-close>إلغاء</button>
+        <button type="submit" class="btn btn-primary">تأكيد</button>
+      </div>
+    </form>
+  </div>
+
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/xml/xml.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/css/css.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/htmlmixed/htmlmixed.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/meta.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/hint/show-hint.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/matchbrackets.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/closebrackets.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/closetag.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/comment/comment.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/search/searchcursor.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/search/search.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/dialog/dialog.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/fold/foldcode.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/fold/foldgutter.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/fold/brace-fold.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/fold/xml-fold.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/fold/comment-fold.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/fold/indent-fold.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/selection/active-line.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/display/placeholder.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/js-beautify@1.15.1/js/lib/beautify.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/js-beautify@1.15.1/js/lib/beautify-css.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/js-beautify@1.15.1/js/lib/beautify-html.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
+
+  <script>
+  (function () {
+    'use strict';
+
+    /* ============================================================
+       Constants & default project
+       ============================================================ */
+    const STORAGE_KEY = 'codex_arena_pro_v3';
+    const BACKUP_KEY = STORAGE_KEY + '_backup';
+    const WELCOME_KEY = 'codex_arena_welcomed_v3';
+
+    const DEFAULT_SETTINGS = {
+      theme: 'dark',
+      fontSize: 14,
+      tabSize: 2,
+      wordWrap: false,
+      autoSave: true,
+      livePreview: false,
+      pistonEndpoint: 'https://emkc.org/api/v2/piston',
+      pistonKey: ''
+    };
+
+    const DEFAULT_FILES = {
+      'index.html': `<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CodeX Arena PRO</title>
+  <link rel="stylesheet" href="styles/style.css">
+</head>
+<body>
+  <main class="hero">
+    <span class="badge">CodeX Arena PRO</span>
+    <h1>اكتب. شغّل. أبدع.</h1>
+    <p>بيئة تطوير متكاملة تعمل بالكامل داخل متصفحك، مجانية 100%.</p>
+    <div class="actions">
+      <button id="hello-btn">جرّب الزر</button>
+      <a href="README.md">اقرأ الدليل</a>
+    </div>
+  </main>
+  <script src="scripts/app.js"><\/script>
+</body>
+</html>`,
+      'styles/style.css': `:root {
+  --accent: #00ffcc;
+  --blue: #00b0ff;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  font-family: "Tajawal", system-ui, sans-serif;
+  background: radial-gradient(circle at 20% 20%, #12203a, #070a11 65%);
+  color: #e2e8f0;
+}
+
+.hero {
+  text-align: center;
+  padding: 48px 28px;
+  max-width: 640px;
+}
+
+.badge {
+  display: inline-block;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent);
+  border: 1px solid rgba(0, 255, 204, 0.35);
+  background: rgba(0, 255, 204, 0.08);
+  border-radius: 999px;
+  padding: 5px 14px;
+  margin-bottom: 18px;
+}
+
+h1 {
+  font-size: clamp(30px, 6vw, 54px);
+  margin: 0 0 14px;
+  background: linear-gradient(90deg, var(--accent), var(--blue));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+p {
+  color: #94a3b8;
+  line-height: 1.9;
+  margin: 0 0 26px;
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+button, a {
+  font: inherit;
+  font-weight: 700;
+  padding: 11px 22px;
+  border-radius: 10px;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+button {
+  border: 0;
+  color: #04121a;
+  background: linear-gradient(135deg, var(--accent), var(--blue));
+}
+
+a {
+  color: #e2e8f0;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}`,
+      'scripts/app.js': `const button = document.getElementById('hello-btn');
+
+if (button) {
+  button.addEventListener('click', () => {
+    console.log('CodeX Engine Active');
+    button.textContent = 'تم التشغيل بنجاح';
+  });
+}
+
+console.log('مرحباً من scripts/app.js');`,
+      'python/main.py': `import math
+
+
+def area(radius):
+    return math.pi * radius ** 2
+
+
+print("مرحباً من Python داخل المتصفح")
+print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
+      'README.md': `# CodeX Arena PRO
+
+محرر أكواد متطور يعمل بالكامل داخل المتصفح ومجاني 100%.
+
+## المميزات
+
+- دعم عشرات لغات البرمجة مع تلوين وإكمال تلقائي.
+- تشغيل Python داخل المتصفح عبر WebAssembly.
+- تشغيل لغات أخرى عبر Piston API.
+- معاينة حية لملفات HTML و CSS و JavaScript.
+- إدارة ملفات ومجلدات، تصدير ZIP، ومشاركة المشروع برابط.
+- Console ومشاكل واختصارات لوحة مفاتيح.
+
+## اختصارات سريعة
+
+- Ctrl+K: لوحة الأوامر
+- Ctrl+Enter: تشغيل
+- Ctrl+S: حفظ
+- Ctrl+Space: إكمال تلقائي`
+    };
+
+    /* ============================================================
+       Language dictionaries for autocomplete
+       ============================================================ */
+    function kw(str) { return str.split(/\s+/).filter(Boolean); }
+    function mk(keywords, snippets) { return { keywords: kw(keywords), snippets: snippets || [] }; }
+
+    const LANG_DATA = {
+      javascript: mk(
+        'const let var function return if else for while do switch case break continue class extends new this super import export default from async await try catch finally throw typeof instanceof in of delete void yield static get set null undefined true false NaN Infinity console document window globalThis Math JSON Object Array String Number Boolean Promise Map Set WeakMap Symbol Date RegExp Error setTimeout setInterval clearTimeout clearInterval fetch localStorage sessionStorage require module exports process querySelector querySelectorAll addEventListener getElementById',
+        [
+          ['log', 'console.log($0);'],
+          ['warn', 'console.warn($0);'],
+          ['error', 'console.error($0);'],
+          ['fn', 'function name(args) {\n  $0\n}'],
+          ['afn', 'const name = (args) => {\n  $0\n};'],
+          ['if', 'if (condition) {\n  $0\n}'],
+          ['for', 'for (let i = 0; i < length; i++) {\n  $0\n}'],
+          ['foreach', 'items.forEach((item) => {\n  $0\n});'],
+          ['map', 'items.map((item) => {\n  return $0;\n});'],
+          ['try', 'try {\n  $0\n} catch (error) {\n  console.error(error);\n}'],
+          ['class', 'class Name {\n  constructor() {\n    $0\n  }\n}'],
+          ['import', 'import { name } from "./module.js";'],
+          ['export', 'export default function name() {\n  $0\n}'],
+          ['async', 'async function name() {\n  try {\n    $0\n  } catch (error) {\n    console.error(error);\n  }\n}'],
+          ['fetch', 'const response = await fetch(url);\nconst data = await response.json();\n$0'],
+          ['query', 'document.querySelector("$0");'],
+          ['event', 'element.addEventListener("click", (event) => {\n  $0\n});'],
+          ['timeout', 'setTimeout(() => {\n  $0\n}, 1000);']
+        ]
+      ),
+      typescript: mk(
+        'interface type enum namespace declare implements readonly public private protected abstract as satisfies unknown never any void string number boolean object bigint symbol const let var function return if else for while do switch case break continue class extends new this super import export default from async await try catch finally throw typeof instanceof in of delete yield static get set null undefined true false console document window Promise Array Record Partial Pick Omit',
+        [
+          ['interface', 'interface Name {\n  id: number;\n  $0\n}'],
+          ['type', 'type Name = {\n  $0\n};'],
+          ['fn', 'function name(args: string): void {\n  $0\n}'],
+          ['afn', 'const name = (args: string): void => {\n  $0\n};'],
+          ['enum', 'enum Name {\n  A,\n  B,\n  $0\n}'],
+          ['class', 'class Name {\n  constructor(private value: string) {\n    $0\n  }\n}'],
+          ['async', 'async function name(): Promise<void> {\n  $0\n}'],
+          ['try', 'try {\n  $0\n} catch (error) {\n  console.error(error);\n}']
+        ]
+      ),
+      html: mk(
+        'html head body div span p a img button input textarea select option ul ol li table thead tbody tr td th form label section header footer nav main aside article h1 h2 h3 h4 h5 h6 script style link meta title canvas svg video audio source iframe template dialog details summary br hr strong em code pre blockquote figure figcaption progress meter time mark small sub sup picture track map area fieldset legend datalist output optgroup',
+        [
+          ['class', 'class=""'],
+          ['id', 'id=""'],
+          ['style', 'style=""'],
+          ['src', 'src=""'],
+          ['href', 'href=""'],
+          ['alt', 'alt=""'],
+          ['type', 'type=""'],
+          ['placeholder', 'placeholder=""'],
+          ['value', 'value=""'],
+          ['name', 'name=""'],
+          ['data', 'data-=""'],
+          ['aria', 'aria-label=""'],
+          ['role', 'role=""'],
+          ['target', 'target="_blank"'],
+          ['rel', 'rel="stylesheet"'],
+          ['charset', 'charset="UTF-8"'],
+          ['width', 'width=""'],
+          ['height', 'height=""'],
+          ['onclick', 'onclick=""']
+        ]
+      ),
+      css: mk(
+        'display position top right bottom left float clear z-index overflow width height min-width min-height max-width max-height margin margin-top margin-right margin-bottom margin-left padding padding-top padding-right padding-bottom padding-left border border-radius border-color border-width background background-color background-image background-size background-position color font font-family font-size font-weight font-style line-height letter-spacing text-align text-decoration text-transform white-space vertical-align box-sizing box-shadow opacity visibility cursor transition transform animation flex flex-direction flex-wrap justify-content align-items align-content align-self gap grid grid-template-columns grid-template-rows grid-column grid-row order content list-style outline filter backdrop-filter user-select object-fit',
+        [
+          ['display', 'display: flex;'],
+          ['flex', 'display: flex;\njustify-content: center;\nalign-items: center;\ngap: $0;'],
+          ['grid', 'display: grid;\ngrid-template-columns: repeat(auto-fit, minmax(200px, 1fr));\ngap: $0;'],
+          ['margin', 'margin: $0;'],
+          ['padding', 'padding: $0;'],
+          ['color', 'color: #$0;'],
+          ['bg', 'background: $0;'],
+          ['border', 'border: 1px solid $0;'],
+          ['radius', 'border-radius: $0;'],
+          ['shadow', 'box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);'],
+          ['transition', 'transition: all 0.2s ease;'],
+          ['media', '@media (max-width: 768px) {\n  $0\n}'],
+          ['center', 'display: flex;\njustify-content: center;\nalign-items: center;'],
+          ['hover', '&:hover {\n  $0\n}']
+        ]
+      ),
+      python: mk(
+        'def class import from return if elif else for while try except finally with as lambda and or not in is pass break continue global nonlocal yield async await self super print input len range enumerate zip map filter list dict set tuple str int float bool True False None open isinstance type property staticmethod classmethod',
+        [
+          ['def', 'def name(args):\n    $0'],
+          ['class', 'class Name:\n    def __init__(self):\n        $0'],
+          ['if', 'if condition:\n    $0'],
+          ['for', 'for item in items:\n    $0'],
+          ['while', 'while condition:\n    $0'],
+          ['try', 'try:\n    $0\nexcept Exception as error:\n    print(error)'],
+          ['main', 'if __name__ == "__main__":\n    $0'],
+          ['print', 'print(f"$0")'],
+          ['input', 'value = input("$0")'],
+          ['open', 'with open("file.txt", "r", encoding="utf-8") as file:\n    $0'],
+          ['list', '[x for x in items if $0]'],
+          ['dict', '{key: value for key, value in items.items()}'],
+          ['async', 'async def name():\n    $0']
+        ]
+      ),
+      java: mk(
+        'public private protected static final void class interface enum extends implements new return if else for while do switch case break continue try catch finally throw throws import package this super null true false int long double float boolean char String System.out.println ArrayList HashMap List Map Set Optional',
+        [
+          ['main', 'public static void main(String[] args) {\n    $0\n}'],
+          ['class', 'public class Name {\n    $0\n}'],
+          ['for', 'for (int i = 0; i < n; i++) {\n    $0\n}'],
+          ['foreach', 'for (String item : items) {\n    $0\n}'],
+          ['try', 'try {\n    $0\n} catch (Exception error) {\n    error.printStackTrace();\n}'],
+          ['method', 'public void name() {\n    $0\n}']
+        ]
+      ),
+      c: mk(
+        'include define int main void char float double long short unsigned signed const static struct typedef enum union return if else for while do switch case break continue sizeof malloc calloc realloc free printf scanf fopen fclose NULL true false',
+        [
+          ['main', '#include <stdio.h>\n\nint main(void) {\n    $0\n    return 0;\n}'],
+          ['for', 'for (int i = 0; i < n; i++) {\n    $0\n}'],
+          ['struct', 'typedef struct {\n    $0\n} Name;'],
+          ['file', 'FILE *file = fopen("file.txt", "r");\nif (file == NULL) {\n    return 1;\n}\nfclose(file);']
+        ]
+      ),
+      cpp: mk(
+        'include using namespace std int main void char float double long short unsigned const static struct class public private protected virtual override template typename return if else for while do switch case break continue new delete nullptr true false cout cin endl vector string map unordered_map set auto this',
+        [
+          ['main', '#include <iostream>\nusing namespace std;\n\nint main() {\n    $0\n    return 0;\n}'],
+          ['class', 'class Name {\npublic:\n    Name() {\n        $0\n    }\n};'],
+          ['for', 'for (int i = 0; i < n; i++) {\n    $0\n}'],
+          ['foreach', 'for (const auto &item : items) {\n    $0\n}'],
+          ['vector', 'vector<int> values = {1, 2, 3};']
+        ]
+      ),
+      csharp: mk(
+        'using namespace class public private protected internal static readonly void int string bool double float decimal long var new return if else for foreach while do switch case break continue try catch finally throw Console.WriteLine List Dictionary Task async await null true false this base get set',
+        [
+          ['main', 'using System;\n\nclass Program {\n    static void Main() {\n        $0\n    }\n}'],
+          ['foreach', 'foreach (var item in items) {\n    $0\n}'],
+          ['class', 'public class Name {\n    public string Value { get; set; }\n\n    public Name() {\n        $0\n    }\n}'],
+          ['try', 'try {\n    $0\n} catch (Exception error) {\n    Console.WriteLine(error.Message);\n}']
+        ]
+      ),
+      php: mk(
+        'echo print function class public private protected static return if else elseif foreach for while do switch case break continue try catch finally throw new array isset empty null true false this namespace use require include strlen count json_encode json_decode htmlspecialchars preg_match explode implode',
+        [
+          ['php', '<?php\n$0'],
+          ['fn', 'function name($args) {\n    $0\n}'],
+          ['class', 'class Name {\n    public function __construct() {\n        $0\n    }\n}'],
+          ['foreach', 'foreach ($items as $item) {\n    $0\n}'],
+          ['try', 'try {\n    $0\n} catch (Exception $error) {\n    echo $error->getMessage();\n}']
+        ]
+      ),
+      ruby: mk(
+        'def end class module if elsif else unless while until for in do return yield begin rescue ensure raise require require_relative attr_accessor attr_reader attr_writer puts print gets nil true false self new each map select reject reduce lambda proc',
+        [
+          ['def', 'def name(args)\n  $0\nend'],
+          ['class', 'class Name\n  def initialize\n    $0\n  end\nend'],
+          ['each', 'items.each do |item|\n  $0\nend'],
+          ['if', 'if condition\n  $0\nend'],
+          ['begin', 'begin\n  $0\nrescue StandardError => error\n  puts error.message\nend']
+        ]
+      ),
+      go: mk(
+        'package import func return if else for range switch case default break continue var const type struct interface map chan go defer select nil true false string int int64 float64 bool error fmt.Println fmt.Printf make len cap append new delete',
+        [
+          ['main', 'package main\n\nimport "fmt"\n\nfunc main() {\n\t$0\n}'],
+          ['func', 'func name() {\n\t$0\n}'],
+          ['for', 'for i := 0; i < n; i++ {\n\t$0\n}'],
+          ['range', 'for index, value := range items {\n\t$0\n}'],
+          ['struct', 'type Name struct {\n\tField string\n}'],
+          ['err', 'if err != nil {\n\treturn err\n}']
+        ]
+      ),
+      rust: mk(
+        'fn let mut const static struct enum impl trait for while loop if else match return use mod pub crate self super Some None Ok Err Result Option Vec String println format async await move ref where unsafe true false i32 u32 i64 u64 f32 f64 bool',
+        [
+          ['main', 'fn main() {\n    $0\n}'],
+          ['fn', 'fn name() {\n    $0\n}'],
+          ['struct', 'struct Name {\n    value: String,\n}'],
+          ['match', 'match value {\n    Some(value) => $0,\n    None => {}\n}'],
+          ['result', 'fn name() -> Result<(), Box<dyn std::error::Error>> {\n    $0\n    Ok(())\n}'],
+          ['println', 'println!("$0");']
+        ]
+      ),
+      swift: mk(
+        'import func let var class struct enum protocol extension if else guard switch case default for in while repeat return break continue throw throws do try catch defer self super nil true false String Int Double Bool Array Dictionary print',
+        [
+          ['func', 'func name() {\n    $0\n}'],
+          ['struct', 'struct Name {\n    let value: String\n}'],
+          ['guard', 'guard let value = value else {\n    return\n}'],
+          ['if', 'if condition {\n    $0\n}'],
+          ['do', 'do {\n    $0\n} catch {\n    print(error)\n}'],
+          ['class', 'class Name {\n    init() {\n        $0\n    }\n}']
+        ]
+      ),
+      kotlin: mk(
+        'fun val var class object interface data enum sealed if else when for in while do return break continue try catch finally throw import package private public protected internal override open abstract companion this super null true false println listOf mutableListOf mapOf setOf',
+        [
+          ['main', 'fun main() {\n    $0\n}'],
+          ['fun', 'fun name(): String {\n    return $0\n}'],
+          ['data', 'data class Name(val value: String)'],
+          ['when', 'when (value) {\n    1 -> $0\n    else -> {}\n}'],
+          ['class', 'class Name {\n    fun value() {\n        $0\n    }\n}']
+        ]
+      ),
+      sql: mk(
+        'SELECT FROM WHERE INSERT INTO VALUES UPDATE SET DELETE CREATE TABLE ALTER DROP JOIN LEFT RIGHT INNER OUTER ON GROUP BY ORDER HAVING LIMIT OFFSET DISTINCT AS AND OR NOT NULL IS IN BETWEEN LIKE COUNT SUM AVG MIN MAX PRIMARY KEY FOREIGN REFERENCES INDEX VIEW UNION ALL CASE WHEN THEN ELSE END ASC DESC',
+        [
+          ['select', 'SELECT * FROM table_name;'],
+          ['where', 'SELECT column FROM table WHERE condition = $0;'],
+          ['insert', 'INSERT INTO table_name (column) VALUES (value);'],
+          ['create', 'CREATE TABLE name (\n  id INTEGER PRIMARY KEY,\n  $0\n);'],
+          ['update', 'UPDATE table_name SET column = value WHERE condition;'],
+          ['join', 'SELECT a.*, b.*\nFROM table_a a\nJOIN table_b b ON a.id = b.a_id;']
+        ]
+      ),
+      markdown: mk(
+        'heading bold italic link image code quote list table todo',
+        [
+          ['h1', '# عنوان'],
+          ['h2', '## عنوان'],
+          ['h3', '### عنوان'],
+          ['bold', '**نص عريض**'],
+          ['italic', '*نص مائل*'],
+          ['link', '[نص](https://)'],
+          ['image', '![وصف](image.png)'],
+          ['code', '```\n$0\n```'],
+          ['list', '- عنصر\n- عنصر\n- $0'],
+          ['ordered', '1. عنصر\n2. عنصر\n3. $0'],
+          ['quote', '> اقتباس'],
+          ['table', '| عمود | عمود |\n| --- | --- |\n| $0 | |'],
+          ['todo', '- [ ] مهمة\n- [x] مهمة مكتملة']
+        ]
+      ),
+      json: mk('true false null',
+        [
+          ['object', '{\n  "$0": ""\n}'],
+          ['array', '[\n  $0\n]'],
+          ['key', '"key": "$0"']
+        ]
+      ),
+      yaml: mk('true false null yes no on off',
+        [
+          ['key', 'key: $0'],
+          ['list', '- item\n- $0'],
+          ['object', 'name:\n  $0']
+        ]
+      ),
+      shell: mk(
+        'echo cd ls pwd mkdir rmdir rm cp mv cat grep sed awk find chmod chown export source if then else elif fi for do done while until case esac function return exit sudo apt brew curl wget git npm npx pip docker ps kill',
+        [
+          ['bash', '#!/bin/bash\n\n$0'],
+          ['if', 'if [ condition ]; then\n  $0\nfi'],
+          ['for', 'for item in list; do\n  $0\ndone'],
+          ['echo', 'echo "$0"'],
+          ['function', 'function name() {\n  $0\n}']
+        ]
+      ),
+      lua: mk(
+        'function end local if then else elseif for in do while repeat until return break table print pairs ipairs nil true false require',
+        [
+          ['fn', 'function name(args)\n  $0\nend'],
+          ['if', 'if condition then\n  $0\nend'],
+          ['for', 'for i = 1, 10 do\n  $0\nend'],
+          ['table', 'local value = {\n  $0\n}']
+        ]
+      ),
+      dart: mk(
+        'import class void main final const var String int double bool List Map if else for in while switch case return break continue try catch finally throw async await Future print',
+        [
+          ['main', 'void main() {\n  $0\n}'],
+          ['class', 'class Name {\n  final String value;\n\n  Name(this.value);\n}'],
+          ['for', 'for (var item in items) {\n  $0\n}']
+        ]
+      ),
+      r: mk(
+        'function if else for while repeat break next return TRUE FALSE NULL NA library require print cat list data.frame matrix vector mean median sum sd ggplot',
+        [
+          ['fn', 'name <- function(args) {\n  $0\n}'],
+          ['for', 'for (item in items) {\n  $0\n}'],
+          ['if', 'if (condition) {\n  $0\n}']
+        ]
+      ),
+      scala: mk(
+        'object def val var class trait case match if else for while return import package extends with new this super null true false println List Map Seq Option Some None Future',
+        [
+          ['object', 'object Main extends App {\n  $0\n}'],
+          ['def', 'def name(args: String): Unit = {\n  $0\n}'],
+          ['case', 'value match {\n  case _ => $0\n}']
+        ]
+      ),
+      perl: mk(
+        'use strict warnings my our sub return if elsif else unless while for foreach last next redo print say chomp split join push pop shift unshift keys values die eval',
+        [
+          ['sub', 'sub name {\n  $0\n}'],
+          ['foreach', 'foreach my $item (@items) {\n  $0\n}'],
+          ['print', 'print "$0\\n";']
+        ]
+      ),
+      haskell: mk(
+        'module where import qualified data type newtype class instance deriving let in if then else case of do return main putStrLn print map filter foldr foldl Just Nothing Maybe Either Integer Int String Bool True False',
+        [
+          ['main', 'main :: IO ()\nmain = do\n  $0'],
+          ['fn', 'name :: Int -> Int\nname value = $0'],
+          ['data', 'data Name = Name\n  { field :: String\n  }']
+        ]
+      ),
+      elixir: mk(
+        'defmodule def defp do end if else unless case cond for Enum map reduce filter import alias use require nil true false module fn when IO.puts',
+        [
+          ['module', 'defmodule Name do\n  $0\nend'],
+          ['fn', 'def name(args) do\n  $0\nend'],
+          ['case', 'case value do\n  _ -> $0\nend']
+        ]
+      ),
+      docker: mk(
+        'FROM RUN CMD COPY ADD ENV WORKDIR EXPOSE ENTRYPOINT VOLUME USER ARG LABEL HEALTHCHECK SHELL',
+        [
+          ['node', 'FROM node:20-alpine\nWORKDIR /app\nCOPY . .\nRUN npm install\nCMD ["node", "index.js"]'],
+          ['python', 'FROM python:3.12-slim\nWORKDIR /app\nCOPY . .\nCMD ["python", "main.py"]'],
+          ['from', 'FROM alpine:latest\n$0']
+        ]
+      ),
+      powershell: mk(
+        'Write-Host Write-Output Get-ChildItem Set-Location if else elseif foreach for while function param return try catch finally throw',
+        [
+          ['function', 'function Name {\n  param($Value)\n  $0\n}'],
+          ['foreach', 'foreach ($item in $items) {\n  $0\n}']
+        ]
+      ),
+      generic: mk(
+        'function return if else for while class const let var true false null none print import export public private static void int float double string',
+        [
+          ['print', 'print($0)'],
+          ['if', 'if (condition) {\n  $0\n}'],
+          ['for', 'for (item in items) {\n  $0\n}']
+        ]
+      )
+    };
+
+    const EXT_LANG = {
+      js: 'javascript', mjs: 'javascript', cjs: 'javascript', jsx: 'javascript',
+      ts: 'typescript', tsx: 'typescript',
+      html: 'html', htm: 'html', xhtml: 'html', vue: 'html', svelte: 'html',
+      css: 'css', scss: 'css', sass: 'css', less: 'css',
+      py: 'python', pyw: 'python',
+      java: 'java',
+      c: 'c', h: 'c',
+      cpp: 'cpp', cc: 'cpp', cxx: 'cpp', hpp: 'cpp',
+      cs: 'csharp',
+      php: 'php',
+      rb: 'ruby',
+      go: 'go',
+      rs: 'rust',
+      swift: 'swift',
+      kt: 'kotlin', kts: 'kotlin',
+      sql: 'sql',
+      md: 'markdown', markdown: 'markdown',
+      json: 'json',
+      yaml: 'yaml', yml: 'yaml',
+      sh: 'shell', bash: 'shell', zsh: 'shell',
+      lua: 'lua',
+      dart: 'dart',
+      r: 'r',
+      scala: 'scala',
+      pl: 'perl',
+      hs: 'haskell',
+      ex: 'elixir', exs: 'elixir',
+      ps1: 'powershell',
+      dockerfile: 'docker'
+    };
+
+    const PISTON_EXT = {
+      js: 'javascript', mjs: 'javascript', cjs: 'javascript',
+      c: 'c', h: 'c',
+      cpp: 'c++', cc: 'c++', cxx: 'c++', hpp: 'c++',
+      java: 'java',
+      go: 'go',
+      rs: 'rust',
+      php: 'php',
+      rb: 'ruby',
+      swift: 'swift',
+      kt: 'kotlin', kts: 'kotlin',
+      cs: 'csharp',
+      sh: 'bash', bash: 'bash', zsh: 'bash',
+      lua: 'lua',
+      pl: 'perl',
+      r: 'rscript',
+      dart: 'dart',
+      ex: 'elixir', exs: 'elixir',
+      hs: 'haskell',
+      scala: 'scala',
+      fs: 'fsharp.net',
+      jl: 'julia',
+      nim: 'nim',
+      sql: 'sqlite3',
+      pas: 'pascal',
+      groovy: 'groovy',
+      cob: 'cobol', cbl: 'cobol',
+      ps1: 'powershell',
+      ts: 'typescript',
+      clj: 'clojure',
+      erl: 'erlang',
+      ml: 'ocaml',
+      zig: 'zig',
+      v: 'vlang',
+      d: 'd',
+      f: 'fortran', f90: 'fortran',
+      lisp: 'lisp',
+      tcl: 'tcl'
+    };
+
+    /* ============================================================
+       Utilities
+       ============================================================ */
+    const $ = function (selector, root) { return (root || document).querySelector(selector); };
+    const $$ = function (selector, root) { return Array.prototype.slice.call((root || document).querySelectorAll(selector)); };
+
+    function extOf(path) {
+      const base = String(path || '').split('/').pop();
+      const dot = base.lastIndexOf('.');
+      return dot > 0 ? base.slice(dot + 1).toLowerCase() : '';
+    }
+    function baseName(path) { return String(path || '').split('/').pop(); }
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, function (ch) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch];
+      });
+    }
+    function normalizePath(input) {
+      let path = String(input || '').trim().replace(/\\/g, '/');
+      path = path.replace(/^\.?\//, '').replace(/\/+/g, '/').replace(/\/+$/, '');
+      if (!path) return null;
+      const parts = path.split('/');
+      if (parts.some(function (part) {
+        return !part || part === '.' || part === '..' || ['__proto__', 'prototype', 'constructor'].indexOf(part.toLowerCase()) !== -1;
+      })) return null;
+      return path;
+    }
+    function isMobile() { return window.matchMedia('(max-width: 900px)').matches; }
+    function formatBytes(bytes) {
+      if (!bytes) return '0 B';
+      const units = ['B', 'KB', 'MB', 'GB'];
+      let index = 0;
+      let value = bytes;
+      while (value >= 1024 && index < units.length - 1) { value /= 1024; index += 1; }
+      return (value >= 10 || index === 0 ? value.toFixed(0) : value.toFixed(1)) + ' ' + units[index];
+    }
+    function safeScript(code) { return String(code).replace(/<\/script/gi, '<\\/script'); }
+    function uniquePath(path) {
+      if (state.files[path] === undefined && state.folders.indexOf(path) === -1) return path;
+      const dot = path.lastIndexOf('.');
+      const slash = path.lastIndexOf('/');
+      const hasExt = dot > slash;
+      const base = hasExt ? path.slice(0, dot) : path;
+      const ext = hasExt ? path.slice(dot) : '';
+      let index = 1;
+      let candidate = path;
+      do {
+        candidate = base + '-' + index + ext;
+        index += 1;
+      } while (state.files[candidate] !== undefined || state.folders.indexOf(candidate) !== -1);
+      return candidate;
+    }
+    function deriveFolders(files) {
+      const set = new Set();
+      Object.keys(files).forEach(function (path) {
+        const parts = path.split('/');
+        parts.pop();
+        let acc = '';
+        parts.forEach(function (segment) {
+          acc = acc ? acc + '/' + segment : segment;
+          set.add(acc);
+        });
+      });
+      return Array.from(set);
+    }
+    function ensureParents(path) {
+      const parts = path.split('/');
+      parts.pop();
+      let acc = '';
+      parts.forEach(function (segment) {
+        acc = acc ? acc + '/' + segment : segment;
+        if (state.folders.indexOf(acc) === -1) state.folders.push(acc);
+        if (state.expanded.indexOf(acc) === -1) state.expanded.push(acc);
+      });
+    }
+    function isFolderPath(path) {
+      if (state.folders.indexOf(path) !== -1) return true;
+      const prefix = path + '/';
+      return Object.keys(state.files).some(function (file) { return file.indexOf(prefix) === 0; });
+    }
+    function langLabel(path) {
+      const ext = extOf(path);
+      const name = baseName(path).toLowerCase();
+      if (name === 'dockerfile') return 'Dockerfile';
+      if (!ext) return 'Text';
+      if (window.CodeMirror) {
+        if (ext === 'tsx') return 'TypeScript JSX';
+        const info = CodeMirror.findModeByExtension(ext);
+        if (info && info.name) return info.name;
+      }
+      return ext.toUpperCase();
+    }
+    function dataLangForPath(path) {
+      if (!path) return 'generic';
+      if (baseName(path).toLowerCase() === 'dockerfile') return 'docker';
+      return EXT_LANG[extOf(path)] || 'generic';
+    }
+    function isPreviewable(path) {
+      const ext = extOf(path);
+      return ['html', 'htm', 'css', 'scss', 'less', 'js', 'mjs', 'cjs', 'md', 'markdown', 'svg'].indexOf(ext) !== -1;
+    }
+    function fileIcon(path) {
+      const ext = extOf(path);
+      const name = baseName(path).toLowerCase();
+      if (name === 'dockerfile') return ['fa-brands fa-docker', '#2496ed'];
+      if (name === 'makefile') return ['fa-solid fa-screwdriver-wrench', '#f59e0b'];
+      const map = {
+        html: ['fa-brands fa-html5', '#e34c26'],
+        htm: ['fa-brands fa-html5', '#e34c26'],
+        css: ['fa-brands fa-css3-alt', '#2965f1'],
+        scss: ['fa-brands fa-sass', '#cf649a'],
+        less: ['fa-brands fa-less', '#1d365d'],
+        js: ['fa-brands fa-js', '#f7df1e'],
+        mjs: ['fa-brands fa-js', '#f7df1e'],
+        cjs: ['fa-brands fa-js', '#f7df1e'],
+        jsx: ['fa-brands fa-react', '#61dafb'],
+        tsx: ['fa-brands fa-react', '#61dafb'],
+        ts: ['fa-solid fa-code', '#3178c6'],
+        py: ['fa-brands fa-python', '#3776ab'],
+        json: ['fa-solid fa-code', '#f59e0b'],
+        md: ['fa-brands fa-markdown', '#94a3b8'],
+        markdown: ['fa-brands fa-markdown', '#94a3b8'],
+        java: ['fa-brands fa-java', '#f89820'],
+        php: ['fa-brands fa-php', '#777bb4'],
+        rb: ['fa-solid fa-gem', '#cc342d'],
+        go: ['fa-solid fa-code', '#00add8'],
+        rs: ['fa-solid fa-gear', '#dea584'],
+        swift: ['fa-brands fa-swift', '#fa7343'],
+        kt: ['fa-solid fa-code', '#7f52ff'],
+        cs: ['fa-solid fa-code', '#68217a'],
+        c: ['fa-solid fa-code', '#a8b9cc'],
+        h: ['fa-solid fa-code', '#a8b9cc'],
+        cpp: ['fa-solid fa-code', '#00599c'],
+        cc: ['fa-solid fa-code', '#00599c'],
+        hpp: ['fa-solid fa-code', '#00599c'],
+        sql: ['fa-solid fa-database', '#e38c00'],
+        sh: ['fa-solid fa-terminal', '#4eaa25'],
+        bash: ['fa-solid fa-terminal', '#4eaa25'],
+        zsh: ['fa-solid fa-terminal', '#4eaa25'],
+        lua: ['fa-solid fa-moon', '#2c2d72'],
+        dart: ['fa-solid fa-code', '#0175c2'],
+        r: ['fa-brands fa-r-project', '#276dc3'],
+        yml: ['fa-solid fa-code', '#cb171e'],
+        yaml: ['fa-solid fa-code', '#cb171e'],
+        png: ['fa-regular fa-image', '#38bdf8'],
+        jpg: ['fa-regular fa-image', '#38bdf8'],
+        jpeg: ['fa-regular fa-image', '#38bdf8'],
+        gif: ['fa-regular fa-image', '#38bdf8'],
+        svg: ['fa-regular fa-image', '#f97316'],
+        zip: ['fa-solid fa-file-zipper', '#facc15']
+      };
+      return map[ext] || ['fa-solid fa-file-code', '#7c8aa5'];
+    }
+
+    let state = null;
+    let editor = null;
+    let contextTarget = null;
+    let promptResolver = null;
+    let hintTimer = null;
+    let persistTimer = null;
+    let liveTimer = null;
+    let paletteItems = [];
+    let paletteIndex = 0;
+    let problems = [];
+    let pyodide = null;
+    let pyodideLoading = null;
+    let pyodideReady = false;
+    let markedLoading = null;
+    let sharedLoaded = false;
+    const loadingModes = new Set();
+    const modeCallbacks = {};
+
+    /* ============================================================
+       Persistence
+       ============================================================ */
+    function loadState() {
+      const base = {
+        files: Object.assign({}, DEFAULT_FILES),
+        folders: ['styles', 'scripts', 'python'],
+        openTabs: ['index.html', 'styles/style.css', 'scripts/app.js', 'python/main.py'],
+        active: 'index.html',
+        expanded: ['styles', 'scripts', 'python'],
+        settings: Object.assign({}, DEFAULT_SETTINGS),
+        cursors: {},
+        dirty: new Set()
+      };
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return base;
+        const data = JSON.parse(raw);
+        if (!data || typeof data !== 'object') return base;
+        const files = data.files && typeof data.files === 'object' && !Array.isArray(data.files) ? data.files : base.files;
+        const openTabs = Array.isArray(data.openTabs) ? data.openTabs.filter(function (path) { return files[path] !== undefined; }) : base.openTabs;
+        let active = data.active && files[data.active] !== undefined ? data.active : null;
+        if (!active && openTabs.length) active = openTabs[0];
+        if (!active && Object.keys(files).length) active = Object.keys(files)[0];
+        const storedFolders = Array.isArray(data.folders)
+          ? data.folders.filter(function (folder) { return typeof folder === 'string' && !!normalizePath(folder); })
+          : [];
+        const folders = Array.from(new Set(storedFolders.concat(deriveFolders(files))));
+        return {
+          files: files,
+          folders: folders.length ? folders : base.folders,
+          openTabs: openTabs,
+          active: active,
+          expanded: Array.isArray(data.expanded) ? data.expanded : base.expanded,
+          settings: Object.assign({}, DEFAULT_SETTINGS, data.settings || {}),
+          cursors: data.cursors && typeof data.cursors === 'object' ? data.cursors : {},
+          dirty: new Set()
+        };
+      } catch (error) {
+        return base;
+      }
+    }
+
+    function serializeProject(includeSettings) {
+      const payload = {
+        app: 'CodeX Arena PRO',
+        version: 3,
+        files: state.files,
+        folders: state.folders
+      };
+      if (includeSettings !== false) {
+        const settings = Object.assign({}, state.settings);
+        delete settings.pistonKey;
+        payload.settings = settings;
+      }
+      return payload;
+    }
+
+    function persist(showToast) {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({
+          files: state.files,
+          folders: state.folders,
+          openTabs: state.openTabs,
+          active: state.active,
+          expanded: state.expanded,
+          settings: state.settings,
+          cursors: state.cursors
+        }));
+        state.dirty.clear();
+        updateStatus();
+        renderTabs();
+        if (showToast) toast('تم حفظ المشروع محلياً', 'ok');
+      } catch (error) {
+        toast('تعذر الحفظ: ' + error.message, 'error');
+      }
+    }
+
+    function schedulePersist() {
+      clearTimeout(persistTimer);
+      if (!state.settings.autoSave) return;
+      persistTimer = setTimeout(function () { persist(false); }, 900);
+    }
+
+    /* ============================================================
+       CodeMirror setup & language modes
+       ============================================================ */
+    function modeInfoFor(path) {
+      const name = baseName(path).toLowerCase();
+      const ext = extOf(path);
+      if (name === 'dockerfile') return { name: 'Dockerfile', mode: 'dockerfile', mime: 'text/x-dockerfile' };
+      if (name === '.env' || ext === 'env') return { name: 'Shell', mode: 'shell', mime: 'text/x-sh' };
+      if (name === 'makefile') return { name: 'Text', mode: 'null', mime: 'text/plain' };
+      if (!window.CodeMirror) return null;
+      let info = CodeMirror.findModeByExtension(ext);
+      if (!info) info = CodeMirror.findModeByFileName(baseName(path));
+      return info || null;
+    }
+
+    function ensureMode(modeName, callback) {
+      if (!modeName || modeName === 'null') { if (callback) callback(); return; }
+      if (CodeMirror.modes[modeName]) { if (callback) callback(); return; }
+      if (!modeCallbacks[modeName]) modeCallbacks[modeName] = [];
+      if (callback) modeCallbacks[modeName].push(callback);
+      if (loadingModes.has(modeName)) return;
+      loadingModes.add(modeName);
+      const script = document.createElement('script');
+      script.src = 'https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/' + modeName + '/' + modeName + '.min.js';
+      script.onload = function () {
+        loadingModes.delete(modeName);
+        const callbacks = modeCallbacks[modeName] || [];
+        delete modeCallbacks[modeName];
+        callbacks.forEach(function (fn) { try { fn(); } catch (error) {} });
+      };
+      script.onerror = function () {
+        loadingModes.delete(modeName);
+        delete modeCallbacks[modeName];
+        toast('تعذر تحميل دعم اللغة: ' + modeName, 'error');
+      };
+      document.head.appendChild(script);
+    }
+
+    function applyMode(path) {
+      if (!editor) return;
+      const info = modeInfoFor(path);
+      if (!info || info.mode === 'null') { editor.setOption('mode', 'null'); return; }
+      const mime = info.mime || (info.mimes && info.mimes[0]) || info.mode;
+      if (CodeMirror.modes[info.mode]) {
+        editor.setOption('mode', mime);
+        return;
+      }
+      editor.setOption('mode', 'null');
+      ensureMode(info.mode, function () {
+        if (state.active === path) editor.setOption('mode', mime);
+      });
+    }
+
+    function collectDocWords() {
+      if (!editor) return [];
+      const text = editor.getValue().slice(0, 120000);
+      const seen = new Set();
+      const regex = /[A-Za-z_$][\w$]{2,}/g;
+      let match;
+      while ((match = regex.exec(text)) && seen.size < 250) seen.add(match[0]);
+      return Array.from(seen);
+    }
+
+    function makeSnippetHint(text) {
+      const marker = text.indexOf('$0');
+      const clean = text.replace(/\$0/g, '');
+      return function (cm, data) {
+        cm.replaceRange(clean, data.from, data.to);
+        if (marker >= 0) {
+          const base = cm.indexFromPos(data.from);
+          cm.setCursor(cm.posFromIndex(base + marker));
+        }
+      };
+    }
+
+    function codexHint(cm) {
+      const cursor = cm.getCursor();
+      const line = cm.getLine(cursor.line);
+      const before = line.slice(0, cursor.ch);
+      const lang = dataLangForPath(state.active);
+      const markup = ['html', 'xml', 'vue', 'svelte'].indexOf(lang) !== -1;
+      const wordMatch = /[A-Za-z_$][\w$.-]*$/.exec(before);
+      let word = wordMatch ? wordMatch[0] : '';
+      let start = cursor.ch - word.length;
+      let prefix = '';
+
+      if (markup) {
+        const beforeWord = before.slice(0, start);
+        if (/<\/$/.test(beforeWord)) { prefix = '</'; start -= 2; }
+        else if (/<$/.test(beforeWord)) { prefix = '<'; start -= 1; }
+      }
+      if (!word && !prefix) return null;
+
+      const token = cm.getTokenAt(cursor, true);
+      if (token && token.type && /comment/.test(token.type)) return null;
+
+      const data = LANG_DATA[lang] || LANG_DATA.generic;
+      const from = CodeMirror.Pos(cursor.line, Math.max(0, start));
+      const to = cursor;
+      const items = [];
+      const seen = new Set();
+
+      function transform(raw) {
+        if (!prefix) return raw;
+        if (prefix === '</') return '</' + raw.replace(/^</, '').replace(/>$/, '') + '>';
+        return raw.charAt(0) === '<' ? raw : '<' + raw;
+      }
+
+      function add(raw, label, type, rank) {
+        if (prefix && type !== 'keyword') return;
+        const key = String(label).toLowerCase();
+        if (seen.has(key)) return;
+        if (word) {
+          const needle = word.toLowerCase();
+          if (key.indexOf(needle) !== 0 && String(raw).toLowerCase().indexOf(needle) !== 0 && key.indexOf(needle) === -1) return;
+        }
+        const text = transform(raw);
+        seen.add(key);
+        items.push({
+          text: text,
+          displayText: label,
+          className: 'cm-hint-' + type,
+          rank: rank,
+          hint: text.indexOf('$0') !== -1 ? makeSnippetHint(text) : undefined
+        });
+      }
+
+      data.keywords.forEach(function (keyword) { add(keyword, keyword, 'keyword', 0); });
+      if (!prefix) {
+        (data.snippets || []).forEach(function (snippet) { add(snippet[1], snippet[0], 'snippet', 1); });
+        if (word) {
+          collectDocWords().forEach(function (documentWord) {
+            if (documentWord.toLowerCase() !== word.toLowerCase()) add(documentWord, documentWord, 'word', 2);
+          });
+        }
+      }
+
+      if (!items.length) return null;
+      items.sort(function (a, b) { return a.rank - b.rank || a.displayText.length - b.displayText.length; });
+      return { list: items.slice(0, 80), from: from, to: to };
+    }
+
+    function initEditor() {
+      editor = CodeMirror.fromTextArea($('#code-editor'), {
+        lineNumbers: true,
+        mode: 'htmlmixed',
+        theme: state.settings.theme === 'light' ? 'eclipse' : 'material-darker',
+        tabSize: state.settings.tabSize,
+        indentUnit: state.settings.tabSize,
+        indentWithTabs: false,
+        lineWrapping: state.settings.wordWrap,
+        autoCloseBrackets: true,
+        autoCloseTags: true,
+        matchBrackets: true,
+        styleActiveLine: true,
+        foldGutter: true,
+        gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
+        placeholder: 'اختر ملفاً أو أنشئ ملفاً جديداً للبدء…',
+        hintOptions: { hint: codexHint, completeSingle: false, alignWithWord: true },
+        extraKeys: {
+          'Ctrl-Space': 'autocomplete',
+          'Alt-/': 'autocomplete',
+          'Ctrl-S': function () { persist(true); },
+          'Cmd-S': function () { persist(true); },
+          'Ctrl-Enter': function () { runProject(); },
+          'Cmd-Enter': function () { runProject(); },
+          'Shift-Alt-F': function () { formatCode(); },
+          'Ctrl-/': 'toggleComment',
+          'Cmd-/': 'toggleComment',
+          'Ctrl-F': 'find',
+          'Cmd-F': 'find',
+          'Ctrl-H': 'replace',
+          'Shift-Ctrl-F': 'replace',
+          'Ctrl-G': 'jumpToLine',
+          'Esc': function () { closeAllModals(); hideContextMenu(); }
+        }
+      });
+
+      editor.on('change', function (cm, change) {
+        if (change.origin === 'setValue') return;
+        if (!state.active) return;
+        state.files[state.active] = cm.getValue();
+        state.dirty.add(state.active);
+        renderTabs();
+        updateStatus();
+        schedulePersist();
+        if (state.settings.livePreview && isPreviewable(state.active)) {
+          clearTimeout(liveTimer);
+          liveTimer = setTimeout(function () { previewCurrent(true); }, 650);
+        }
+      });
+
+      editor.on('cursorActivity', function (cm) {
+        updateStatus();
+        if (state.active) {
+          const cursor = cm.getCursor();
+          state.cursors[state.active] = { line: cursor.line, ch: cursor.ch };
+        }
+      });
+
+      editor.on('inputRead', function (cm, change) {
+        if (change.origin !== '+input') return;
+        const text = change.text.join('\n');
+        const last = text.slice(-1);
+        if (!/[A-Za-z0-9_$.\-<\/]/.test(last)) return;
+        const cursor = cm.getCursor();
+        const token = cm.getTokenAt(cursor, true);
+        if (token && token.type && /comment/.test(token.type)) return;
+        clearTimeout(hintTimer);
+        hintTimer = setTimeout(function () {
+          if (!cm.state.completionActive) cm.showHint({ hint: codexHint, completeSingle: false, alignWithWord: true });
+        }, 110);
+      });
+
+      editor.setSize('100%', '100%');
+    }
+
+    /* ============================================================
+       Rendering
+       ============================================================ */
+    function createTreeRow(options) {
+      const row = document.createElement('div');
+      row.className = 'tree-row' + (options.active ? ' active' : '') + (options.expanded ? ' expanded' : '');
+      row.style.paddingInlineStart = (8 + options.depth * 14) + 'px';
+      row.title = options.path;
+      row.setAttribute('data-path', options.path);
+      row.setAttribute('data-type', options.type);
+
+      const chevron = document.createElement(options.type === 'folder' ? 'i' : 'span');
+      chevron.className = options.type === 'folder' ? 'fa-solid fa-chevron-down chevron' : 'chevron';
+      row.appendChild(chevron);
+
+      const icon = document.createElement('i');
+      if (options.type === 'folder') {
+        icon.className = 'fa-solid ' + (options.expanded ? 'fa-folder-open' : 'fa-folder') + ' file-icon';
+        icon.style.color = 'var(--blue)';
+      } else {
+        const info = fileIcon(options.path);
+        icon.className = info[0] + ' file-icon';
+        icon.style.color = info[1];
+      }
+      row.appendChild(icon);
+
+      const name = document.createElement('span');
+      name.className = 'name';
+      name.textContent = options.name;
+      row.appendChild(name);
+
+      row.addEventListener('click', function () {
+        if (options.type === 'folder') toggleFolder(options.path);
+        else openFile(options.path);
+      });
+      row.addEventListener('contextmenu', function (event) {
+        event.preventDefault();
+        showContextMenu(event.clientX, event.clientY, options.path, options.type);
+      });
+      return row;
+    }
+
+    function buildTreeModel() {
+      const root = { name: '', path: '', type: 'folder', children: new Map() };
+      function insert(path, type) {
+        const parts = path.split('/');
+        let node = root;
+        let acc = '';
+        parts.forEach(function (part, index) {
+          acc = acc ? acc + '/' + part : part;
+          if (!node.children.has(part)) {
+            node.children.set(part, { name: part, path: acc, type: 'folder', children: new Map() });
+          }
+          node = node.children.get(part);
+          if (index === parts.length - 1 && type === 'file') node.type = 'file';
+        });
+      }
+      state.folders.forEach(function (folder) { insert(folder, 'folder'); });
+      Object.keys(state.files).forEach(function (file) { insert(file, 'file'); });
+      return root;
+    }
+
+    function renderTree(filter) {
+      const container = $('#file-tree');
+      if (!container) return;
+      const query = String(filter || '').trim().toLowerCase();
+      container.innerHTML = '';
+
+      if (query) {
+        const matches = Object.keys(state.files).filter(function (path) {
+          return path.toLowerCase().indexOf(query) !== -1;
+        }).sort();
+        if (!matches.length) {
+          container.innerHTML = '<div class="tree-empty">لا توجد ملفات مطابقة.<br>جرّب اسماً آخر أو أنشئ ملفاً جديداً.</div>';
+          return;
+        }
+        matches.forEach(function (path) {
+          container.appendChild(createTreeRow({ name: path, path: path, type: 'file', depth: 0, active: path === state.active }));
+        });
+        return;
+      }
+
+      const root = buildTreeModel();
+      if (!root.children.size) {
+        container.innerHTML = '<div class="tree-empty">المشروع فارغ.<br>ابدأ بإنشاء ملف جديد.</div>';
+        return;
+      }
+
+      function walk(node, depth) {
+        const children = Array.from(node.children.values()).sort(function (a, b) {
+          if (a.type !== b.type) return a.type === 'folder' ? -1 : 1;
+          return a.name.localeCompare(b.name);
+        });
+        children.forEach(function (child) {
+          const isFolder = child.type === 'folder' || child.children.size > 0;
+          if (isFolder) {
+            const open = state.expanded.indexOf(child.path) !== -1;
+            container.appendChild(createTreeRow({ name: child.name, path: child.path, type: 'folder', depth: depth, expanded: open }));
+            if (open && child.children.size) walk(child, depth + 1);
+            if (child.type === 'file') {
+              container.appendChild(createTreeRow({ name: child.name, path: child.path, type: 'file', depth: depth + 1, active: child.path === state.active }));
+            }
+          } else {
+            container.appendChild(createTreeRow({ name: child.name, path: child.path, type: 'file', depth: depth, active: child.path === state.active }));
+          }
+        });
+      }
+      walk(root, 0);
+    }
+
+    function renderTabs() {
+      const container = $('#workspace-tabs');
+      if (!container) return;
+      container.innerHTML = '';
+      state.openTabs = state.openTabs.filter(function (path) { return state.files[path] !== undefined; });
+
+      state.openTabs.forEach(function (path) {
+        const tab = document.createElement('div');
+        tab.className = 'tab' + (path === state.active ? ' active' : '') + (state.dirty.has(path) ? ' dirty' : '');
+        tab.title = path;
+
+        const info = fileIcon(path);
+        const icon = document.createElement('i');
+        icon.className = info[0];
+        icon.style.color = info[1];
+        tab.appendChild(icon);
+
+        const name = document.createElement('span');
+        name.className = 'tab-name';
+        name.textContent = baseName(path);
+        tab.appendChild(name);
+
+        const close = document.createElement('button');
+        close.className = 'tab-close';
+        close.type = 'button';
+        close.title = 'إغلاق';
+        close.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+        close.addEventListener('click', function (event) {
+          event.stopPropagation();
+          closeTab(path);
+        });
+        tab.appendChild(close);
+
+        tab.addEventListener('click', function () { openFile(path); });
+        container.appendChild(tab);
+      });
+
+      const add = document.createElement('button');
+      add.className = 'tab-add';
+      add.type = 'button';
+      add.title = 'ملف جديد';
+      add.innerHTML = '<i class="fa-solid fa-plus"></i>';
+      add.addEventListener('click', function () { createFile(); });
+      container.appendChild(add);
+    }
+
+    function renderAll() {
+      renderTree($('#tree-search') ? $('#tree-search').value : '');
+      renderTabs();
+      updateStatus();
+      renderProblems();
+    }
+
+    function updateStatus() {
+      if (!state) return;
+      const dirty = state.dirty.size > 0;
+      const dot = $('#status-dot');
+      if (dot) dot.className = 'status-dot' + (dirty ? '' : ' saved');
+      const statusText = $('#status-text');
+      if (statusText) statusText.textContent = state.active ? (dirty ? 'تغييرات غير محفوظة…' : 'محفوظ محلياً') : 'لا يوجد ملف مفتوح';
+
+      if (state.active && editor) {
+        const cursor = editor.getCursor();
+        const langNode = $('#status-lang');
+        const posNode = $('#status-position');
+        const sizeNode = $('#status-size');
+        if (langNode) langNode.innerHTML = '<i class="fa-solid fa-code"></i> ' + langLabel(state.active);
+        if (posNode) posNode.innerHTML = '<i class="fa-solid fa-location-dot"></i> Ln ' + (cursor.line + 1) + ', Col ' + (cursor.ch + 1);
+        if (sizeNode) sizeNode.innerHTML = '<i class="fa-solid fa-ruler"></i> ' + editor.lineCount() + ' سطر · ' + editor.getValue().length.toLocaleString('en-US') + ' حرف';
+      } else {
+        if ($('#status-lang')) $('#status-lang').innerHTML = '<i class="fa-solid fa-code"></i> —';
+        if ($('#status-position')) $('#status-position').innerHTML = '<i class="fa-solid fa-location-dot"></i> Ln 1, Col 1';
+        if ($('#status-size')) $('#status-size').innerHTML = '<i class="fa-solid fa-ruler"></i> 0';
+      }
+
+      const footer = $('#footer-files');
+      if (footer) footer.textContent = Object.keys(state.files).length + ' ملف · ' + state.folders.length + ' مجلد';
+    }
+
+    function showEmpty(show) {
+      const empty = $('#empty-state');
+      if (empty) empty.classList.toggle('hidden', !show);
+    }
+
+    function saveCursorNow() {
+      if (editor && state.active) {
+        const cursor = editor.getCursor();
+        state.cursors[state.active] = { line: cursor.line, ch: cursor.ch };
+      }
+    }
+
+    function openFile(path, options) {
+      options = options || {};
+      if (state.files[path] === undefined) return;
+      if (state.active && state.active !== path) saveCursorNow();
+      state.active = path;
+      if (state.openTabs.indexOf(path) === -1) state.openTabs.push(path);
+
+      const cursor = state.cursors[path] || { line: 0, ch: 0 };
+      editor.setValue(state.files[path]);
+      editor.clearHistory();
+      editor.setCursor(cursor);
+      applyMode(path);
+      showEmpty(false);
+      renderTabs();
+      renderTree($('#tree-search') ? $('#tree-search').value : '');
+      updateStatus();
+      if (isMobile() && !options.keepMobileView) switchMobileView('editor');
+    }
+
+    function closeTab(path) {
+      const index = state.openTabs.indexOf(path);
+      if (index === -1) return;
+      state.openTabs.splice(index, 1);
+      if (state.active === path) {
+        state.active = state.openTabs[Math.min(index, state.openTabs.length - 1)] || null;
+        if (state.active) {
+          const cursor = state.cursors[state.active] || { line: 0, ch: 0 };
+          editor.setValue(state.files[state.active]);
+          editor.clearHistory();
+          editor.setCursor(cursor);
+          applyMode(state.active);
+          showEmpty(false);
+        } else {
+          editor.setValue('');
+          showEmpty(true);
+        }
+      }
+      renderTabs();
+      renderTree($('#tree-search') ? $('#tree-search').value : '');
+      updateStatus();
+    }
+
+    function toggleFolder(path) {
+      const index = state.expanded.indexOf(path);
+      if (index === -1) state.expanded.push(path);
+      else state.expanded.splice(index, 1);
+      renderTree($('#tree-search') ? $('#tree-search').value : '');
+      persist(false);
+    }
+
+    function replaceEditorContent(value) {
+      if (!state.active) return;
+      const scroll = editor.getScrollInfo();
+      editor.setValue(value);
+      state.files[state.active] = value;
+      state.dirty.add(state.active);
+      editor.scrollTo(scroll.left, scroll.top);
+      renderTabs();
+      updateStatus();
+      schedulePersist();
+    }
+
+    function formatCode() {
+      if (!state.active) { toast('افتح ملفاً أولاً', 'info'); return; }
+      const ext = extOf(state.active);
+      const code = editor.getValue();
+      let output = code;
+      try {
+        if (ext === 'json') {
+          output = JSON.stringify(JSON.parse(code), null, state.settings.tabSize);
+        } else if ((ext === 'js' || ext === 'mjs' || ext === 'jsx' || ext === 'ts' || ext === 'tsx') && window.js_beautify) {
+          output = window.js_beautify(code, {
+            indent_size: state.settings.tabSize,
+            indent_char: ' ',
+            preserve_newlines: true,
+            max_preserve_newlines: 2
+          });
+        } else if ((ext === 'css' || ext === 'scss' || ext === 'less') && window.css_beautify) {
+          output = window.css_beautify(code, {
+            indent_size: state.settings.tabSize,
+            indent_char: ' ',
+            newline_between_rules: true
+          });
+        } else if ((ext === 'html' || ext === 'htm' || ext === 'xml' || ext === 'svg' || ext === 'vue') && window.html_beautify) {
+          output = window.html_beautify(code, {
+            indent_size: state.settings.tabSize,
+            indent_char: ' ',
+            preserve_newlines: true,
+            max_preserve_newlines: 2,
+            wrap_line_length: 0
+          });
+        } else {
+          toast('التنسيق غير مدعوم لهذه اللغة بعد', 'info');
+          return;
+        }
+        if (output === code) { toast('الكود منسق بالفعل', 'info'); return; }
+        replaceEditorContent(output);
+        toast('تم تنسيق الكود', 'ok');
+      } catch (error) {
+        toast('تعذر التنسيق: ' + error.message, 'error');
+      }
+    }
+
+    /* ============================================================
+       File operations
+       ============================================================ */
+    async function createFile(defaultDir) {
+      const suggestion = defaultDir ? defaultDir.replace(/\/?$/, '/') : '';
+      const value = await askText({
+        title: 'ملف جديد',
+        label: 'اسم الملف أو مساره',
+        value: suggestion,
+        hint: 'مثال: src/utils.js — سيتم إنشاء المجلدات تلقائياً'
+      });
+      if (value === null) return;
+      const path = normalizePath(value);
+      if (!path) { toast('مسار غير صالح', 'error'); return; }
+      if (state.files[path] !== undefined || state.folders.indexOf(path) !== -1) {
+        toast('يوجد ملف أو مجلد بهذا الاسم', 'error');
+        return;
+      }
+      const parts = path.split('/');
+      for (let index = 1; index < parts.length; index += 1) {
+        const parent = parts.slice(0, index).join('/');
+        if (state.files[parent] !== undefined) {
+          toast('لا يمكن إنشاء ملف داخل ملف: ' + parent, 'error');
+          return;
+        }
+      }
+      ensureParents(path);
+      state.files[path] = '';
+      state.openTabs.push(path);
+      persist(false);
+      renderAll();
+      openFile(path);
+      toast('تم إنشاء ' + path, 'ok');
+    }
+
+    async function createFolder(defaultDir) {
+      const suggestion = defaultDir ? defaultDir.replace(/\/?$/, '/') : '';
+      const value = await askText({
+        title: 'مجلد جديد',
+        label: 'اسم المجلد أو مساره',
+        value: suggestion,
+        hint: 'مثال: src/components'
+      });
+      if (value === null) return;
+      const path = normalizePath(value);
+      if (!path) { toast('مسار غير صالح', 'error'); return; }
+      if (state.files[path] !== undefined || state.folders.indexOf(path) !== -1) {
+        toast('المجلد موجود بالفعل', 'error');
+        return;
+      }
+      const parts = path.split('/');
+      for (let index = 1; index < parts.length; index += 1) {
+        const parent = parts.slice(0, index).join('/');
+        if (state.files[parent] !== undefined) {
+          toast('لا يمكن إنشاء مجلد داخل ملف: ' + parent, 'error');
+          return;
+        }
+      }
+      ensureParents(path);
+      if (state.folders.indexOf(path) === -1) state.folders.push(path);
+      if (state.expanded.indexOf(path) === -1) state.expanded.push(path);
+      persist(false);
+      renderTree($('#tree-search') ? $('#tree-search').value : '');
+      updateStatus();
+      toast('تم إنشاء المجلد ' + path, 'ok');
+    }
+
+    async function renamePath(oldPath) {
+      const isFolder = state.files[oldPath] === undefined && isFolderPath(oldPath);
+      const value = await askText({
+        title: isFolder ? 'إعادة تسمية المجلد' : 'إعادة تسمية الملف',
+        label: 'الاسم أو المسار الجديد',
+        value: oldPath,
+        hint: 'يمكنك تغيير المسار أيضاً لنقل الملف أو المجلد'
+      });
+      if (value === null) return;
+      const next = normalizePath(value);
+      if (!next || next === oldPath) return;
+      if (state.files[next] !== undefined || state.folders.indexOf(next) !== -1) {
+        toast('الاسم مستخدم بالفعل', 'error');
+        return;
+      }
+      if (isFolder && next.indexOf(oldPath + '/') === 0) {
+        toast('لا يمكن نقل مجلد داخل نفسه', 'error');
+        return;
+      }
+      const insideSource = function (path) { return path === oldPath || path.indexOf(oldPath + '/') === 0; };
+      const subtreeConflict = Object.keys(state.files).some(function (path) {
+        return (path === next || path.indexOf(next + '/') === 0) && !insideSource(path);
+      }) || state.folders.some(function (folder) {
+        return (folder === next || folder.indexOf(next + '/') === 0) && !insideSource(folder);
+      });
+      if (subtreeConflict) {
+        toast('يوجد ملفات أو مجلدات في المسار الجديد', 'error');
+        return;
+      }
+      function remap(path) {
+        if (path === oldPath) return next;
+        if (path.indexOf(oldPath + '/') === 0) return next + path.slice(oldPath.length);
+        return path;
+      }
+      const files = {};
+      Object.keys(state.files).forEach(function (path) { files[remap(path)] = state.files[path]; });
+      state.files = files;
+      state.folders = state.folders.map(remap).filter(function (folder, index, list) { return list.indexOf(folder) === index; });
+      state.openTabs = state.openTabs.map(remap).filter(function (path, index, list) { return list.indexOf(path) === index && state.files[path] !== undefined; });
+      state.expanded = state.expanded.map(remap);
+      const cursors = {};
+      Object.keys(state.cursors).forEach(function (path) { cursors[remap(path)] = state.cursors[path]; });
+      state.cursors = cursors;
+      const dirty = new Set();
+      state.dirty.forEach(function (path) { dirty.add(remap(path)); });
+      state.dirty = dirty;
+      if (state.active) state.active = remap(state.active);
+      ensureParents(next);
+      persist(false);
+      renderAll();
+      if (state.active) openFile(state.active, { keepMobileView: true });
+      toast('تمت إعادة التسمية', 'ok');
+    }
+
+    function deletePath(path) {
+      const isFolder = state.files[path] === undefined && isFolderPath(path);
+      const message = 'هل تريد حذف "' + path + '"؟' + (isFolder ? '\nسيتم حذف كل الملفات والمجلدات بداخله.' : '');
+      if (!window.confirm(message)) return;
+      function isUnder(candidate) { return candidate === path || candidate.indexOf(path + '/') === 0; }
+      if (isFolder) {
+        Object.keys(state.files).forEach(function (file) { if (isUnder(file)) delete state.files[file]; });
+        state.folders = state.folders.filter(function (folder) { return !isUnder(folder); });
+        state.expanded = state.expanded.filter(function (folder) { return !isUnder(folder); });
+      } else {
+        delete state.files[path];
+      }
+      state.openTabs = state.openTabs.filter(function (tab) { return state.files[tab] !== undefined && !isUnder(tab); });
+      Object.keys(state.cursors).forEach(function (cursorPath) { if (isUnder(cursorPath)) delete state.cursors[cursorPath]; });
+      Array.from(state.dirty).forEach(function (dirtyPath) { if (isUnder(dirtyPath)) state.dirty.delete(dirtyPath); });
+      if (state.active && isUnder(state.active)) state.active = state.openTabs[0] || Object.keys(state.files)[0] || null;
+      persist(false);
+      renderAll();
+      if (state.active) openFile(state.active, { keepMobileView: true });
+      else { editor.setValue(''); showEmpty(true); }
+      toast('تم الحذف', 'ok');
+    }
+
+    function showContextMenu(x, y, path, type) {
+      contextTarget = { path: path, type: type };
+      const menu = $('#context-menu');
+      menu.innerHTML = '';
+      function add(icon, label, action, danger) {
+        const item = document.createElement('button');
+        item.type = 'button';
+        item.className = 'context-menu-item' + (danger ? ' danger' : '');
+        item.innerHTML = '<i class="' + icon + '"></i> ' + label;
+        item.addEventListener('click', function () {
+          hideContextMenu();
+          action();
+        });
+        menu.appendChild(item);
+      }
+      if (type === 'folder') {
+        add('fa-solid fa-file-circle-plus', 'ملف جديد هنا', function () { createFile(path); });
+        add('fa-solid fa-folder-plus', 'مجلد جديد هنا', function () { createFolder(path); });
+      } else {
+        add('fa-solid fa-folder-open', 'فتح', function () { openFile(path); });
+        add('fa-solid fa-download', 'تنزيل الملف', function () { downloadFile(path); });
+        add('fa-solid fa-copy', 'نسخ المسار', function () {
+          copyText(path).then(function () { toast('تم نسخ المسار', 'ok'); });
+        });
+      }
+      add('fa-solid fa-pen', 'إعادة تسمية', function () { renamePath(path); });
+      add('fa-solid fa-trash', 'حذف', function () { deletePath(path); }, true);
+      menu.style.display = 'block';
+      const rect = menu.getBoundingClientRect();
+      menu.style.left = Math.max(8, Math.min(x, window.innerWidth - rect.width - 8)) + 'px';
+      menu.style.top = Math.max(8, Math.min(y, window.innerHeight - rect.height - 8)) + 'px';
+    }
+
+    function hideContextMenu() {
+      const menu = $('#context-menu');
+      if (menu) menu.style.display = 'none';
+      contextTarget = null;
+    }
+
+    function downloadBlob(blob, filename) {
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement('a');
+      anchor.href = url;
+      anchor.download = filename;
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
+    }
+
+    function downloadFile(path) {
+      if (state.files[path] === undefined) return;
+      downloadBlob(new Blob([state.files[path]], { type: 'text/plain;charset=utf-8' }), baseName(path));
+    }
+
+    function buildZipBlob() {
+      if (!window.JSZip) return Promise.reject(new Error('مكتبة ZIP لم تُحمّل بعد، حاول مرة أخرى'));
+      const zip = new JSZip();
+      Object.keys(state.files).forEach(function (path) { zip.file(path, state.files[path]); });
+      state.folders.forEach(function (folder) {
+        const hasChild = Object.keys(state.files).some(function (path) { return path.indexOf(folder + '/') === 0; })
+          || state.folders.some(function (other) { return other.indexOf(folder + '/') === 0; });
+        if (!hasChild) zip.folder(folder);
+      });
+      zip.file('codex-project.json', JSON.stringify(serializeProject(true), null, 2));
+      return zip.generateAsync({ type: 'blob' });
+    }
+
+    function exportZip() {
+      buildZipBlob().then(function (blob) {
+        downloadBlob(blob, 'codex-arena-project.zip');
+        toast('تم تجهيز ملف ZIP', 'ok');
+      }).catch(function (error) { toast(error.message, 'error'); });
+    }
+
+    function exportJson() {
+      const json = JSON.stringify(serializeProject(true), null, 2);
+      downloadBlob(new Blob([json], { type: 'application/json;charset=utf-8' }), 'codex-project.json');
+      toast('تم تنزيل نسخة JSON', 'ok');
+    }
+
+    function backupCurrentProject() {
+      try {
+        localStorage.setItem(BACKUP_KEY, JSON.stringify({
+          at: Date.now(),
+          project: serializeProject(true)
+        }));
+        return true;
+      } catch (error) {
+        return false;
+      }
+    }
+
+    function applyProjectData(data, options) {
+      options = options || {};
+      if (!data || typeof data !== 'object' || !data.files || typeof data.files !== 'object') {
+        throw new Error('ملف المشروع غير صالح');
+      }
+      const files = {};
+      Object.keys(data.files).forEach(function (path) {
+        const normalized = normalizePath(path);
+        if (!normalized) return;
+        const value = data.files[path];
+        files[normalized] = typeof value === 'string' ? value : (value && typeof value.content === 'string' ? value.content : '');
+      });
+      if (!Object.keys(files).length) throw new Error('المشروع لا يحتوي على ملفات');
+      state.files = files;
+      const declaredFolders = Array.isArray(data.folders)
+        ? data.folders.map(normalizePath).filter(Boolean)
+        : [];
+      state.folders = Array.from(new Set(declaredFolders.concat(deriveFolders(files))));
+      if (data.settings && typeof data.settings === 'object') {
+        state.settings = Object.assign({}, DEFAULT_SETTINGS, state.settings, data.settings);
+      }
+      state.openTabs = options.openTabs || Object.keys(files).slice(0, 6);
+      state.active = options.active || state.openTabs[0] || Object.keys(files)[0] || null;
+      state.expanded = Array.from(new Set(state.folders.concat(deriveFolders(files))));
+      state.cursors = {};
+      state.dirty = new Set();
+    }
+
+    async function importFiles(fileList) {
+      const files = Array.prototype.slice.call(fileList || []);
+      if (!files.length) return;
+      const binaryExt = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'ico', 'pdf', 'zip', 'gz', 'rar', '7z', 'mp3', 'mp4', 'woff', 'woff2', 'ttf', 'eot', 'exe', 'dll', 'bin', 'wasm', 'psd', 'ai', 'sketch'];
+      let imported = 0;
+      let skipped = 0;
+      let lastPath = null;
+      for (const file of files) {
+        const ext = extOf(file.name);
+        if (file.size > 2 * 1024 * 1024 || binaryExt.indexOf(ext) !== -1) { skipped += 1; continue; }
+        let path = file.webkitRelativePath || file.name;
+        path = normalizePath(path) || normalizePath(String(file.name).replace(/[^\w.\-\/]+/g, '_'));
+        if (!path) { skipped += 1; continue; }
+        if (state.files[path] !== undefined) path = uniquePath(path);
+        try {
+          const text = await file.text();
+          ensureParents(path);
+          state.files[path] = text;
+          state.openTabs.push(path);
+          lastPath = path;
+          imported += 1;
+        } catch (error) {
+          skipped += 1;
+        }
+      }
+      if (!imported) { toast('لم يتم استيراد أي ملفات نصية', 'error'); return; }
+      persist(false);
+      renderAll();
+      if (lastPath) openFile(lastPath);
+      toast('تم استيراد ' + imported + ' ملف' + (skipped ? ' (تم تجاهل ' + skipped + ')' : ''), 'ok');
+    }
+
+    function importJsonFile(file) {
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function () {
+        try {
+          const data = JSON.parse(String(reader.result));
+          if (data && data.project && data.project.files) {
+            backupCurrentProject();
+            applyProjectData(data.project, { active: Object.keys(data.project.files)[0] });
+          } else {
+            backupCurrentProject();
+            applyProjectData(data);
+          }
+          persist(false);
+          applySettings();
+          renderAll();
+          showEmpty(!state.active);
+          if (state.active) openFile(state.active, { keepMobileView: true });
+          else editor.setValue('');
+          toast('تم استيراد المشروع بنجاح', 'ok');
+        } catch (error) {
+          toast('تعذر قراءة ملف JSON: ' + error.message, 'error');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    /* ============================================================
+       Execution & preview
+       ============================================================ */
+    const DEFAULT_PISTON_BASE = 'https://emkc.org/api/v2/piston';
+    const PYODIDE_CDN = 'https://cdn.jsdelivr.net/pyodide/v0.26.4/full/';
+    const MARKED_CDN = 'https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js';
+
+    let pistonVersions = null;
+    let pistonVersionsPromise = null;
+    let consoleEntries = [];
+    let consoleSeq = 0;
+    let consoleFilter = 'all';
+    let consoleSearch = '';
+    let consoleHistory = [];
+    let consoleHistoryIndex = -1;
+
+    const CONSOLE_BRIDGE = `<script>(function(){
+      function serialize(value){
+        try{
+          if(value instanceof Error) return { text: 'Uncaught ' + (value.name || 'Error') + ': ' + value.message, detail: value.stack || '' };
+          if(typeof value === 'undefined') return { text: 'undefined', detail: '' };
+          if(value === null) return { text: 'null', detail: '' };
+          if(typeof value === 'string') return { text: value, detail: '' };
+          if(typeof value === 'function') return { text: value.toString().slice(0, 300), detail: '' };
+          if(typeof value === 'object'){
+            var detail;
+            try{ detail = JSON.stringify(value, null, 2); }catch(error){ detail = String(value); }
+            var name = Array.isArray(value) ? 'Array(' + value.length + ')' : ((value.constructor && value.constructor.name) || 'Object');
+            return { text: name, detail: detail };
+          }
+          return { text: String(value), detail: '' };
+        }catch(error){ return { text: String(value), detail: '' }; }
+      }
+      function emit(type, args){
+        var parts = Array.prototype.map.call(args, serialize);
+        try{ parent.postMessage({ __codexConsole: true, type: type, args: parts }, '*'); }catch(error){}
+        var out = document.getElementById('codex-console-out');
+        if(out){
+          var line = document.createElement('div');
+          line.className = 'codex-line ' + type;
+          line.textContent = parts.map(function(part){ return part.text; }).join(' ');
+          var details = parts.map(function(part){ return part.detail; }).filter(Boolean);
+          if(details.length) line.title = details.join('\\n');
+          out.appendChild(line);
+          out.scrollTop = out.scrollHeight;
+        }
+      }
+      ['log', 'info', 'warn', 'error', 'debug'].forEach(function(type){
+        var original = console[type];
+        console[type] = function(){
+          emit(type === 'debug' ? 'log' : type, arguments);
+          if(original) original.apply(console, arguments);
+        };
+      });
+      window.addEventListener('error', function(event){
+        emit('error', [event.error || (event.message + (event.lineno ? ' (line ' + event.lineno + ')' : ''))]);
+      });
+      window.addEventListener('unhandledrejection', function(event){
+        emit('error', [event.reason || 'Unhandled rejection']);
+      });
+      window.addEventListener('message', function(event){
+        if(!event.data || !event.data.__codexEval) return;
+        try{
+          var result = (0, eval)(event.data.code);
+          if(result && typeof result.then === 'function'){
+            emit('info', ['Promise قيد التنفيذ…']);
+            result.then(function(value){ emit('log', [value]); }, function(error){ emit('error', [error]); });
+          } else {
+            emit('log', [result]);
+          }
+        }catch(error){
+          emit('error', [error]);
+        }
+      });
+    })();<\/script>`;
+
+    function resolveLocalRef(ref, basePath) {
+      if (!ref) return null;
+      if (/^(?:[a-z]+:)?\/\//i.test(ref) || /^data:/i.test(ref) || /^blob:/i.test(ref) || ref.charAt(0) === '#') return null;
+      const clean = ref.split('#')[0].split('?')[0];
+      if (!clean) return null;
+      if (clean.charAt(0) === '/') return normalizePath(clean);
+      const dir = basePath.indexOf('/') !== -1 ? basePath.slice(0, basePath.lastIndexOf('/')) : '';
+      return normalizePath((dir ? dir + '/' : '') + clean);
+    }
+
+    function inlineAssets(html, entry) {
+      let output = String(html);
+      output = output.replace(/<link\b[^>]*>/gi, function (tag) {
+        if (!/stylesheet/i.test(tag)) return tag;
+        const hrefMatch = /href\s*=\s*["']([^"']+)["']/i.exec(tag);
+        if (!hrefMatch) return tag;
+        const local = resolveLocalRef(hrefMatch[1], entry);
+        if (!local || state.files[local] === undefined) return tag;
+        return '<style>\n' + state.files[local] + '\n</style>';
+      });
+      output = output.replace(/<script\b([^>]*?)\bsrc\s*=\s*["']([^"']+)["']([^>]*)>\s*<\/script>/gi, function (tag, before, src, after) {
+        const local = resolveLocalRef(src, entry);
+        if (!local || state.files[local] === undefined) return tag;
+        return '<script' + before + after + '>\n' + safeScript(state.files[local]) + '\n<\/script>';
+      });
+      return output;
+    }
+
+    function injectBridge(html) {
+      if (/<head[^>]*>/i.test(html)) return html.replace(/<head([^>]*)>/i, '<head$1>\n' + CONSOLE_BRIDGE);
+      return CONSOLE_BRIDGE + html;
+    }
+
+    function demoPage(body, extraHead) {
+      return '<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8">' +
+        '<meta name="viewport" content="width=device-width, initial-scale=1">' +
+        '<style>body{margin:0;padding:24px;font-family:system-ui,Segoe UI,Tahoma,sans-serif;background:#f8fafc;color:#0f172a}' +
+        '#codex-console-out{margin-top:18px;padding:12px;border-radius:10px;background:#0f172a;color:#d7e2f1;font:12px/1.6 ui-monospace,Consolas,monospace;min-height:60px;max-height:220px;overflow:auto;direction:ltr;text-align:left;white-space:pre-wrap}' +
+        '.codex-line{padding:1px 0}.codex-line.error{color:#ff8a8a}.codex-line.warn{color:#ffd166}.codex-line.info{color:#93c5fd}' +
+        '</style>' + (extraHead || '') + '</head><body>' + body + '</body></html>';
+    }
+
+    function buildPreviewDoc(entry) {
+      const ext = extOf(entry);
+      const code = state.files[entry] || '';
+
+      if (ext === 'html' || ext === 'htm') {
+        return injectBridge(inlineAssets(code, entry));
+      }
+
+      if (ext === 'css' || ext === 'scss' || ext === 'less') {
+        const body = '<div class="demo-card"><h1>معاينة الأنماط</h1>' +
+          '<p>هذه صفحة تجريبية لعرض تنسيقات <strong>' + escapeHtml(baseName(entry)) + '</strong>.</p>' +
+          '<div class="demo-row"><button class="btn-primary">زر أساسي</button><button class="btn-ghost">زر ثانوي</button></div>' +
+          '<div class="demo-row"><span class="tag">وسم</span><span class="tag">آخر</span></div>' +
+          '<div class="demo-grid"><div>بطاقة 1</div><div>بطاقة 2</div><div>بطاقة 3</div></div>' +
+          '<p><a href="#">رابط تجريبي</a> — نص عادي للمعاينة.</p></div>';
+        return '<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8">' +
+          '<meta name="viewport" content="width=device-width, initial-scale=1">' +
+          '<style>' + code + '</style></head><body>' + body + '</body></html>';
+      }
+
+      if (ext === 'js' || ext === 'mjs' || ext === 'cjs' || ext === 'jsx') {
+        const body = '<div class="demo-card"><h1>تشغيل JavaScript</h1>' +
+          '<p>ملف: <strong>' + escapeHtml(entry) + '</strong></p>' +
+          '<div id="codex-console-out"></div></div>';
+        return demoPage(
+          body + '<script>\ntry {\n' + safeScript(code) + '\n} catch (error) { console.error(error && error.stack ? error.stack : error); }\n<\/script>',
+          '<style>.demo-card{max-width:820px;margin:0 auto;padding:20px;border-radius:14px;background:#fff;box-shadow:0 10px 30px rgba(2,6,23,.08)}</style>' + CONSOLE_BRIDGE
+        );
+      }
+
+      if (ext === 'svg') {
+        return '<!DOCTYPE html><html><head><meta charset="UTF-8"><style>html,body{margin:0;min-height:100%;display:grid;place-items:center;background:#fff}</style></head><body>' + CONSOLE_BRIDGE + code + '</body></html>';
+      }
+
+      if (ext === 'md' || ext === 'markdown') {
+        return buildMarkdownDoc(code);
+      }
+
+      return null;
+    }
+
+    function buildMarkdownDoc(code) {
+      const hasMarked = window.marked && typeof window.marked.parse === 'function';
+      const html = hasMarked
+        ? window.marked.parse(code, { gfm: true, breaks: false })
+        : '<pre>' + escapeHtml(code) + '</pre>';
+      return '<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8">' +
+        '<meta name="viewport" content="width=device-width, initial-scale=1">' +
+        '<style>body{margin:0;padding:28px;font-family:system-ui,Segoe UI,Tahoma,sans-serif;background:#fff;color:#1f2937;line-height:1.8}' +
+        'main{max-width:860px;margin:0 auto}h1,h2,h3{line-height:1.35;margin:1.3em 0 .5em}h1{border-bottom:1px solid #e5e7eb;padding-bottom:.3em}' +
+        'code{background:#f1f5f9;padding:2px 5px;border-radius:4px;font-family:ui-monospace,Consolas,monospace;font-size:.9em}' +
+        'pre{background:#0f172a;color:#e2e8f0;padding:14px;border-radius:10px;overflow:auto;direction:ltr;text-align:left}' +
+        'pre code{background:transparent;padding:0}a{color:#2563eb}blockquote{margin:0;padding:.2em 1em;border-inline-start:4px solid #cbd5e1;color:#475569}' +
+        'table{border-collapse:collapse}td,th{border:1px solid #d1d5db;padding:6px 10px}img{max-width:100%}</style></head>' +
+        '<body><main>' + html + '</main></body></html>';
+    }
+
+    function ensureMarked(callback) {
+      if (window.marked && typeof window.marked.parse === 'function') { callback(true); return; }
+      if (Array.isArray(markedLoading)) { markedLoading.push(callback); return; }
+      markedLoading = [callback];
+      const script = document.createElement('script');
+      script.src = MARKED_CDN;
+      script.onload = function () {
+        const callbacks = markedLoading || [];
+        markedLoading = null;
+        callbacks.forEach(function (fn) { try { fn(!!window.marked); } catch (error) {} });
+      };
+      script.onerror = function () {
+        const callbacks = markedLoading || [];
+        markedLoading = null;
+        callbacks.forEach(function (fn) { try { fn(false); } catch (error) {} });
+      };
+      document.head.appendChild(script);
+    }
+
+    function setPreview(html) {
+      const frame = $('#preview-frame');
+      if (!frame) return;
+      frame.srcdoc = html;
+    }
+
+    function previewCurrent(silent) {
+      if (!state.active) { if (!silent) toast('افتح ملفاً أولاً', 'info'); return; }
+      const ext = extOf(state.active);
+      if (!isPreviewable(state.active)) {
+        if (!silent) toast('لا تتوفر معاينة لهذا النوع — استخدم زر التشغيل', 'info');
+        return;
+      }
+      if (ext === 'md' || ext === 'markdown') {
+        ensureMarked(function () {
+          const doc = buildMarkdownDoc(state.files[state.active] || '');
+          setPreview(doc);
+          if (!silent) { switchDevTab('preview'); toast('تم تحديث معاينة Markdown', 'ok'); }
+        });
+        return;
+      }
+      const doc = buildPreviewDoc(state.active);
+      if (!doc) { if (!silent) toast('لا تتوفر معاينة لهذا الملف', 'info'); return; }
+      setPreview(doc);
+      if (!silent) {
+        switchDevTab('preview');
+        toast('تم تحديث المعاينة', 'ok');
+      }
+    }
+
+    function openPreviewWindow() {
+      if (!state.active) { toast('افتح ملفاً أولاً', 'info'); return; }
+      if (!isPreviewable(state.active)) { toast('هذا الملف غير قابل للمعاينة', 'info'); return; }
+      const build = function () {
+        const doc = buildPreviewDoc(state.active);
+        if (!doc) { toast('تعذر إنشاء المعاينة', 'error'); return; }
+        const blob = new Blob([doc], { type: 'text/html;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        window.open(url, '_blank', 'noopener');
+        setTimeout(function () { URL.revokeObjectURL(url); }, 60000);
+      };
+      if (['md', 'markdown'].indexOf(extOf(state.active)) !== -1) ensureMarked(build);
+      else build();
+    }
+
+    function findHtmlEntry() {
+      if (state.active && ['html', 'htm'].indexOf(extOf(state.active)) !== -1) return state.active;
+      if (state.files['index.html'] !== undefined) return 'index.html';
+      const fromTabs = state.openTabs.find(function (path) { return ['html', 'htm'].indexOf(extOf(path)) !== -1; });
+      if (fromTabs) return fromTabs;
+      return Object.keys(state.files).find(function (path) { return ['html', 'htm'].indexOf(extOf(path)) !== -1; }) || null;
+    }
+
+    function runProject() {
+      if (!state.active) { toast('افتح ملفاً أولاً', 'info'); return; }
+      if (isMobile()) switchMobileView('output');
+      const ext = extOf(state.active);
+      if (['html', 'htm', 'css', 'scss', 'less', 'md', 'markdown', 'svg'].indexOf(ext) !== -1) {
+        previewCurrent(false);
+        return;
+      }
+      if (ext === 'js' || ext === 'mjs' || ext === 'cjs' || ext === 'jsx') {
+        const entry = findHtmlEntry();
+        if (entry) {
+          setPreview(injectBridge(inlineAssets(state.files[entry], entry)));
+          switchDevTab('preview');
+          toast('تم تشغيل ' + entry, 'ok');
+        } else {
+          previewCurrent(false);
+        }
+        return;
+      }
+      if (ext === 'py') {
+        runPython();
+        return;
+      }
+      if (PISTON_EXT[ext]) {
+        runRemote();
+        return;
+      }
+      toast('لا يوجد مشغّل لهذه اللغة بعد', 'info');
+    }
+
+    function runCurrentFile() {
+      if (!state.active) { toast('افتح ملفاً أولاً', 'info'); return; }
+      const ext = extOf(state.active);
+      if (ext === 'py') runPython();
+      else if (isPreviewable(state.active) && ext !== 'js' && ext !== 'mjs' && ext !== 'cjs' && ext !== 'jsx') previewCurrent(false);
+      else if (PISTON_EXT[ext]) runRemote();
+      else previewCurrent(false);
+    }
+
+    function switchDevTab(tab) {
+      $$('.output-tab').forEach(function (button) {
+        button.classList.toggle('active', button.getAttribute('data-tab') === tab);
+      });
+      $$('.output-view').forEach(function (view) {
+        view.classList.toggle('active', view.id === 'tab-' + tab);
+      });
+      if (tab === 'console') {
+        const output = $('#console-logs');
+        if (output) output.scrollTop = output.scrollHeight;
+      }
+      if (isMobile()) switchMobileView('output');
+    }
+
+    function consoleLevelFor(type) {
+      if (type === 'error' || type === 'warn' || type === 'info') return type;
+      if (type === 'ok') return 'info';
+      return 'log';
+    }
+
+    function consoleIconFor(type) {
+      if (type === 'error') return 'fa-solid fa-circle-exclamation';
+      if (type === 'warn') return 'fa-solid fa-triangle-exclamation';
+      if (type === 'info') return 'fa-solid fa-circle-info';
+      if (type === 'ok') return 'fa-solid fa-circle-check';
+      if (type === 'input') return 'fa-solid fa-chevron-right';
+      return 'fa-solid fa-angle-right';
+    }
+
+    function getVisibleConsoleEntries() {
+      const query = consoleSearch.trim().toLowerCase();
+      return consoleEntries.filter(function (entry) {
+        if (consoleFilter !== 'all' && entry.level !== consoleFilter) return false;
+        if (!query) return true;
+        return (entry.text + ' ' + entry.detail).toLowerCase().indexOf(query) !== -1;
+      });
+    }
+
+    function updateConsoleCounts() {
+      const counts = { all: consoleEntries.length, error: 0, warn: 0, info: 0, log: 0 };
+      consoleEntries.forEach(function (entry) { counts[entry.level] = (counts[entry.level] || 0) + 1; });
+      Object.keys(counts).forEach(function (level) {
+        const node = document.getElementById('console-count-' + level);
+        if (node) node.textContent = counts[level];
+      });
+    }
+
+    function renderConsole(scrollToEnd) {
+      const output = $('#console-logs');
+      if (!output) return;
+      const stick = output.scrollHeight - output.scrollTop - output.clientHeight < 60;
+      const visible = getVisibleConsoleEntries();
+      output.innerHTML = '';
+      if (!visible.length) {
+        const empty = document.createElement('div');
+        empty.className = 'console-empty';
+        empty.textContent = consoleEntries.length
+          ? 'لا توجد سجلات مطابقة للتصفية الحالية.'
+          : 'لا توجد سجلات بعد — شغّل الكود أو اكتب في الطرفية بالأسفل.';
+        output.appendChild(empty);
+      } else {
+        visible.forEach(function (entry) {
+          const node = document.createElement('div');
+          node.className = 'console-entry ' + entry.type;
+
+          const time = document.createElement('span');
+          time.className = 'c-time';
+          time.textContent = entry.time.toLocaleTimeString('en-GB', { hour12: false });
+
+          const icon = document.createElement('i');
+          icon.className = 'c-level ' + consoleIconFor(entry.type);
+          icon.setAttribute('aria-hidden', 'true');
+
+          const body = document.createElement('div');
+          body.className = 'c-body';
+          const text = document.createElement('div');
+          text.className = 'c-text';
+          text.textContent = entry.text;
+          body.appendChild(text);
+
+          if (entry.detail) {
+            const details = document.createElement('details');
+            const summary = document.createElement('summary');
+            summary.textContent = 'عرض التفاصيل';
+            const pre = document.createElement('pre');
+            pre.textContent = entry.detail;
+            details.appendChild(summary);
+            details.appendChild(pre);
+            body.appendChild(details);
+          }
+
+          node.appendChild(time);
+          node.appendChild(icon);
+          node.appendChild(body);
+          output.appendChild(node);
+        });
+      }
+      updateConsoleCounts();
+      if (scrollToEnd && stick) output.scrollTop = output.scrollHeight;
+    }
+
+    function logConsole(type, message, detail) {
+      const normalized = type || 'log';
+      const entry = {
+        seq: ++consoleSeq,
+        type: normalized,
+        level: consoleLevelFor(normalized),
+        text: String(message),
+        detail: detail ? String(detail) : '',
+        time: new Date()
+      };
+      consoleEntries.push(entry);
+      if (consoleEntries.length > 800) consoleEntries.shift();
+      renderConsole(true);
+    }
+
+    function setConsoleFilter(level) {
+      consoleFilter = level;
+      $$('.console-filter').forEach(function (button) {
+        button.classList.toggle('active', button.getAttribute('data-level') === level);
+      });
+      renderConsole(false);
+    }
+
+    function setConsoleSearch(value) {
+      consoleSearch = String(value || '');
+      renderConsole(false);
+    }
+
+    function clearConsole() {
+      consoleEntries = [];
+      problems = [];
+      renderConsole(false);
+      updateConsoleCounts();
+      renderProblems();
+    }
+
+    function describeConsoleValue(value) {
+      try {
+        if (value instanceof Error) return { text: 'Uncaught ' + (value.name || 'Error') + ': ' + value.message, detail: value.stack || '' };
+        if (typeof value === 'undefined') return { text: 'undefined', detail: '' };
+        if (value === null) return { text: 'null', detail: '' };
+        if (typeof value === 'string') return { text: value, detail: '' };
+        if (typeof value === 'function') return { text: value.toString().slice(0, 300), detail: '' };
+        if (typeof value === 'object') {
+          let detail;
+          try { detail = JSON.stringify(value, null, 2); } catch (error) { detail = String(value); }
+          const name = Array.isArray(value) ? 'Array(' + value.length + ')' : ((value.constructor && value.constructor.name) || 'Object');
+          return { text: name, detail: detail };
+        }
+        return { text: String(value), detail: '' };
+      } catch (error) {
+        return { text: String(value), detail: '' };
+      }
+    }
+
+    async function evaluateInParent(code) {
+      try {
+        let result = (0, eval)(code);
+        if (result && typeof result.then === 'function') {
+          logConsole('info', 'Promise قيد التنفيذ…');
+          result = await result;
+        }
+        const info = describeConsoleValue(result);
+        logConsole('log', info.text, info.detail);
+      } catch (error) {
+        const message = error && error.message ? 'Uncaught ' + (error.name || 'Error') + ': ' + error.message : String(error);
+        logConsole('error', message, error && error.stack ? error.stack : '');
+        addProblem('error', message, state.active);
+      }
+    }
+
+    function runConsoleCommand() {
+      const input = $('#console-prompt');
+      if (!input) return;
+      const value = input.value.trim();
+      if (!value) return;
+      consoleHistory.push(value);
+      if (consoleHistory.length > 100) consoleHistory.shift();
+      consoleHistoryIndex = consoleHistory.length;
+      logConsole('input', '› ' + value);
+      input.value = '';
+      sendPreviewEval(value);
+    }
+
+    function copyConsole() {
+      const visible = getVisibleConsoleEntries();
+      if (!visible.length) { toast('لا توجد سجلات لنسخها', 'info'); return; }
+      const text = visible.map(function (entry) {
+        const time = entry.time.toLocaleTimeString('en-GB', { hour12: false });
+        return '[' + time + '] ' + entry.type.toUpperCase() + ': ' + entry.text + (entry.detail ? '\n' + entry.detail : '');
+      }).join('\n');
+      copyText(text).then(function () { toast('تم نسخ السجلات', 'ok'); }).catch(function () { toast('تعذر النسخ', 'error'); });
+    }
+
+    function addProblem(severity, message, path) {
+      problems.push({ severity: severity || 'error', message: String(message), path: path || state.active || '' });
+      if (problems.length > 120) problems.shift();
+      renderProblems();
+    }
+
+    function renderProblems() {
+      const list = $('#problems-list');
+      if (!list) return;
+      list.innerHTML = '';
+      if (!problems.length) {
+        list.innerHTML = '<div class="problems-empty">لا توجد مشاكل حالياً — شغّل الكود لبدء الفحص.</div>';
+        return;
+      }
+      problems.forEach(function (problem) {
+        const item = document.createElement('div');
+        item.className = 'problem-item';
+        item.style.borderInlineStartColor = problem.severity === 'warn' ? 'var(--warn)' : 'var(--danger)';
+        item.textContent = (problem.path ? problem.path + ': ' : '') + problem.message;
+        item.title = 'اضغط لفتح الملف';
+        item.addEventListener('click', function () {
+          if (problem.path && state.files[problem.path] !== undefined) openFile(problem.path);
+        });
+        list.appendChild(item);
+      });
+    }
+
+    function sendPreviewEval(code) {
+      const frame = $('#preview-frame');
+      if (frame && frame.getAttribute('srcdoc') && frame.contentWindow) {
+        frame.contentWindow.postMessage({ __codexEval: true, code: code }, '*');
+        return;
+      }
+      evaluateInParent(code);
+    }
+
+    function loadPyodideOnce() {
+      if (pyodide) return Promise.resolve(pyodide);
+      if (pyodideLoading) return pyodideLoading;
+      pyodideLoading = new Promise(function (resolve, reject) {
+        if (window.loadPyodide) { resolve(); return; }
+        const script = document.createElement('script');
+        script.src = PYODIDE_CDN + 'pyodide.js';
+        script.onload = function () { resolve(); };
+        script.onerror = function () { reject(new Error('تعذر تحميل Pyodide')); };
+        document.head.appendChild(script);
+      }).then(function () {
+        return window.loadPyodide({ indexURL: PYODIDE_CDN });
+      }).then(function (instance) {
+        pyodide = instance;
+        pyodideReady = true;
+        pyodide.setStdout({ batched: function (text) { if (text) logConsole('log', text); } });
+        pyodide.setStderr({ batched: function (text) { if (text) logConsole('error', text); } });
+        return pyodide;
+      }).catch(function (error) {
+        pyodideLoading = null;
+        throw error;
+      });
+      return pyodideLoading;
+    }
+
+    async function runPython() {
+      if (!state.active) { toast('افتح ملفاً أولاً', 'info'); return; }
+      const path = state.active;
+      switchDevTab('console');
+      clearConsole();
+      logConsole('info', 'تجهيز Python (Pyodide)… قد يستغرق التحميل الأول بعض الثواني.');
+      addProblem('info', 'تشغيل ' + path);
+      problems = problems.filter(function (problem) { return problem.severity !== 'info'; });
+      renderProblems();
+
+      let runtime;
+      try {
+        runtime = await loadPyodideOnce();
+      } catch (error) {
+        logConsole('error', error.message);
+        addProblem('error', error.message + ' — تحقق من الاتصال بالإنترنت.', path);
+        toast('تعذر تحميل Python', 'error');
+        return;
+      }
+
+      try {
+        logConsole('info', 'Python ' + (runtime.version || '') + ' — تشغيل ' + path);
+        const root = '/project';
+        try { runtime.FS.mkdirTree(root); } catch (error) {}
+        Object.keys(state.files).forEach(function (file) {
+          if (extOf(file) !== 'py') return;
+          const full = root + '/' + file;
+          const dir = full.slice(0, full.lastIndexOf('/'));
+          try { runtime.FS.mkdirTree(dir); } catch (error) {}
+          runtime.FS.writeFile(full, state.files[file], { encoding: 'utf8' });
+        });
+        const fullPath = root + '/' + path;
+        const dirPath = fullPath.slice(0, fullPath.lastIndexOf('/'));
+        const wrapper = [
+          'import sys',
+          'sys.path.insert(0, ' + JSON.stringify(root) + ')',
+          'sys.path.insert(0, ' + JSON.stringify(dirPath) + ')',
+          'for __name, __module in list(sys.modules.items()):',
+          '    __file = getattr(__module, "__file__", "") or ""',
+          '    if __file.startswith("/project/"):',
+          '        del sys.modules[__name]',
+          'with open(' + JSON.stringify(fullPath) + ', "r", encoding="utf-8") as __file_handle:',
+          '    __source = __file_handle.read()',
+          '__globals = {"__name__": "__main__", "__file__": ' + JSON.stringify(fullPath) + '}',
+          'exec(compile(__source, ' + JSON.stringify(fullPath) + ', "exec"), __globals)'
+        ].join('\n');
+        const result = await runtime.runPythonAsync(wrapper);
+        if (result !== undefined && result !== null) logConsole('log', String(result));
+        logConsole('ok', 'انتهى التنفيذ بنجاح');
+      } catch (error) {
+        const message = error && error.message ? error.message : String(error);
+        logConsole('error', message);
+        addProblem('error', message, path);
+        setPreview('<pre style="color:#b91c1c;background:#fff;padding:16px;white-space:pre-wrap;font:13px/1.6 ui-monospace,monospace">' + escapeHtml(message) + '</pre>');
+        toast('حدث خطأ أثناء تشغيل Python', 'error');
+      }
+    }
+
+    function pistonBase() {
+      const configured = state && state.settings ? state.settings.pistonEndpoint : '';
+      const value = String(configured || DEFAULT_PISTON_BASE).trim().replace(/\/+$/, '');
+      return /^https?:\/\//i.test(value) ? value : DEFAULT_PISTON_BASE;
+    }
+
+    function pistonHeaders(method) {
+      const headers = {};
+      if (String(method || 'POST').toUpperCase() !== 'GET') headers['Content-Type'] = 'application/json';
+      const key = state && state.settings ? String(state.settings.pistonKey || '').trim() : '';
+      if (key) headers.Authorization = key;
+      return headers;
+    }
+
+    function loadPistonVersions() {
+      if (pistonVersions) return Promise.resolve(pistonVersions);
+      if (pistonVersionsPromise) return pistonVersionsPromise;
+      pistonVersionsPromise = fetch(pistonBase() + '/runtimes', { headers: pistonHeaders('GET') }).then(function (response) {
+        if (!response.ok) throw new Error('HTTP ' + response.status);
+        return response.json();
+      }).then(function (list) {
+        pistonVersions = {};
+        (Array.isArray(list) ? list : []).forEach(function (runtime) {
+          if (!pistonVersions[runtime.language]) pistonVersions[runtime.language] = runtime.version;
+          (runtime.aliases || []).forEach(function (alias) {
+            if (!pistonVersions[alias]) pistonVersions[alias] = runtime.version;
+          });
+        });
+        return pistonVersions;
+      }).catch(function () {
+        pistonVersions = {};
+        return pistonVersions;
+      });
+      return pistonVersionsPromise;
+    }
+
+    async function runRemote() {
+      if (!state.active) { toast('افتح ملفاً أولاً', 'info'); return; }
+      const ext = extOf(state.active);
+      const language = PISTON_EXT[ext];
+      if (!language) { toast('لا يوجد مشغّل سحابي لهذه اللغة', 'info'); return; }
+      if (!navigator.onLine) { toast('أنت غير متصل بالإنترنت', 'error'); return; }
+      const path = state.active;
+      const code = state.files[path] || '';
+      switchDevTab('console');
+      clearConsole();
+      logConsole('info', 'إرسال الكود إلى Piston (' + language + ')…');
+      addProblem('info', 'تشغيل ' + path);
+      problems = problems.filter(function (problem) { return problem.severity !== 'info'; });
+      renderProblems();
+      try {
+        const versions = await loadPistonVersions();
+        const version = versions[language] || '*';
+        const response = await fetch(pistonBase() + '/execute', {
+          method: 'POST',
+          headers: pistonHeaders(),
+          body: JSON.stringify({
+            language: language,
+            version: version,
+            files: [{ name: baseName(path), content: code }],
+            stdin: '',
+            run_timeout: 8000,
+            compile_timeout: 10000
+          })
+        });
+        if (!response.ok) {
+          let detail = '';
+          try {
+            const data = await response.json();
+            detail = data.message || data.error || '';
+          } catch (error) {}
+          const hint = response.status === 401 ? ' — الـ API العام مغلق الآن؛ أضف عنوان Piston خاصاً بك من الإعدادات.' : '';
+          throw new Error('فشل التنفيذ (HTTP ' + response.status + ')' + (detail ? ': ' + detail : '') + hint);
+        }
+        const data = await response.json();
+        const compile = data.compile || {};
+        const run = data.run || {};
+        if (compile.stdout) logConsole('log', compile.stdout);
+        if (compile.stderr) logConsole('warn', compile.stderr);
+        if (run.stdout) logConsole('log', run.stdout);
+        if (run.stderr) {
+          logConsole('error', run.stderr);
+          addProblem('error', run.stderr.trim(), path);
+        }
+        if (run.code === 0 && !run.stderr) logConsole('ok', 'انتهى التنفيذ بنجاح (exit 0)');
+        else logConsole('info', 'انتهى التنفيذ بالرمز ' + run.code + ' في ' + (run.wall_time || 0) + ' ثانية.');
+        toast('انتهى التنفيذ', run.code === 0 ? 'ok' : 'info');
+      } catch (error) {
+        const message = error && error.message ? error.message : String(error);
+        logConsole('error', message);
+        addProblem('error', message, path);
+        toast('تعذر تشغيل الكود', 'error');
+      }
+    }
+
+    /* ============================================================
+       Sharing & project import/export
+       ============================================================ */
+    function projectPayloadForShare() {
+      return {
+        app: 'CodeX Arena PRO',
+        version: 3,
+        files: state.files,
+        folders: state.folders
+      };
+    }
+
+    function buildShareLink() {
+      if (!window.LZString) return '';
+      const json = JSON.stringify(projectPayloadForShare());
+      const packed = LZString.compressToEncodedURIComponent(json);
+      const base = location.href.split('#')[0];
+      return base + '#p=' + packed;
+    }
+
+    function shareProject() {
+      const link = buildShareLink();
+      if (!link) { toast('مكتبة المشاركة لم تُحمّل، أعد تحميل الصفحة', 'error'); return; }
+      const field = $('#share-link');
+      if (field) { field.value = link; field.focus(); field.select(); }
+      const size = $('#share-size');
+      if (size) size.textContent = 'حجم الرابط: ' + formatBytes(link.length) + ' — ' + Object.keys(state.files).length + ' ملف';
+      const note = $('#share-note');
+      if (note) {
+        note.innerHTML = location.protocol === 'file:'
+          ? '<i class="fa-solid fa-triangle-exclamation"></i> أنت تفتح الصفحة محلياً (file://). الرابط سيحتاج نفس الملف عند الطرف الآخر، أو استخدم ZIP بدلاً منه.'
+          : '<i class="fa-solid fa-circle-info"></i> يحتوي الرابط على نسخة مضغوطة من كل ملفات المشروع. استخدم ZIP للمشاريع الكبيرة أو الثنائية.';
+      }
+      const nativeButton = $('#btn-native-share');
+      if (nativeButton) nativeButton.disabled = !(navigator.share || navigator.clipboard);
+      openModal('share-modal');
+    }
+
+    function copyShareLink() {
+      const field = $('#share-link');
+      if (!field || !field.value) return;
+      copyText(field.value).then(function () { toast('تم نسخ رابط المشروع', 'ok'); }).catch(function () { toast('تعذر النسخ', 'error'); });
+    }
+
+    function nativeShare() {
+      const field = $('#share-link');
+      const url = field ? field.value : '';
+      if (!url) return;
+      if (navigator.share) {
+        navigator.share({ title: 'CodeX Arena PRO — مشروعي', text: 'جرّب مشروعي على CodeX Arena PRO', url: url })
+          .catch(function () {});
+      } else {
+        copyShareLink();
+      }
+    }
+
+    async function shareZip() {
+      try {
+        const blob = await buildZipBlob();
+        const file = new File([blob], 'codex-arena-project.zip', { type: 'application/zip' });
+        if (navigator.canShare && navigator.canShare({ files: [file] }) && navigator.share) {
+          await navigator.share({ files: [file], title: 'CodeX Arena PRO', text: 'مشروعي من CodeX Arena PRO' });
+        } else {
+          downloadBlob(blob, 'codex-arena-project.zip');
+        }
+      } catch (error) {
+        toast('تعذر إنشاء ZIP: ' + error.message, 'error');
+      }
+    }
+
+    function stripShareHash() {
+      try {
+        history.replaceState(null, '', location.href.split('#')[0]);
+      } catch (error) {
+        try { location.hash = ''; } catch (ignored) {}
+      }
+    }
+
+    function consumeSharedLink() {
+      const hash = location.hash || '';
+      if (hash.indexOf('#p=') !== 0) return false;
+      if (!window.LZString) return false;
+      try {
+        const packed = hash.slice(3);
+        const json = LZString.decompressFromEncodedURIComponent(packed);
+        if (!json) throw new Error('الرابط فارغ أو تالف');
+        const data = JSON.parse(json);
+        backupCurrentProject();
+        applyProjectData(data);
+        state.openTabs = Object.keys(state.files).slice(0, 8);
+        state.active = state.openTabs[0] || null;
+        persist(false);
+        stripShareHash();
+        toast('تم فتح المشروع المشارك — احفظ نسخة إذا أردت الاحتفاظ به', 'ok');
+        return true;
+      } catch (error) {
+        toast('تعذر فتح رابط المشاركة: ' + error.message, 'error');
+        stripShareHash();
+        return false;
+      }
+    }
+
+    function copyText(text) {
+      if (navigator.clipboard && window.isSecureContext) {
+        return navigator.clipboard.writeText(text).catch(function () { return legacyCopy(text); });
+      }
+      return legacyCopy(text);
+    }
+
+    function legacyCopy(text) {
+      return new Promise(function (resolve, reject) {
+        const area = document.createElement('textarea');
+        area.value = text;
+        area.setAttribute('readonly', '');
+        area.style.position = 'fixed';
+        area.style.opacity = '0';
+        document.body.appendChild(area);
+        area.select();
+        try {
+          if (document.execCommand('copy')) resolve();
+          else reject(new Error('copy failed'));
+        } catch (error) {
+          reject(error);
+        } finally {
+          area.remove();
+        }
+      });
+    }
+
+    /* ============================================================
+       Modals, prompt, toast, reset
+       ============================================================ */
+    function openModal(id) {
+      const modal = document.getElementById(id);
+      if (modal) modal.classList.add('open');
+    }
+
+    function closeModal(id) {
+      const modal = document.getElementById(id);
+      if (modal) modal.classList.remove('open');
+    }
+
+    function closeAllModals() {
+      $$('.modal-overlay.open').forEach(function (modal) { modal.classList.remove('open'); });
+    }
+
+    function askText(options) {
+      options = options || {};
+      return new Promise(function (resolve) {
+        promptResolver = resolve;
+        const title = $('#prompt-title');
+        const label = $('#prompt-label');
+        const hint = $('#prompt-hint');
+        const input = $('#prompt-input');
+        if (title) title.textContent = options.title || 'إدخال';
+        if (label) label.textContent = options.label || 'القيمة';
+        if (hint) hint.textContent = options.hint || '';
+        if (input) {
+          input.value = options.value || '';
+          input.placeholder = options.placeholder || '';
+        }
+        openModal('prompt-modal');
+        setTimeout(function () { if (input) { input.focus(); input.select(); } }, 40);
+      });
+    }
+
+    function resolvePrompt(value) {
+      const resolver = promptResolver;
+      promptResolver = null;
+      closeModal('prompt-modal');
+      if (resolver) resolver(value);
+    }
+
+    function toast(message, type) {
+      const container = $('#toasts');
+      if (!container) return;
+      const item = document.createElement('div');
+      item.className = 'toast ' + (type || 'info');
+      item.textContent = message;
+      container.appendChild(item);
+      while (container.children.length > 4) container.removeChild(container.firstChild);
+      setTimeout(function () {
+        item.style.transition = 'opacity .2s, transform .2s';
+        item.style.opacity = '0';
+        item.style.transform = 'translateY(6px)';
+        setTimeout(function () { item.remove(); }, 220);
+      }, 3400);
+    }
+
+    function resetProject() {
+      if (!window.confirm('سيتم استبدال المشروع الحالي بالمشروع الافتراضي. هل أنت متأكد؟')) return;
+      backupCurrentProject();
+      state.files = Object.assign({}, DEFAULT_FILES);
+      state.folders = ['styles', 'scripts', 'python'];
+      state.openTabs = ['index.html', 'styles/style.css', 'scripts/app.js', 'python/main.py'];
+      state.active = 'index.html';
+      state.expanded = ['styles', 'scripts', 'python'];
+      state.cursors = {};
+      state.dirty = new Set();
+      persist(false);
+      renderAll();
+      openFile('index.html');
+      closeAllModals();
+      toast('تمت إعادة ضبط المشروع', 'ok');
+    }
+
+    function restoreBackup() {
+      let backup = null;
+      try {
+        const raw = localStorage.getItem(BACKUP_KEY);
+        if (raw) backup = JSON.parse(raw);
+      } catch (error) {}
+      if (!backup || !backup.project || !backup.project.files) {
+        toast('لا توجد نسخة احتياطية سابقة', 'info');
+        return;
+      }
+      const when = backup.at ? new Date(backup.at).toLocaleString('ar-EG') : 'وقت غير معروف';
+      if (!window.confirm('استعادة النسخة الاحتياطية المحفوظة في ' + when + '؟')) return;
+      try {
+        backupCurrentProject();
+        applyProjectData(backup.project);
+        persist(false);
+        applySettings();
+        renderAll();
+        if (state.active) openFile(state.active, { keepMobileView: true });
+        else { editor.setValue(''); showEmpty(true); }
+        closeAllModals();
+        toast('تمت استعادة النسخة الاحتياطية', 'ok');
+      } catch (error) {
+        toast('تعذر الاستعادة: ' + error.message, 'error');
+      }
+    }
+
+    /* ============================================================
+       UI foundations
+       ============================================================ */
+    const OUTPUT_WIDTH_KEY = 'codex_output_width_v3';
+    let settingsTimer = null;
+
+    function syncSettingsUI() {
+      const s = state.settings;
+      const theme = $('#setting-theme');
+      const font = $('#setting-font');
+      const fontVal = $('#setting-font-val');
+      const tab = $('#setting-tab');
+      const wrap = $('#setting-wrap');
+      const autosave = $('#setting-autosave');
+      const live = $('#setting-live');
+      const piston = $('#setting-piston');
+      const pistonKey = $('#setting-piston-key');
+      if (theme) theme.value = s.theme;
+      if (font) font.value = s.fontSize;
+      if (fontVal) fontVal.textContent = s.fontSize + 'px';
+      if (tab) tab.value = String(s.tabSize);
+      if (wrap) wrap.checked = !!s.wordWrap;
+      if (autosave) autosave.checked = !!s.autoSave;
+      if (live) live.checked = !!s.livePreview;
+      if (piston) piston.value = s.pistonEndpoint || '';
+      if (pistonKey) pistonKey.value = s.pistonKey || '';
+    }
+
+    function applySettings() {
+      const s = state.settings;
+      document.documentElement.setAttribute('data-theme', s.theme === 'light' ? 'light' : 'dark');
+      if (editor) {
+        editor.setOption('theme', s.theme === 'light' ? 'eclipse' : 'material-darker');
+        editor.setOption('tabSize', s.tabSize);
+        editor.setOption('indentUnit', s.tabSize);
+        editor.setOption('lineWrapping', !!s.wordWrap);
+        editor.getWrapperElement().style.fontSize = s.fontSize + 'px';
+        editor.refresh();
+      }
+      syncSettingsUI();
+    }
+
+    function toggleTheme() {
+      state.settings.theme = state.settings.theme === 'light' ? 'dark' : 'light';
+      applySettings();
+      persist(false);
+      toast(state.settings.theme === 'light' ? 'تم تفعيل المظهر الفاتح' : 'تم تفعيل المظهر الداكن', 'ok');
+    }
+
+    function openSettings() {
+      syncSettingsUI();
+      openModal('settings-modal');
+    }
+
+    function switchMobileView(view) {
+      document.body.classList.remove('mobile-mode-files', 'mobile-mode-editor', 'mobile-mode-output');
+      document.body.classList.add('mobile-mode-' + view);
+      $$('.mobile-nav-btn[data-view]').forEach(function (button) {
+        button.classList.toggle('active', button.getAttribute('data-view') === view);
+      });
+    }
+
+    function toggleSidebar() {
+      if (isMobile()) {
+        const filesOpen = document.body.classList.contains('mobile-mode-files');
+        switchMobileView(filesOpen ? 'editor' : 'files');
+        return;
+      }
+      const sidebar = $('#sidebar-panel');
+      if (!sidebar) return;
+      sidebar.classList.toggle('collapsed');
+      if (editor) setTimeout(function () { editor.refresh(); }, 220);
+    }
+
+    function toggleFullscreen() {
+      const panel = $('#output-panel');
+      if (!panel) return;
+      panel.classList.toggle('fullscreen');
+      if (panel.classList.contains('fullscreen')) {
+        if (isMobile()) switchMobileView('output');
+        if (editor) setTimeout(function () { editor.refresh(); }, 220);
+      }
+    }
+
+    function setOutputWidth(width) {
+      const panel = $('#output-panel');
+      const container = $('#main-container');
+      if (!panel || !container) return;
+      const max = Math.max(320, container.clientWidth - 420);
+      const clamped = Math.max(260, Math.min(width, max));
+      panel.style.flex = '0 0 ' + clamped + 'px';
+      panel.style.width = clamped + 'px';
+      panel.style.maxWidth = 'none';
+    }
+
+    function initSplitter() {
+      const splitter = $('#splitter');
+      const container = $('#main-container');
+      const panel = $('#output-panel');
+      if (!splitter || !container || !panel) return;
+      let dragging = false;
+
+      splitter.addEventListener('pointerdown', function (event) {
+        if (isMobile()) return;
+        dragging = true;
+        document.body.classList.add('resizing');
+        try { splitter.setPointerCapture(event.pointerId); } catch (error) {}
+        event.preventDefault();
+      });
+
+      window.addEventListener('pointermove', function (event) {
+        if (!dragging) return;
+        const rect = container.getBoundingClientRect();
+        setOutputWidth(event.clientX - rect.left);
+      });
+
+      function stop() {
+        if (!dragging) return;
+        dragging = false;
+        document.body.classList.remove('resizing');
+        try { localStorage.setItem(OUTPUT_WIDTH_KEY, String(panel.getBoundingClientRect().width)); } catch (error) {}
+        if (editor) editor.refresh();
+      }
+      window.addEventListener('pointerup', stop);
+      window.addEventListener('pointercancel', stop);
+
+      try {
+        const stored = parseInt(localStorage.getItem(OUTPUT_WIDTH_KEY) || '', 10);
+        if (stored) setOutputWidth(stored);
+      } catch (error) {}
+    }
+
+    function readEntry(entry, prefix, output) {
+      return new Promise(function (resolve) {
+        if (!entry) { resolve(); return; }
+        if (entry.isFile) {
+          entry.file(function (file) {
+            try { Object.defineProperty(file, 'webkitRelativePath', { value: prefix + file.name }); } catch (error) {}
+            output.push(file);
+            resolve();
+          }, function () { resolve(); });
+          return;
+        }
+        if (entry.isDirectory) {
+          const reader = entry.createReader();
+          const entries = [];
+          const readBatch = function () {
+            reader.readEntries(function (batch) {
+              if (!batch.length) {
+                Promise.all(entries.map(function (child) {
+                  return readEntry(child, prefix + entry.name + '/', output);
+                })).then(function () { resolve(); });
+                return;
+              }
+              entries.push.apply(entries, batch);
+              readBatch();
+            }, function () { resolve(); });
+          };
+          readBatch();
+          return;
+        }
+        resolve();
+      });
+    }
+
+    function droppedFiles(dataTransfer) {
+      const items = dataTransfer && dataTransfer.items ? Array.prototype.slice.call(dataTransfer.items) : [];
+      const entries = items.map(function (item) {
+        return item.webkitGetAsEntry ? item.webkitGetAsEntry() : null;
+      }).filter(Boolean);
+      if (!entries.length) return Promise.resolve(Array.prototype.slice.call((dataTransfer && dataTransfer.files) || []));
+      const output = [];
+      return Promise.all(entries.map(function (entry) { return readEntry(entry, '', output); }))
+        .then(function () { return output; });
+    }
+
+    function initDropZone() {
+      let depth = 0;
+      function hasFiles(dataTransfer) {
+        return dataTransfer && Array.from(dataTransfer.types || []).indexOf('Files') !== -1;
+      }
+      window.addEventListener('dragenter', function (event) {
+        if (!hasFiles(event.dataTransfer)) return;
+        event.preventDefault();
+        depth += 1;
+        document.body.classList.add('dragging-files');
+      });
+      window.addEventListener('dragover', function (event) {
+        if (!hasFiles(event.dataTransfer)) return;
+        event.preventDefault();
+        event.dataTransfer.dropEffect = 'copy';
+      });
+      window.addEventListener('dragleave', function () {
+        depth = Math.max(0, depth - 1);
+        if (!depth) document.body.classList.remove('dragging-files');
+      });
+      window.addEventListener('drop', function (event) {
+        if (!hasFiles(event.dataTransfer)) return;
+        event.preventDefault();
+        depth = 0;
+        document.body.classList.remove('dragging-files');
+        droppedFiles(event.dataTransfer).then(function (files) {
+          if (files.length) importFiles(files);
+          else toast('لم يتم العثور على ملفات قابلة للاستيراد', 'info');
+        });
+      });
+    }
+
+    /* ============================================================
+       Command palette
+       ============================================================ */
+    function paletteCommands() {
+      const commands = [];
+      Object.keys(state.files).sort().forEach(function (path) {
+        commands.push({
+          icon: 'fa-solid fa-file-code',
+          label: 'فتح: ' + path,
+          keywords: 'open file ' + path,
+          kbd: '',
+          run: function () { openFile(path); }
+        });
+      });
+      const actions = [
+        ['fa-solid fa-play', 'تشغيل المشروع', 'run project execute', 'Ctrl+Enter', runProject],
+        ['fa-solid fa-bolt', 'تشغيل الملف الحالي', 'run current file', '', runCurrentFile],
+        ['fa-solid fa-eye', 'معاينة الملف الحالي', 'preview html css markdown', '', function () { previewCurrent(false); }],
+        ['fa-solid fa-floppy-disk', 'حفظ المشروع', 'save', 'Ctrl+S', function () { persist(true); }],
+        ['fa-solid fa-wand-magic-sparkles', 'تنسيق الكود', 'format beautify', 'Shift+Alt+F', formatCode],
+        ['fa-solid fa-file-circle-plus', 'ملف جديد', 'new file create', '', function () { createFile(); }],
+        ['fa-solid fa-folder-plus', 'مجلد جديد', 'new folder create', '', function () { createFolder(); }],
+        ['fa-solid fa-file-import', 'استيراد ملفات', 'import files', '', function () { $('#file-input').click(); }],
+        ['fa-solid fa-folder-tree', 'استيراد مجلد', 'import folder', '', function () { $('#folder-input').click(); }],
+        ['fa-solid fa-file-arrow-up', 'استيراد مشروع JSON', 'import json project', '', function () { $('#json-input').click(); }],
+        ['fa-solid fa-share-nodes', 'مشاركة المشروع', 'share link', '', shareProject],
+        ['fa-solid fa-file-zipper', 'تصدير ZIP', 'export download zip', '', exportZip],
+        ['fa-solid fa-download', 'تصدير JSON', 'export download json', '', exportJson],
+        ['fa-solid fa-circle-half-stroke', 'تبديل المظهر', 'theme dark light', '', toggleTheme],
+        ['fa-solid fa-gear', 'الإعدادات', 'settings preferences', 'Ctrl+,', openSettings],
+        ['fa-solid fa-keyboard', 'الاختصارات', 'shortcuts help', 'F1', function () { openModal('shortcuts-modal'); }],
+        ['fa-solid fa-broom', 'مسح الكونسول', 'clear console logs', '', function () { clearConsole(); toast('تم مسح السجلات', 'ok'); }],
+        ['fa-solid fa-expand', 'ملء شاشة الناتج', 'fullscreen output', '', toggleFullscreen],
+        ['fa-solid fa-clock-rotate-left', 'استعادة النسخة السابقة', 'restore backup', '', restoreBackup],
+        ['fa-solid fa-trash-can', 'إعادة ضبط المشروع', 'reset project', '', resetProject]
+      ];
+      actions.forEach(function (action) {
+        commands.push({ icon: action[0], label: action[1], keywords: action[2], kbd: action[3], run: action[4] });
+      });
+      return commands;
+    }
+
+    function updatePaletteActive() {
+      const list = $('#palette-list');
+      if (!list) return;
+      $$('.palette-item', list).forEach(function (item, index) {
+        item.classList.toggle('active', index === paletteIndex);
+      });
+      const active = list.children[paletteIndex];
+      if (active && active.scrollIntoView) active.scrollIntoView({ block: 'nearest' });
+    }
+
+    function renderPalette() {
+      const list = $('#palette-list');
+      const input = $('#palette-input');
+      if (!list || !input) return;
+      const query = input.value.trim().toLowerCase();
+      const all = paletteCommands();
+      paletteItems = all.filter(function (command) {
+        if (!query) return true;
+        return (command.label + ' ' + command.keywords).toLowerCase().indexOf(query) !== -1;
+      }).slice(0, 80);
+
+      if (paletteIndex >= paletteItems.length) paletteIndex = Math.max(0, paletteItems.length - 1);
+      list.innerHTML = '';
+      if (!paletteItems.length) {
+        const empty = document.createElement('div');
+        empty.className = 'palette-empty';
+        empty.textContent = 'لا توجد أوامر مطابقة';
+        list.appendChild(empty);
+        return;
+      }
+
+      paletteItems.forEach(function (command, index) {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'palette-item' + (index === paletteIndex ? ' active' : '');
+        const icon = document.createElement('i');
+        icon.className = command.icon;
+        button.appendChild(icon);
+        const label = document.createElement('span');
+        label.textContent = command.label;
+        button.appendChild(label);
+        if (command.kbd) {
+          const kbd = document.createElement('span');
+          kbd.className = 'kbd';
+          kbd.textContent = command.kbd;
+          button.appendChild(kbd);
+        }
+        button.addEventListener('mouseenter', function () { paletteIndex = index; updatePaletteActive(); });
+        button.addEventListener('click', function () { runPaletteItem(command); });
+        list.appendChild(button);
+      });
+    }
+
+    function openPalette() {
+      const input = $('#palette-input');
+      if (input) input.value = '';
+      paletteIndex = 0;
+      renderPalette();
+      openModal('palette-modal');
+      setTimeout(function () { if (input) input.focus(); }, 40);
+    }
+
+    function runPaletteItem(command) {
+      closeModal('palette-modal');
+      if (!command) return;
+      setTimeout(function () { command.run(); }, 30);
+    }
+
+    /* ============================================================
+       Bindings
+       ============================================================ */
+    function bindUI() {
+      function on(id, event, handler) {
+        const node = document.getElementById(id);
+        if (node) node.addEventListener(event, handler);
+      }
+
+      on('btn-run', 'click', runProject);
+      on('mobile-run', 'click', runProject);
+      on('btn-save', 'click', function () { persist(true); });
+      on('btn-format', 'click', formatCode);
+      on('btn-share', 'click', shareProject);
+      on('btn-export', 'click', exportZip);
+      on('btn-import', 'click', function () { $('#file-input').click(); });
+      on('btn-import-side', 'click', function () { $('#folder-input').click(); });
+      on('btn-palette', 'click', openPalette);
+      on('btn-theme', 'click', toggleTheme);
+      on('btn-settings', 'click', openSettings);
+      on('btn-help', 'click', function () { openModal('shortcuts-modal'); });
+      on('btn-sidebar-toggle', 'click', toggleSidebar);
+      on('btn-new-file', 'click', function () { createFile(); });
+      on('btn-new-folder', 'click', function () { createFolder(); });
+      on('empty-new-file', 'click', function () { createFile(); });
+      on('empty-import', 'click', function () { $('#folder-input').click(); });
+      on('empty-palette', 'click', openPalette);
+      on('btn-clear-console', 'click', function () { clearConsole(); toast('تم مسح السجلات', 'ok'); });
+      on('btn-open-preview', 'click', openPreviewWindow);
+      on('btn-fullscreen', 'click', toggleFullscreen);
+      on('btn-copy-link', 'click', copyShareLink);
+      on('btn-native-share', 'click', nativeShare);
+      on('btn-share-zip', 'click', shareZip);
+      on('btn-share-json', 'click', exportJson);
+      on('btn-restore-backup', 'click', restoreBackup);
+      on('btn-reset', 'click', resetProject);
+
+      const treeSearch = $('#tree-search');
+      if (treeSearch) {
+        treeSearch.addEventListener('input', function () { renderTree(treeSearch.value); });
+      }
+
+      $$('.output-tab').forEach(function (button) {
+        button.addEventListener('click', function () { switchDevTab(button.getAttribute('data-tab')); });
+      });
+
+      $$('.mobile-nav-btn[data-view]').forEach(function (button) {
+        button.addEventListener('click', function () { switchMobileView(button.getAttribute('data-view')); });
+      });
+
+      const promptForm = $('#prompt-form');
+      if (promptForm) {
+        promptForm.addEventListener('submit', function (event) {
+          event.preventDefault();
+          const input = $('#prompt-input');
+          resolvePrompt(input ? input.value : '');
+        });
+      }
+
+      document.addEventListener('click', function (event) {
+        const closer = event.target.closest('[data-close]');
+        if (!closer) return;
+        const modal = closer.closest('.modal-overlay');
+        if (!modal) return;
+        if (modal.id === 'prompt-modal' && promptResolver) resolvePrompt(null);
+        else modal.classList.remove('open');
+      });
+
+      $$('.modal-overlay').forEach(function (overlay) {
+        overlay.addEventListener('click', function (event) {
+          if (event.target !== overlay) return;
+          if (overlay.id === 'prompt-modal' && promptResolver) resolvePrompt(null);
+          else overlay.classList.remove('open');
+        });
+      });
+
+      const paletteInput = $('#palette-input');
+      if (paletteInput) {
+        paletteInput.addEventListener('input', function () { paletteIndex = 0; renderPalette(); });
+        paletteInput.addEventListener('keydown', function (event) {
+          if (event.key === 'ArrowDown') {
+            event.preventDefault();
+            paletteIndex = Math.min(paletteIndex + 1, paletteItems.length - 1);
+            updatePaletteActive();
+          } else if (event.key === 'ArrowUp') {
+            event.preventDefault();
+            paletteIndex = Math.max(paletteIndex - 1, 0);
+            updatePaletteActive();
+          } else if (event.key === 'Enter') {
+            event.preventDefault();
+            runPaletteItem(paletteItems[paletteIndex]);
+          } else if (event.key === 'Escape') {
+            event.preventDefault();
+            closeModal('palette-modal');
+          }
+        });
+      }
+
+      on('setting-theme', 'change', function (event) {
+        state.settings.theme = event.target.value === 'light' ? 'light' : 'dark';
+        applySettings();
+        persist(false);
+      });
+      on('setting-font', 'input', function (event) {
+        state.settings.fontSize = Number(event.target.value) || 14;
+        applySettings();
+        clearTimeout(settingsTimer);
+        settingsTimer = setTimeout(function () { persist(false); }, 350);
+      });
+      on('setting-tab', 'change', function (event) {
+        state.settings.tabSize = Number(event.target.value) || 2;
+        applySettings();
+        persist(false);
+      });
+      on('setting-wrap', 'change', function (event) {
+        state.settings.wordWrap = event.target.checked;
+        applySettings();
+        persist(false);
+      });
+      on('setting-autosave', 'change', function (event) {
+        state.settings.autoSave = event.target.checked;
+        persist(false);
+        toast(event.target.checked ? 'تم تفعيل الحفظ التلقائي' : 'تم إيقاف الحفظ التلقائي', 'info');
+      });
+      on('setting-live', 'change', function (event) {
+        state.settings.livePreview = event.target.checked;
+        persist(false);
+        toast(event.target.checked ? 'تم تفعيل المعاينة التلقائية' : 'تم إيقاف المعاينة التلقائية', 'info');
+      });
+      on('setting-piston', 'change', function (event) {
+        const value = event.target.value.trim().replace(/\/+$/, '');
+        if (value && !/^https?:\/\//i.test(value)) {
+          toast('عنوان Piston يجب أن يبدأ بـ http:// أو https://', 'error');
+          event.target.value = state.settings.pistonEndpoint || '';
+          return;
+        }
+        state.settings.pistonEndpoint = value || 'https://emkc.org/api/v2/piston';
+        pistonVersions = null;
+        pistonVersionsPromise = null;
+        event.target.value = state.settings.pistonEndpoint;
+        persist(false);
+        toast('تم تحديث عنوان Piston', 'ok');
+      });
+      on('setting-piston-key', 'change', function (event) {
+        state.settings.pistonKey = event.target.value.trim();
+        pistonVersions = null;
+        pistonVersionsPromise = null;
+        persist(false);
+        toast(state.settings.pistonKey ? 'تم حفظ مفتاح Piston' : 'تم مسح مفتاح Piston', 'ok');
+      });
+
+      on('file-input', 'change', function (event) {
+        importFiles(event.target.files);
+        event.target.value = '';
+      });
+      on('folder-input', 'change', function (event) {
+        importFiles(event.target.files);
+        event.target.value = '';
+      });
+      on('json-input', 'change', function (event) {
+        importJsonFile(event.target.files && event.target.files[0]);
+        event.target.value = '';
+      });
+
+      $$('.console-filter').forEach(function (button) {
+        button.addEventListener('click', function () { setConsoleFilter(button.getAttribute('data-level') || 'all'); });
+      });
+      on('console-filter-input', 'input', function (event) { setConsoleSearch(event.target.value); });
+      on('btn-console-copy', 'click', copyConsole);
+      on('btn-console-clear', 'click', clearConsole);
+      on('btn-console-run', 'click', runConsoleCommand);
+
+      const consolePrompt = $('#console-prompt');
+      if (consolePrompt) {
+        consolePrompt.addEventListener('keydown', function (event) {
+          const mod = event.ctrlKey || event.metaKey;
+          if (mod && String(event.key || '').toLowerCase() === 'l') {
+            event.preventDefault();
+            clearConsole();
+            return;
+          }
+          if (event.key === 'Enter') {
+            event.preventDefault();
+            runConsoleCommand();
+            return;
+          }
+          if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+            if (!consoleHistory.length) return;
+            event.preventDefault();
+            if (event.key === 'ArrowUp') consoleHistoryIndex = Math.max(0, consoleHistoryIndex - 1);
+            else consoleHistoryIndex = Math.min(consoleHistory.length, consoleHistoryIndex + 1);
+            consolePrompt.value = consoleHistoryIndex >= consoleHistory.length ? '' : consoleHistory[consoleHistoryIndex];
+            const end = consolePrompt.value.length;
+            setTimeout(function () { consolePrompt.setSelectionRange(end, end); }, 0);
+            return;
+          }
+          if (event.key === 'Escape') {
+            consolePrompt.value = '';
+            consoleHistoryIndex = consoleHistory.length;
+          }
+        });
+      }
+
+      window.addEventListener('message', function (event) {
+        const data = event.data;
+        if (!data || !data.__codexConsole) return;
+        const frame = $('#preview-frame');
+        if (frame && event.source && event.source !== frame.contentWindow) return;
+        const args = (data.args || []).map(function (arg) {
+          if (arg && typeof arg === 'object') return { text: String(arg.text), detail: arg.detail ? String(arg.detail) : '' };
+          return { text: String(arg), detail: '' };
+        });
+        const text = args.map(function (arg) { return arg.text; }).join(' ');
+        const detail = args.map(function (arg) { return arg.detail; }).filter(Boolean).join('\n');
+        logConsole(data.type || 'log', text, detail);
+        if (data.type === 'error') addProblem('error', text, state.active);
+      });
+
+      document.addEventListener('keydown', function (event) {
+        const mod = event.ctrlKey || event.metaKey;
+        const key = String(event.key || '').toLowerCase();
+        if (event.defaultPrevented) return;
+
+        if (event.key === 'F1') { event.preventDefault(); openModal('shortcuts-modal'); return; }
+        if (mod && key === 'k') { event.preventDefault(); openPalette(); return; }
+        if (mod && key === 'b') { event.preventDefault(); toggleSidebar(); return; }
+        if (mod && event.key === ',') { event.preventDefault(); openSettings(); return; }
+        if (mod && key === 's') {
+          if (editor && editor.hasFocus()) return;
+          event.preventDefault();
+          persist(true);
+          return;
+        }
+        if (mod && event.key === 'Enter') {
+          if (editor && editor.hasFocus()) return;
+          event.preventDefault();
+          runProject();
+          return;
+        }
+        if (mod && event.shiftKey && key === 'j') {
+          event.preventDefault();
+          switchDevTab('console');
+          if (isMobile()) switchMobileView('output');
+          const prompt = $('#console-prompt');
+          if (prompt) setTimeout(function () { prompt.focus(); }, 0);
+          return;
+        }
+        if (mod && event.shiftKey && key === 'e') { event.preventDefault(); exportZip(); return; }
+        if (event.key === 'Escape') {
+          hideContextMenu();
+          if (document.querySelector('.modal-overlay.open')) {
+            if (promptResolver) resolvePrompt(null);
+            else closeAllModals();
+          }
+          const panel = $('#output-panel');
+          if (panel && panel.classList.contains('fullscreen')) panel.classList.remove('fullscreen');
+        }
+      });
+
+      document.addEventListener('click', function (event) {
+        if (!event.target.closest('#context-menu')) hideContextMenu();
+      });
+      window.addEventListener('scroll', hideContextMenu, true);
+      window.addEventListener('blur', hideContextMenu);
+
+      window.addEventListener('resize', function () {
+        if (!isMobile()) {
+          document.body.classList.remove('mobile-mode-files', 'mobile-mode-editor', 'mobile-mode-output');
+        }
+        if (editor) editor.refresh();
+      });
+
+      window.addEventListener('beforeunload', function () {
+        if (state.settings.autoSave && state.dirty.size) persist(false);
+      });
+    }
+
+    /* ============================================================
+       Init
+       ============================================================ */
+    function init() {
+      state = loadState();
+
+      if (!window.CodeMirror) {
+        toast('تعذر تحميل محرر CodeMirror — تحقق من اتصال الإنترنت ثم أعد تحميل الصفحة.', 'error');
+        return;
+      }
+
+      initEditor();
+      bindUI();
+      const shared = consumeSharedLink();
+      applySettings();
+      if (isMobile()) switchMobileView('editor');
+      else document.body.classList.remove('mobile-mode-files', 'mobile-mode-editor', 'mobile-mode-output');
+      renderAll();
+      if (state.active) openFile(state.active);
+      else { editor.setValue(''); showEmpty(true); }
+
+      initSplitter();
+      initDropZone();
+      renderProblems();
+
+      if (!shared) {
+        try {
+          if (!localStorage.getItem(WELCOME_KEY)) {
+            localStorage.setItem(WELCOME_KEY, '1');
+            setTimeout(function () {
+              toast('مرحباً بك! اضغط Ctrl+K للأوامر أو Ctrl+Enter للتشغيل.', 'info');
+            }, 800);
+          }
+        } catch (error) {}
+      }
+    }
+
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+    else init();
+  })();
+  </script>
+</body>
+</html>
