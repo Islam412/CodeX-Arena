@@ -489,6 +489,25 @@
     .help-section h4 { margin: 0 0 5px; font-size: 14px; color: var(--blue); font-weight: 600; }
     .help-section p { margin: 0; font-size: 13px; line-height: 1.75; color: var(--text); }
     .help-empty { padding: 18px; text-align: center; color: var(--muted); font-size: 13px; }
+    .planning-tabs { display: flex; gap: 6px; padding: 4px; border: 1px solid var(--divider); border-radius: var(--radius-md); background: var(--parchment); margin-bottom: 14px; }
+    .planning-tab { flex: 1; border: 0; border-radius: var(--radius-sm); background: transparent; color: var(--muted); padding: 8px 12px; font-size: 13px; font-weight: 600; cursor: pointer; }
+    .planning-tab.active { background: var(--canvas); color: var(--blue); box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+    .planning-panel { display: none; }
+    .planning-panel.active { display: block; }
+    .todo-add { display: flex; gap: 8px; }
+    .todo-add .text-input { flex: 1; }
+    .todo-progress { margin: 12px 0 8px; font-size: 12px; color: var(--muted); }
+    .todo-list { display: flex; flex-direction: column; gap: 7px; max-height: 42vh; overflow: auto; }
+    .todo-row { display: flex; align-items: center; gap: 10px; padding: 9px 11px; border: 1px solid var(--divider); border-radius: var(--radius-md); background: var(--parchment); }
+    .todo-check { width: 18px; height: 18px; accent-color: var(--blue); flex: 0 0 auto; cursor: pointer; }
+    .todo-text { flex: 1; font-size: 13px; line-height: 1.5; overflow-wrap: anywhere; }
+    .todo-row.done .todo-text { text-decoration: line-through; color: var(--muted); }
+    .sketch-toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 10px; }
+    .sketch-toolbar .text-input { width: auto; min-height: 32px; padding: 4px 8px; }
+    .sketch-toolbar input[type="color"] { width: 38px; height: 32px; padding: 2px; border: 1px solid var(--divider); border-radius: var(--radius-sm); background: var(--parchment); cursor: pointer; }
+    .sketch-toolbar input[type="range"] { width: 110px; accent-color: var(--blue); }
+    .sketch-wrap { border: 1px solid var(--divider); border-radius: var(--radius-md); overflow: hidden; background: #fff; }
+    #sketch-canvas { display: block; width: 100%; height: min(52vh, 440px); touch-action: none; cursor: crosshair; }
     .modal-footer { display: flex; align-items: center; justify-content: flex-end; gap: 9px; padding: 12px 18px; border-top: 1px solid var(--divider); }
     .muted { color: var(--muted); }
     .field { display: flex; flex-direction: column; gap: 7px; margin-bottom: 15px; }
@@ -644,6 +663,7 @@
       <button class="btn btn-icon" id="btn-save-as" title="Save project file (Ctrl+Shift+S)" data-title-ar="حفظ ملف المشروع (Ctrl+Shift+S)" data-title-en="Save project file (Ctrl+Shift+S)"><i class="fa-solid fa-file-arrow-down"></i></button>
       <button class="btn btn-icon" id="btn-export" title="Export ZIP" data-title-ar="تصدير ZIP" data-title-en="Export ZIP"><i class="fa-solid fa-file-zipper"></i></button>
       <button class="btn btn-icon" id="btn-import" title="Import files" data-title-ar="استيراد ملفات" data-title-en="Import files"><i class="fa-solid fa-file-import"></i></button>
+      <button class="btn btn-icon" id="btn-planning" title="Planning / To-do / Sketch" data-title-ar="التخطيط والمهام والرسم" data-title-en="Planning / To-do / Sketch"><i class="fa-solid fa-list-check"></i></button>
       <button class="btn btn-icon" id="btn-palette" title="Command palette (Ctrl+K)" data-title-ar="لوحة الأوامر (Ctrl+K)" data-title-en="Command palette (Ctrl+K)"><i class="fa-solid fa-terminal"></i></button>
       <button class="btn btn-icon" id="btn-language" title="العربية / English" data-title-ar="التبديل إلى الإنجليزية / Switch to English" data-title-en="التبديل إلى العربية / Switch to Arabic"><i class="fa-solid fa-language"></i></button>
       <button class="btn btn-icon" id="btn-theme" title="Appearance" data-title-ar="تبديل المظهر" data-title-en="Switch appearance"><i class="fa-solid fa-circle-half-stroke"></i></button>
@@ -1021,6 +1041,10 @@
             <p data-i18n-ar="أنشئ ملفات داخل أي مجلد من شريط المسار أو الأزرار الصغيرة بجانب المجلد. اسحب أي ملف أو مجلد إلى مجلد آخر أو إلى الجذر للنقل، أو استخدم «نقل إلى مجلد» من القائمة." data-i18n-en="Create files inside any folder from the path bar or the small buttons next to a folder. Drag any file or folder into another folder or to the root to move it, or use “Move to folder” from the menu.">أنشئ ملفات داخل أي مجلد من شريط المسار أو الأزرار الصغيرة بجانب المجلد. اسحب أي ملف أو مجلد إلى مجلد آخر أو إلى الجذر للنقل، أو استخدم «نقل إلى مجلد» من القائمة.</p>
           </section>
           <section class="help-section">
+            <h4 data-i18n-ar="التخطيط والمهام" data-i18n-en="Planning & tasks">التخطيط والمهام</h4>
+            <p data-i18n-ar="افتح زر «التخطيط» من الشريط العلوي لتكتب قائمة مهام وتحددها كمنجزة، أو ارسم مخطط الواجهة على اللوحة بالقلم والممحاة، ثم نزّل الرسم PNG. تُحفظ المهام والرسم مع المشروع." data-i18n-en="Open the “Planning” button in the header to write a to-do list and mark tasks done, or sketch the interface on the canvas with the pen and eraser and download it as PNG. Tasks and sketch are saved with the project.">افتح زر «التخطيط» من الشريط العلوي لتكتب قائمة مهام وتحددها كمنجزة، أو ارسم مخطط الواجهة على اللوحة بالقلم والممحاة، ثم نزّل الرسم PNG. تُحفظ المهام والرسم مع المشروع.</p>
+          </section>
+          <section class="help-section">
             <h4 data-i18n-ar="الأخطاء والفحص" data-i18n-en="Errors & inspection">الأخطاء والفحص</h4>
             <p data-i18n-ar="تظهر الأخطاء بالعربية والإنجليزية مع رقم السطر ومقتطف من الكود. اضغط على الخطأ للقفز إلى السطر. استخدم تبويب «الفحص» لاختيار عنصر من المعاينة ورؤية تنسيقاته." data-i18n-en="Errors appear in Arabic and English with the line number and a code snippet. Click an error to jump to its line. Use the “Inspect” tab to pick an element in the preview and see its styles.">تظهر الأخطاء بالعربية والإنجليزية مع رقم السطر ومقتطف من الكود. اضغط على الخطأ للقفز إلى السطر. استخدم تبويب «الفحص» لاختيار عنصر من المعاينة ورؤية تنسيقاته.</p>
           </section>
@@ -1034,6 +1058,42 @@
           </section>
         </div>
         <div class="help-empty" id="help-empty" hidden data-i18n-ar="لا توجد نتائج مطابقة." data-i18n-en="No matching results.">لا توجد نتائج مطابقة.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="planning-modal">
+    <div class="modal modal-wide">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-list-check"></i> <span data-i18n-ar="التخطيط" data-i18n-en="Planning">التخطيط</span></h3>
+        <button class="icon-btn" data-close title="Close" data-title-ar="إغلاق" data-title-en="Close"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="planning-tabs">
+          <button class="planning-tab active" id="planning-tab-todo" type="button" data-i18n-ar="قائمة المهام" data-i18n-en="To-do list">قائمة المهام</button>
+          <button class="planning-tab" id="planning-tab-sketch" type="button" data-i18n-ar="الرسم والتخطيط" data-i18n-en="Sketch & plan">الرسم والتخطيط</button>
+        </div>
+        <div class="planning-panel active" id="planning-panel-todo">
+          <div class="todo-add">
+            <input class="text-input" id="todo-input" type="text" data-ph-ar="اكتب مهمة جديدة…" data-ph-en="Add a new task…" placeholder="اكتب مهمة جديدة…" autocomplete="off">
+            <button class="btn btn-primary" id="btn-todo-add" type="button"><i class="fa-solid fa-plus"></i> <span data-i18n-ar="إضافة" data-i18n-en="Add">إضافة</span></button>
+          </div>
+          <div class="todo-progress" id="todo-progress">0 / 0</div>
+          <div class="todo-list" id="todo-list"></div>
+          <div class="help-empty" id="todo-empty" data-i18n-ar="لا توجد مهام بعد. أضف أول مهمة للبدء." data-i18n-en="No tasks yet. Add your first task to begin.">لا توجد مهام بعد. أضف أول مهمة للبدء.</div>
+        </div>
+        <div class="planning-panel" id="planning-panel-sketch">
+          <div class="sketch-toolbar">
+            <button class="btn active" id="sketch-tool-pen" type="button" data-i18n-ar="قلم" data-i18n-en="Pen">قلم</button>
+            <button class="btn" id="sketch-tool-eraser" type="button" data-i18n-ar="ممحاة" data-i18n-en="Eraser">ممحاة</button>
+            <input type="color" id="sketch-color" value="#0066cc" title="Color" data-title-ar="اللون" data-title-en="Color">
+            <input type="range" id="sketch-size" min="1" max="24" value="3" title="Size" data-title-ar="السماكة" data-title-en="Size">
+            <button class="btn btn-icon" id="btn-sketch-undo" type="button" title="Undo" data-title-ar="تراجع" data-title-en="Undo"><i class="fa-solid fa-rotate-left"></i></button>
+            <button class="btn btn-icon" id="btn-sketch-clear" type="button" title="Clear" data-title-ar="مسح اللوحة" data-title-en="Clear canvas"><i class="fa-solid fa-broom"></i></button>
+            <button class="btn btn-icon" id="btn-sketch-download" type="button" title="Download PNG" data-title-ar="تنزيل PNG" data-title-en="Download PNG"><i class="fa-solid fa-download"></i></button>
+          </div>
+          <div class="sketch-wrap"><canvas id="sketch-canvas" width="1200" height="700"></canvas></div>
+        </div>
       </div>
     </div>
   </div>
@@ -1299,6 +1359,7 @@
       'تعذرت المزامنة': 'Sync failed',
       'مجلد محلي متصل': 'Local folder connected',
       'مزامنة المجلد المحلي': 'Sync local folder',
+      'حذف مهمة': 'Delete task',
       'دليل الاستخدام': 'Help & guide',
       'مشروع جديد': 'New project',
       'فتح مشروع': 'Open project',
@@ -1348,7 +1409,7 @@
       document.body.style.setProperty('--drag-label', lang === 'ar' ? '"أفلت الملفات لاستيرادها إلى المشروع"' : '"Drop files to import"');
       const languageSelect = $('#setting-language');
       if (languageSelect) languageSelect.value = lang;
-      if (state) { updateStatus(); renderProblems(); renderConsole(false); }
+      if (state) { updateStatus(); renderProblems(); renderConsole(false); renderTodos(); }
       updateLocalStatus();
       if (typeof refreshInspectStatus === 'function') refreshInspectStatus();
     }
@@ -2094,6 +2155,9 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
     let liveTimer = null;
     let syncTimer = null;
     let syncPending = false;
+    let sketchCtx = null;
+    let sketchUndo = [];
+    const sketchTool = { mode: 'pen', color: '#0066cc', size: 3, drawing: false, last: null };
     const localBridge = { enabled: false, root: '', name: '', busy: false, error: '' };
     let paletteItems = [];
     let paletteIndex = 0;
@@ -2119,6 +2183,8 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
         expanded: ['styles', 'scripts', 'python'],
         settings: Object.assign({}, DEFAULT_SETTINGS),
         cursors: {},
+        todos: [],
+        sketch: '',
         dirty: new Set()
       };
       try {
@@ -2144,6 +2210,8 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
           expanded: Array.isArray(data.expanded) ? data.expanded : base.expanded,
           settings: Object.assign({}, DEFAULT_SETTINGS, data.settings || {}),
           cursors: data.cursors && typeof data.cursors === 'object' ? data.cursors : {},
+          todos: Array.isArray(data.todos) ? data.todos.filter(function (task) { return task && typeof task.text === 'string'; }) : [],
+          sketch: typeof data.sketch === 'string' ? data.sketch : '',
           dirty: new Set()
         };
       } catch (error) {
@@ -2157,7 +2225,9 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
         version: 3,
         files: state.files,
         folders: state.folders,
-        currentFolder: state.currentFolder || ''
+        currentFolder: state.currentFolder || '',
+        todos: state.todos,
+        sketch: state.sketch
       };
       if (includeSettings !== false) {
         const settings = Object.assign({}, state.settings);
@@ -2176,7 +2246,9 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
           active: state.active,
           expanded: state.expanded,
           settings: state.settings,
-          cursors: state.cursors
+          cursors: state.cursors,
+          todos: state.todos,
+          sketch: state.sketch
         }));
         state.dirty.clear();
         updateStatus();
@@ -2474,6 +2546,185 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
       if (!state || state.settings.autoComplete === false) return;
       if (cm.state.completionActive) cm.closeHint();
       cm.showHint({ hint: codexHint, completeSingle: false, alignWithWord: true });
+    }
+
+    function switchPlanningTab(tab) {
+      $$('.planning-tab').forEach(function (button) {
+        button.classList.toggle('active', button.id === 'planning-tab-' + tab);
+      });
+      $$('.planning-panel').forEach(function (panel) {
+        panel.classList.toggle('active', panel.id === 'planning-panel-' + tab);
+      });
+      if (tab === 'sketch') setupSketchCanvas();
+      else renderTodos();
+    }
+
+    function renderTodos() {
+      const list = $('#todo-list');
+      if (!list || !state) return;
+      list.textContent = '';
+      const tasks = Array.isArray(state.todos) ? state.todos : [];
+      tasks.forEach(function (task, index) {
+        const row = document.createElement('div');
+        row.className = 'todo-row' + (task.done ? ' done' : '');
+        const check = document.createElement('input');
+        check.type = 'checkbox';
+        check.className = 'todo-check';
+        check.checked = !!task.done;
+        check.setAttribute('data-todo-toggle', String(index));
+        const label = document.createElement('span');
+        label.className = 'todo-text';
+        label.textContent = task.text;
+        const remove = document.createElement('button');
+        remove.type = 'button';
+        remove.className = 'icon-btn';
+        remove.title = tr('حذف مهمة');
+        remove.innerHTML = '<i class="fa-solid fa-trash"></i>';
+        remove.setAttribute('data-todo-delete', String(index));
+        row.appendChild(check);
+        row.appendChild(label);
+        row.appendChild(remove);
+        list.appendChild(row);
+      });
+      const done = tasks.filter(function (task) { return !!task.done; }).length;
+      const progress = $('#todo-progress');
+      if (progress) progress.textContent = done + ' / ' + tasks.length;
+      const empty = $('#todo-empty');
+      if (empty) empty.hidden = tasks.length > 0;
+    }
+
+    function addTodo() {
+      const input = $('#todo-input');
+      if (!input || !state) return;
+      const text = String(input.value || '').trim();
+      if (!text) return;
+      if (!Array.isArray(state.todos)) state.todos = [];
+      state.todos.push({ id: Date.now() + '-' + Math.random().toString(36).slice(2), text: text, done: false });
+      input.value = '';
+      renderTodos();
+      persist(false);
+    }
+
+    function clearSketchCanvas() {
+      if (!sketchCtx) return;
+      sketchCtx.save();
+      sketchCtx.fillStyle = '#ffffff';
+      sketchCtx.fillRect(0, 0, sketchCtx.canvas.width, sketchCtx.canvas.height);
+      sketchCtx.restore();
+    }
+
+    function sketchPoint(event) {
+      const canvas = $('#sketch-canvas');
+      const rect = canvas.getBoundingClientRect();
+      return {
+        x: (event.clientX - rect.left) * (canvas.width / rect.width),
+        y: (event.clientY - rect.top) * (canvas.height / rect.height)
+      };
+    }
+
+    function sketchStyle() {
+      return {
+        color: sketchTool.mode === 'eraser' ? '#ffffff' : sketchTool.color,
+        width: sketchTool.mode === 'eraser' ? sketchTool.size * 5 : sketchTool.size
+      };
+    }
+
+    function sketchSnapshot() {
+      const canvas = $('#sketch-canvas');
+      return canvas ? canvas.toDataURL('image/png') : '';
+    }
+
+    function saveSketch() {
+      if (!state) return;
+      state.sketch = sketchSnapshot();
+      persist(false);
+    }
+
+    function pushSketchUndo() {
+      sketchUndo.push(sketchSnapshot());
+      if (sketchUndo.length > 20) sketchUndo.shift();
+    }
+
+    function restoreSketch(dataUrl) {
+      if (!sketchCtx) return;
+      clearSketchCanvas();
+      if (!dataUrl) return;
+      const image = new Image();
+      image.onload = function () {
+        if (sketchCtx) sketchCtx.drawImage(image, 0, 0, sketchCtx.canvas.width, sketchCtx.canvas.height);
+      };
+      image.src = dataUrl;
+    }
+
+    function updateSketchTools() {
+      const pen = $('#sketch-tool-pen');
+      const eraser = $('#sketch-tool-eraser');
+      if (pen) pen.classList.toggle('active', sketchTool.mode === 'pen');
+      if (eraser) eraser.classList.toggle('active', sketchTool.mode === 'eraser');
+    }
+
+    function setupSketchCanvas() {
+      const canvas = $('#sketch-canvas');
+      if (!canvas) return;
+      if (!sketchCtx) {
+        canvas.width = 1200;
+        canvas.height = 700;
+        sketchCtx = canvas.getContext('2d');
+        sketchCtx.lineCap = 'round';
+        sketchCtx.lineJoin = 'round';
+        canvas.addEventListener('pointerdown', function (event) {
+          event.preventDefault();
+          canvas.setPointerCapture(event.pointerId);
+          pushSketchUndo();
+          sketchTool.drawing = true;
+          sketchTool.last = sketchPoint(event);
+          const style = sketchStyle();
+          sketchCtx.beginPath();
+          sketchCtx.fillStyle = style.color;
+          sketchCtx.arc(sketchTool.last.x, sketchTool.last.y, style.width / 2, 0, Math.PI * 2);
+          sketchCtx.fill();
+        });
+        canvas.addEventListener('pointermove', function (event) {
+          if (!sketchTool.drawing) return;
+          event.preventDefault();
+          const point = sketchPoint(event);
+          const style = sketchStyle();
+          sketchCtx.beginPath();
+          sketchCtx.moveTo(sketchTool.last.x, sketchTool.last.y);
+          sketchCtx.lineTo(point.x, point.y);
+          sketchCtx.strokeStyle = style.color;
+          sketchCtx.lineWidth = style.width;
+          sketchCtx.stroke();
+          sketchTool.last = point;
+        });
+        function stopSketch() {
+          if (!sketchTool.drawing) return;
+          sketchTool.drawing = false;
+          sketchTool.last = null;
+          saveSketch();
+        }
+        canvas.addEventListener('pointerup', stopSketch);
+        canvas.addEventListener('pointercancel', stopSketch);
+      }
+      restoreSketch(state && state.sketch ? state.sketch : '');
+      updateSketchTools();
+    }
+
+    function undoSketch() {
+      if (!sketchCtx || !sketchUndo.length) return;
+      restoreSketch(sketchUndo.pop());
+      saveSketch();
+    }
+
+    function downloadSketch() {
+      const data = state && state.sketch ? state.sketch : sketchSnapshot();
+      if (!data) return;
+      const link = document.createElement('a');
+      link.href = data;
+      link.download = 'codex-arena-sketch.png';
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
     }
 
     function selectedLineRange(cm) {
@@ -3432,6 +3683,8 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
       state.currentFolder = '';
       state.expanded = Array.from(new Set(state.folders.concat(deriveFolders(files))));
       state.cursors = {};
+      state.todos = Array.isArray(data.todos) ? data.todos.filter(function (task) { return task && typeof task.text === 'string'; }) : state.todos || [];
+      state.sketch = typeof data.sketch === 'string' ? data.sketch : state.sketch || '';
       state.dirty = new Set();
     }
 
@@ -5205,6 +5458,44 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
       on('btn-export', 'click', exportZip);
       on('btn-import', 'click', function () { $('#file-input').click(); });
       on('btn-import-side', 'click', function () { $('#folder-input').click(); });
+      on('btn-planning', 'click', function () {
+        openModal('planning-modal');
+        switchPlanningTab('todo');
+        setupSketchCanvas();
+      });
+      on('planning-tab-todo', 'click', function () { switchPlanningTab('todo'); });
+      on('planning-tab-sketch', 'click', function () { switchPlanningTab('sketch'); });
+      on('btn-todo-add', 'click', addTodo);
+      on('todo-input', 'keydown', function (event) {
+        if (event.key === 'Enter') { event.preventDefault(); addTodo(); }
+      });
+      on('todo-list', 'change', function (event) {
+        const index = event.target && event.target.getAttribute ? event.target.getAttribute('data-todo-toggle') : null;
+        if (index === null || !state || !state.todos[Number(index)]) return;
+        state.todos[Number(index)].done = !!event.target.checked;
+        renderTodos();
+        persist(false);
+      });
+      on('todo-list', 'click', function (event) {
+        const button = event.target && event.target.closest ? event.target.closest('[data-todo-delete]') : null;
+        if (!button || !state) return;
+        const index = Number(button.getAttribute('data-todo-delete'));
+        if (!state.todos[index]) return;
+        state.todos.splice(index, 1);
+        renderTodos();
+        persist(false);
+      });
+      on('sketch-tool-pen', 'click', function () { sketchTool.mode = 'pen'; updateSketchTools(); });
+      on('sketch-tool-eraser', 'click', function () { sketchTool.mode = 'eraser'; updateSketchTools(); });
+      on('sketch-color', 'input', function (event) { sketchTool.color = event.target.value; sketchTool.mode = 'pen'; updateSketchTools(); });
+      on('sketch-size', 'input', function (event) { sketchTool.size = Number(event.target.value) || 3; });
+      on('btn-sketch-undo', 'click', undoSketch);
+      on('btn-sketch-clear', 'click', function () {
+        pushSketchUndo();
+        clearSketchCanvas();
+        saveSketch();
+      });
+      on('btn-sketch-download', 'click', downloadSketch);
       on('btn-palette', 'click', openPalette);
       on('btn-theme', 'click', toggleTheme);
       on('btn-settings', 'click', openSettings);

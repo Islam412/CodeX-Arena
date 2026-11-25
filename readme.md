@@ -33,7 +33,8 @@
 - **VS Code-style Editing:** `Alt+Up` / `Alt+Down` move the current line or selection, and `Shift+Alt+Down` duplicates it.
 - **New Project & Open Project:** Short starter templates (blank page, HTML/CSS/JS, Python, Markdown), asks for a project name and creates a file with that name, save the project as a JSON file, and open a saved project file or full folder.
 - **Terminal Launcher:** Run `./codex` from any folder to open the editor in that folder; files and folders are auto-saved back to disk like a local VS Code workspace.
-- **Help & Guide:** Searchable in-app guide covering editing, files, errors, inspect tools, saving and language switching.
+- **Planning Workspace:** Built-in to-do list and a drawing canvas for wireframing and app planning, with pen, eraser, colors, undo, clear and PNG export; saved with the project.
+- **Help & Guide:** Searchable in-app guide covering editing, files, errors, inspect tools, planning, saving and language switching.
 - **🛠️ Built-in Developer Tools:** Interactive JavaScript Console (REPL), Problems panel with exact line numbers and source snippets, plus a DOM Inspector with element picker, tree and computed styles.
 - **🖱️ Custom Context Menus:** Native-feel right-click menus for quick file operations (Rename, Delete, Create).
 - **Responsive Layout:** Sidebar drawer and full-screen output views on phones, with touch-friendly controls on tablets and desktops.
