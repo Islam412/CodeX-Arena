@@ -273,8 +273,10 @@
       padding: 4px; max-height: 230px;
       font-family: var(--font-code); font-size: 13px;
       direction: ltr; text-align: left;
+      z-index: 1000; box-shadow: var(--shadow-lg, 0 12px 30px rgba(0,0,0,.16));
     }
-    .CodeMirror-hint { color: var(--text); padding: 5px 9px; border-radius: var(--radius-sm); }
+    .CodeMirror-hint { color: var(--text); padding: 5px 9px; border-radius: var(--radius-sm); cursor: pointer; }
+    .CodeMirror-hint:hover { background: var(--hover); color: var(--text); }
     li.CodeMirror-hint-active { background: var(--blue); color: #fff; }
     .CodeMirror-dialog { background: var(--canvas); color: var(--text); border-color: var(--border); font-family: var(--font-ui); }
     .CodeMirror-dialog input { color: var(--text); font-family: var(--font-code); }
@@ -480,6 +482,13 @@
     .modal-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 14px 18px; border-bottom: 1px solid var(--divider); }
     .modal-header h3 { margin: 0; font-family: var(--font-display); font-size: 21px; font-weight: 600; letter-spacing: -0.374px; display: inline-flex; align-items: center; gap: 8px; }
     .modal-body { padding: 18px; max-height: 68vh; overflow: auto; }
+    .modal-wide .modal { width: min(680px, 96vw); }
+    .modal-intro { margin: 0 0 14px; color: var(--muted); font-size: 13px; line-height: 1.7; }
+    .help-sections { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+    .help-section { padding: 12px 14px; border-radius: var(--radius-md); background: var(--parchment); }
+    .help-section h4 { margin: 0 0 5px; font-size: 14px; color: var(--blue); font-weight: 600; }
+    .help-section p { margin: 0; font-size: 13px; line-height: 1.75; color: var(--text); }
+    .help-empty { padding: 18px; text-align: center; color: var(--muted); font-size: 13px; }
     .modal-footer { display: flex; align-items: center; justify-content: flex-end; gap: 9px; padding: 12px 18px; border-top: 1px solid var(--divider); }
     .muted { color: var(--muted); }
     .field { display: flex; flex-direction: column; gap: 7px; margin-bottom: 15px; }
@@ -507,6 +516,17 @@
     .kbd { font-family: var(--font-code); font-size: 12px; border: 1px solid var(--divider); background: var(--parchment); border-radius: var(--radius-sm); padding: 3px 8px; color: var(--muted); }
     .shortcut-grid { display: grid; grid-template-columns: 1fr auto; gap: 11px 14px; align-items: center; font-size: 14px; }
     .shortcut-grid .kbd { justify-self: end; }
+    .project-card-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .project-card {
+      display: flex; flex-direction: column; align-items: flex-start; gap: 6px;
+      padding: 16px; border: 1px solid var(--divider); border-radius: var(--radius-lg);
+      background: var(--canvas); color: var(--text); text-align: start; cursor: pointer;
+      transition: border-color .15s, background .15s, transform .15s;
+    }
+    .project-card:hover { border-color: var(--blue); background: var(--hover); transform: translateY(-1px); }
+    .project-card i { font-size: 20px; color: var(--blue); }
+    .project-card strong { font-size: 14px; font-weight: 600; }
+    .project-card small { font-size: 12px; color: var(--muted); line-height: 1.6; }
     .share-actions { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 14px; }
 
     .palette-input { width: 100%; height: 52px; border: 0; border-bottom: 1px solid var(--divider); background: transparent; color: var(--text); padding: 0 18px; font-size: 17px; outline: none; }
@@ -559,6 +579,7 @@
       .app-footer { display: none; }
       .modal-overlay { padding-top: 4vh; }
       .modal-body { max-height: 76vh; }
+      .toolbar #btn-format, .toolbar #btn-share, .toolbar #btn-export, .toolbar #btn-help { display: none; }
       .tree-row { min-height: 38px; }
       .tree-row-actions { opacity: 1; }
       .icon-btn { width: 34px; height: 34px; }
@@ -585,10 +606,11 @@
       .tree-context { padding: 6px; }
       .output-tabs { padding: 0 4px; overflow-x: auto; }
       .output-tab { flex: 0 0 auto; }
+      .project-card-grid { grid-template-columns: minmax(0, 1fr); }
     }
     @media (max-width: 420px) {
       .brand-name { font-size: .86rem; }
-      .toolbar #btn-format, .toolbar #btn-share, .toolbar #btn-export, .toolbar #btn-help { display: none; }
+      .toolbar #btn-import, .toolbar #btn-theme { display: none; }
       .tree-context-path { font-size: 11px; }
       .mobile-nav-btn { font-size: 11px; }
       .problem-head { gap: 4px; }
@@ -605,6 +627,8 @@
     </div>
 
     <div class="toolbar">
+      <button class="btn" id="btn-new-project" title="New project" data-title-ar="مشروع جديد" data-title-en="New project"><i class="fa-solid fa-layer-plus"></i><span class="btn-label" data-i18n-ar="مشروع جديد" data-i18n-en="New project">مشروع جديد</span></button>
+      <button class="btn" id="btn-open-project" title="Open project" data-title-ar="فتح مشروع" data-title-en="Open project"><i class="fa-solid fa-folder-open"></i><span class="btn-label" data-i18n-ar="فتح مشروع" data-i18n-en="Open project">فتح مشروع</span></button>
       <button class="btn btn-primary" id="btn-run" title="Run (Ctrl+Enter)" data-title-ar="تشغيل (Ctrl+Enter)" data-title-en="Run (Ctrl+Enter)">
         <i class="fa-solid fa-play"></i><span class="btn-label" data-i18n-ar="تشغيل" data-i18n-en="Run">تشغيل</span>
       </button>
@@ -617,6 +641,7 @@
       <button class="btn" id="btn-share" title="Share project" data-title-ar="مشاركة المشروع" data-title-en="Share project">
         <i class="fa-solid fa-share-nodes"></i><span class="btn-label" data-i18n-ar="مشاركة" data-i18n-en="Share">مشاركة</span>
       </button>
+      <button class="btn btn-icon" id="btn-save-as" title="Save project file (Ctrl+Shift+S)" data-title-ar="حفظ ملف المشروع (Ctrl+Shift+S)" data-title-en="Save project file (Ctrl+Shift+S)"><i class="fa-solid fa-file-arrow-down"></i></button>
       <button class="btn btn-icon" id="btn-export" title="Export ZIP" data-title-ar="تصدير ZIP" data-title-en="Export ZIP"><i class="fa-solid fa-file-zipper"></i></button>
       <button class="btn btn-icon" id="btn-import" title="Import files" data-title-ar="استيراد ملفات" data-title-en="Import files"><i class="fa-solid fa-file-import"></i></button>
       <button class="btn btn-icon" id="btn-palette" title="Command palette (Ctrl+K)" data-title-ar="لوحة الأوامر (Ctrl+K)" data-title-en="Command palette (Ctrl+K)"><i class="fa-solid fa-terminal"></i></button>
@@ -624,6 +649,7 @@
       <button class="btn btn-icon" id="btn-theme" title="Appearance" data-title-ar="تبديل المظهر" data-title-en="Switch appearance"><i class="fa-solid fa-circle-half-stroke"></i></button>
       <button class="btn btn-icon" id="btn-settings" title="Settings (Ctrl+,)" data-title-ar="الإعدادات (Ctrl+,)" data-title-en="Settings (Ctrl+,)"><i class="fa-solid fa-gear"></i></button>
       <button class="btn btn-icon" id="btn-help" title="Shortcuts (F1)" data-title-ar="الاختصارات (F1)" data-title-en="Shortcuts (F1)"><i class="fa-solid fa-keyboard"></i></button>
+      <button class="btn btn-icon" id="btn-guide" title="Help / Guide" data-title-ar="دليل الاستخدام" data-title-en="Help / Guide"><i class="fa-solid fa-circle-question"></i></button>
       <button class="btn btn-icon" id="btn-sidebar-toggle" title="Toggle files (Ctrl+B)" data-title-ar="إظهار/إخفاء الملفات (Ctrl+B)" data-title-en="Toggle files (Ctrl+B)"><i class="fa-solid fa-table-columns"></i></button>
     </div>
   </header>
@@ -661,6 +687,8 @@
           <span id="status-text">—</span>
         </div>
         <div class="status-right">
+          <button class="icon-btn" id="btn-local-sync" hidden title="Sync local folder" data-title-ar="مزامنة المجلد المحلي" data-title-en="Sync local folder"><i class="fa-solid fa-rotate"></i></button>
+          <span class="status-chip" id="local-status" hidden><i class="fa-solid fa-folder-open"></i> <span id="local-status-text">—</span></span>
           <span class="status-chip" id="status-lang"><i class="fa-solid fa-code"></i> —</span>
           <span class="status-chip status-meta-hide" id="status-position"><i class="fa-solid fa-location-dot"></i> Ln 1, Col 1</span>
           <span class="status-chip status-meta-hide" id="status-size"><i class="fa-solid fa-ruler"></i> 0</span>
@@ -673,7 +701,8 @@
           <h2 data-i18n-ar="مرحباً في CodeX Arena" data-i18n-en="Welcome to CodeX Arena">مرحباً في CodeX Arena</h2>
           <p data-i18n-ar="بيئة تطوير متكاملة تعمل بالكامل داخل المتصفح، مجانية 100%، وتدعم عشرات اللغات مع الإكمال التلقائي والمعاينة الحية وأدوات الفحص والمشاركة." data-i18n-en="A complete development environment that runs entirely in your browser — free, with dozens of languages, autocomplete, live preview, inspect tools and sharing.">بيئة تطوير متكاملة تعمل بالكامل داخل المتصفح، مجانية 100%، وتدعم عشرات اللغات مع الإكمال التلقائي والمعاينة الحية وأدوات الفحص والمشاركة.</p>
           <div class="empty-actions">
-            <button class="btn btn-primary" id="empty-new-file"><i class="fa-solid fa-file-circle-plus"></i> <span data-i18n-ar="ملف جديد" data-i18n-en="New file">ملف جديد</span></button>
+            <button class="btn btn-primary" id="empty-new-project"><i class="fa-solid fa-layer-plus"></i> <span data-i18n-ar="مشروع جديد" data-i18n-en="New project">مشروع جديد</span></button>
+            <button class="btn" id="empty-new-file"><i class="fa-solid fa-file-circle-plus"></i> <span data-i18n-ar="ملف جديد" data-i18n-en="New file">ملف جديد</span></button>
             <button class="btn" id="empty-import"><i class="fa-solid fa-upload"></i> <span data-i18n-ar="استيراد مشروع" data-i18n-en="Import project">استيراد مشروع</span></button>
             <button class="btn" id="empty-palette"><i class="fa-solid fa-terminal"></i> <span data-i18n-ar="لوحة الأوامر" data-i18n-en="Command palette">لوحة الأوامر</span></button>
           </div>
@@ -764,6 +793,7 @@
   <input type="file" id="file-input" multiple hidden>
   <input type="file" id="folder-input" webkitdirectory directory multiple hidden>
   <input type="file" id="json-input" accept=".json,application/json" hidden>
+  <input type="file" id="project-folder-input" webkitdirectory directory multiple hidden>
 
   <div class="modal-overlay" id="palette-modal">
     <div class="modal palette-modal">
@@ -841,6 +871,10 @@
           <label class="switch"><input type="checkbox" id="setting-autosave"><span></span></label>
         </div>
         <div class="switch-row">
+          <div class="switch-text"><strong data-i18n-ar="الإكمال التلقائي أثناء الكتابة" data-i18n-en="Autocomplete while typing">الإكمال التلقائي أثناء الكتابة</strong><small data-i18n-ar="اقتراح الكلمات والقصاصات أثناء كتابة الكود" data-i18n-en="Suggest keywords and snippets as you type code">اقتراح الكلمات والقصاصات أثناء كتابة الكود</small></div>
+          <label class="switch"><input type="checkbox" id="setting-autocomplete"><span></span></label>
+        </div>
+        <div class="switch-row">
           <div class="switch-text"><strong data-i18n-ar="المعاينة التلقائية" data-i18n-en="Live preview">المعاينة التلقائية</strong><small data-i18n-ar="تحديث معاينة HTML/CSS/JS أثناء الكتابة" data-i18n-en="Update the HTML/CSS/JS preview while typing">تحديث معاينة HTML/CSS/JS أثناء الكتابة</small></div>
           <label class="switch"><input type="checkbox" id="setting-live"><span></span></label>
         </div>
@@ -873,7 +907,11 @@
           <span data-i18n-ar="لوحة الأوامر" data-i18n-en="Command palette">لوحة الأوامر</span><span class="kbd">Ctrl + K</span>
           <span data-i18n-ar="تشغيل الملف الحالي" data-i18n-en="Run current file">تشغيل الملف الحالي</span><span class="kbd">Ctrl + Enter</span>
           <span data-i18n-ar="حفظ المشروع" data-i18n-en="Save project">حفظ المشروع</span><span class="kbd">Ctrl + S</span>
+          <span data-i18n-ar="حفظ ملف المشروع" data-i18n-en="Save project file">حفظ ملف المشروع</span><span class="kbd">Ctrl + Shift + S</span>
           <span data-i18n-ar="تنسيق الكود" data-i18n-en="Format code">تنسيق الكود</span><span class="kbd">Shift + Alt + F</span>
+          <span data-i18n-ar="تحريك السطر للأعلى" data-i18n-en="Move line up">تحريك السطر للأعلى</span><span class="kbd">Alt + Up</span>
+          <span data-i18n-ar="تحريك السطر للأسفل" data-i18n-en="Move line down">تحريك السطر للأسفل</span><span class="kbd">Alt + Down</span>
+          <span data-i18n-ar="نسخ السطر" data-i18n-en="Duplicate line">نسخ السطر</span><span class="kbd">Shift + Alt + Down</span>
           <span data-i18n-ar="فتح/إغلاق الملفات" data-i18n-en="Toggle files">فتح/إغلاق الملفات</span><span class="kbd">Ctrl + B</span>
           <span data-i18n-ar="الإكمال التلقائي" data-i18n-en="Autocomplete">الإكمال التلقائي</span><span class="kbd">Ctrl + Space</span>
           <span data-i18n-ar="بحث داخل الملف" data-i18n-en="Find in file">بحث داخل الملف</span><span class="kbd">Ctrl + F</span>
@@ -882,8 +920,120 @@
           <span data-i18n-ar="الإعدادات" data-i18n-en="Settings">الإعدادات</span><span class="kbd">Ctrl + ,</span>
           <span data-i18n-ar="الكونسول" data-i18n-en="Console">الكونسول</span><span class="kbd">Ctrl + Shift + J</span>
           <span data-i18n-ar="أدوات الفحص (Inspect)" data-i18n-en="Inspect tools">أدوات الفحص (Inspect)</span><span class="kbd">Ctrl + Shift + I</span>
+          <span data-i18n-ar="نقل الملف النشط" data-i18n-en="Move active file">نقل الملف النشط</span><span class="kbd">Ctrl + Shift + M</span>
           <span data-i18n-ar="هذه النافذة" data-i18n-en="This window">هذه النافذة</span><span class="kbd">F1</span>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="new-project-modal">
+    <div class="modal modal-wide">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-layer-plus"></i> <span data-i18n-ar="مشروع جديد" data-i18n-en="New project">مشروع جديد</span></h3>
+        <button class="icon-btn" data-close title="Close" data-title-ar="إغلاق" data-title-en="Close"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-intro" data-i18n-ar="ابدأ بقوالب قصيرة جاهزة، ثم عدّل الملفات كما تحب. سيتم حفظ المشروع الحالي كنسخة احتياطية." data-i18n-en="Start from a short ready-made template, then edit the files as you like. The current project is saved as a backup.">ابدأ بقوالب قصيرة جاهزة، ثم عدّل الملفات كما تحب. سيتم حفظ المشروع الحالي كنسخة احتياطية.</p>
+        <div class="project-card-grid">
+          <button class="project-card" type="button" data-template="blank">
+            <i class="fa-solid fa-file-code"></i>
+            <strong data-i18n-ar="صفحة فارغة" data-i18n-en="Blank page">صفحة فارغة</strong>
+            <small data-i18n-ar="ملف index.html واحد بأساسيات HTML فقط." data-i18n-en="A single index.html with the HTML basics.">ملف index.html واحد بأساسيات HTML فقط.</small>
+          </button>
+          <button class="project-card" type="button" data-template="web">
+            <i class="fa-solid fa-window-maximize"></i>
+            <strong data-i18n-ar="موقع HTML/CSS/JS" data-i18n-en="HTML/CSS/JS site">موقع HTML/CSS/JS</strong>
+            <small data-i18n-ar="index.html مع styles/style.css وscripts/app.js." data-i18n-en="index.html with styles/style.css and scripts/app.js.">index.html مع styles/style.css وscripts/app.js.</small>
+          </button>
+          <button class="project-card" type="button" data-template="python">
+            <i class="fa-brands fa-python"></i>
+            <strong data-i18n-ar="مشروع Python" data-i18n-en="Python project">مشروع Python</strong>
+            <small data-i18n-ar="ملف python/main.py بسيط جاهز للتشغيل." data-i18n-en="A simple python/main.py ready to run.">ملف python/main.py بسيط جاهز للتشغيل.</small>
+          </button>
+          <button class="project-card" type="button" data-template="notes">
+            <i class="fa-solid fa-note-sticky"></i>
+            <strong data-i18n-ar="ملاحظات Markdown" data-i18n-en="Markdown notes">ملاحظات Markdown</strong>
+            <small data-i18n-ar="README.md وصفحة صغيرة لعرض الملاحظات." data-i18n-en="README.md plus a small page to display the notes.">README.md وصفحة صغيرة لعرض الملاحظات.</small>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="open-project-modal">
+    <div class="modal modal-wide">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-folder-open"></i> <span data-i18n-ar="فتح مشروع" data-i18n-en="Open project">فتح مشروع</span></h3>
+        <button class="icon-btn" data-close title="Close" data-title-ar="إغلاق" data-title-en="Close"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-intro" data-i18n-ar="افتح مشروعاً محفوظاً أو مجلداً كاملاً. سيتم حفظ المشروع الحالي كنسخة احتياطية قبل الاستبدال." data-i18n-en="Open a saved project file or a full folder. The current project is backed up before replacement.">افتح مشروعاً محفوظاً أو مجلداً كاملاً. سيتم حفظ المشروع الحالي كنسخة احتياطية قبل الاستبدال.</p>
+        <div class="project-card-grid">
+          <button class="project-card" type="button" id="open-project-file">
+            <i class="fa-solid fa-file-arrow-up"></i>
+            <strong data-i18n-ar="ملف مشروع JSON" data-i18n-en="Project JSON file">ملف مشروع JSON</strong>
+            <small data-i18n-ar="ملف .codex-project.json أو أي JSON يحتوي على files." data-i18n-en="A .codex-project.json file or any JSON with files.">ملف .codex-project.json أو أي JSON يحتوي على files.</small>
+          </button>
+          <button class="project-card" type="button" id="open-project-folder">
+            <i class="fa-solid fa-folder-tree"></i>
+            <strong data-i18n-ar="مجلد كامل" data-i18n-en="Full folder">مجلد كامل</strong>
+            <small data-i18n-ar="اختر مجلداً وسيُفتح كمشروع جديد بكل ملفاته النصية." data-i18n-en="Choose a folder and it opens as a new project with all its text files.">اختر مجلداً وسيُفتح كمشروع جديد بكل ملفاته النصية.</small>
+          </button>
+          <button class="project-card" type="button" id="open-project-merge">
+            <i class="fa-solid fa-file-import"></i>
+            <strong data-i18n-ar="إضافة ملفات للمشروع الحالي" data-i18n-en="Add files to current project">إضافة ملفات للمشروع الحالي</strong>
+            <small data-i18n-ar="استيراد ملفات أو مجلد دون استبدال المشروع الحالي." data-i18n-en="Import files or a folder without replacing the current project.">استيراد ملفات أو مجلد دون استبدال المشروع الحالي.</small>
+          </button>
+          <button class="project-card" type="button" id="open-project-backup">
+            <i class="fa-solid fa-clock-rotate-left"></i>
+            <strong data-i18n-ar="استعادة النسخة الاحتياطية" data-i18n-en="Restore backup">استعادة النسخة الاحتياطية</strong>
+            <small data-i18n-ar="العودة إلى آخر مشروع محفوظ تلقائياً قبل التبديل." data-i18n-en="Return to the last project saved automatically before switching.">العودة إلى آخر مشروع محفوظ تلقائياً قبل التبديل.</small>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="help-modal">
+    <div class="modal modal-wide">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-circle-question"></i> <span data-i18n-ar="دليل الاستخدام" data-i18n-en="Help & guide">دليل الاستخدام</span></h3>
+        <button class="icon-btn" data-close title="Close" data-title-ar="إغلاق" data-title-en="Close"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <input class="text-input" id="help-search" type="search" data-ph-ar="ابحث في الدليل…" data-ph-en="Search the guide…" placeholder="ابحث في الدليل…" autocomplete="off">
+        <div class="help-sections" id="help-sections">
+          <section class="help-section">
+            <h4 data-i18n-ar="البداية السريعة" data-i18n-en="Quick start">البداية السريعة</h4>
+            <p data-i18n-ar="أنشئ مشروعاً جديداً من زر «مشروع جديد»، أو افتح مشروعاً محفوظاً من زر «فتح مشروع». سيطلب المحرر اسم المشروع وينشئ ملفاً باسمه. اكتب الكود ثم اضغط Ctrl+Enter للتشغيل." data-i18n-en="Create a project from “New project”, or open a saved one from “Open project”. The editor asks for a project name and creates a file with that name. Write code and press Ctrl+Enter to run it.">أنشئ مشروعاً جديداً من زر «مشروع جديد»، أو افتح مشروعاً محفوظاً من زر «فتح مشروع». سيطلب المحرر اسم المشروع وينشئ ملفاً باسمه. اكتب الكود ثم اضغط Ctrl+Enter للتشغيل.</p>
+          </section>
+          <section class="help-section">
+            <h4 data-i18n-ar="العمل من الطرفية" data-i18n-en="Terminal workflow">العمل من الطرفية</h4>
+            <p data-i18n-ar="من الطرفية داخل مجلد المشروع شغّل `codex` أو `./codex` لفتح المحرر في نفس المجلد. الملفات والمجلدات التي تنشئها داخل المشروع تُحفظ تلقائياً على القرص، ويمكنك الضغط على زر المزامنة في شريط الحالة." data-i18n-en="From a terminal inside the project folder run `codex` or `./codex` to open the editor in that folder. Files and folders you create are saved to disk automatically, and you can use the status bar sync button.">من الطرفية داخل مجلد المشروع شغّل `codex` أو `./codex` لفتح المحرر في نفس المجلد. الملفات والمجلدات التي تنشئها داخل المشروع تُحفظ تلقائياً على القرص، ويمكنك الضغط على زر المزامنة في شريط الحالة.</p>
+          </section>
+          <section class="help-section">
+            <h4 data-i18n-ar="الكتابة والإكمال التلقائي" data-i18n-en="Writing & autocomplete">الكتابة والإكمال التلقائي</h4>
+            <p data-i18n-ar="الكتابة ذكية: اكتب log فتجد console.log(); والمؤشر داخل الأقواس، واختر وسم HTML مثل div فيُفتح ويُغلق تلقائياً. اضغط Ctrl+Space لفتح الاقتراحات يدوياً، وShift+Alt+Down لنسخ السطر، وAlt+Up / Alt+Down لتحريك السطر." data-i18n-en="Typing is smart: type log and get console.log(); with the cursor inside the parentheses, pick an HTML tag like div and it opens and closes automatically. Press Ctrl+Space for suggestions, Shift+Alt+Down to duplicate a line, and Alt+Up / Alt+Down to move the line.">الكتابة ذكية: اكتب log فتجد console.log(); والمؤشر داخل الأقواس، واختر وسم HTML مثل div فيُفتح ويُغلق تلقائياً. اضغط Ctrl+Space لفتح الاقتراحات يدوياً، وShift+Alt+Down لنسخ السطر، وAlt+Up / Alt+Down لتحريك السطر.</p>
+          </section>
+          <section class="help-section">
+            <h4 data-i18n-ar="الملفات والمجلدات" data-i18n-en="Files & folders">الملفات والمجلدات</h4>
+            <p data-i18n-ar="أنشئ ملفات داخل أي مجلد من شريط المسار أو الأزرار الصغيرة بجانب المجلد. اسحب أي ملف أو مجلد إلى مجلد آخر أو إلى الجذر للنقل، أو استخدم «نقل إلى مجلد» من القائمة." data-i18n-en="Create files inside any folder from the path bar or the small buttons next to a folder. Drag any file or folder into another folder or to the root to move it, or use “Move to folder” from the menu.">أنشئ ملفات داخل أي مجلد من شريط المسار أو الأزرار الصغيرة بجانب المجلد. اسحب أي ملف أو مجلد إلى مجلد آخر أو إلى الجذر للنقل، أو استخدم «نقل إلى مجلد» من القائمة.</p>
+          </section>
+          <section class="help-section">
+            <h4 data-i18n-ar="الأخطاء والفحص" data-i18n-en="Errors & inspection">الأخطاء والفحص</h4>
+            <p data-i18n-ar="تظهر الأخطاء بالعربية والإنجليزية مع رقم السطر ومقتطف من الكود. اضغط على الخطأ للقفز إلى السطر. استخدم تبويب «الفحص» لاختيار عنصر من المعاينة ورؤية تنسيقاته." data-i18n-en="Errors appear in Arabic and English with the line number and a code snippet. Click an error to jump to its line. Use the “Inspect” tab to pick an element in the preview and see its styles.">تظهر الأخطاء بالعربية والإنجليزية مع رقم السطر ومقتطف من الكود. اضغط على الخطأ للقفز إلى السطر. استخدم تبويب «الفحص» لاختيار عنصر من المعاينة ورؤية تنسيقاته.</p>
+          </section>
+          <section class="help-section">
+            <h4 data-i18n-ar="الحفظ والمشاركة" data-i18n-en="Save & share">الحفظ والمشاركة</h4>
+            <p data-i18n-ar="Ctrl+S يحفظ في المتصفح، وCtrl+Shift+S ينزّل ملف مشروع JSON يمكن فتحه لاحقاً. يمكنك أيضاً تصدير ZIP أو مشاركة المشروع برابط." data-i18n-en="Ctrl+S saves in the browser, and Ctrl+Shift+S downloads a JSON project file you can open later. You can also export a ZIP or share the project by link.">Ctrl+S يحفظ في المتصفح، وCtrl+Shift+S ينزّل ملف مشروع JSON يمكن فتحه لاحقاً. يمكنك أيضاً تصدير ZIP أو مشاركة المشروع برابط.</p>
+          </section>
+          <section class="help-section">
+            <h4 data-i18n-ar="اللغة والمظهر" data-i18n-en="Language & appearance">اللغة والمظهر</h4>
+            <p data-i18n-ar="بدّل اللغة من زر اللغة في الشريط العلوي أو من الإعدادات. الواجهة تدعم RTL للعربية وLTR للإنجليزية، مع مظهر فاتح وداكن بأسلوب Apple." data-i18n-en="Switch languages from the header language button or in Settings. The UI supports RTL for Arabic and LTR for English, with Apple-inspired light and dark themes.">بدّل اللغة من زر اللغة في الشريط العلوي أو من الإعدادات. الواجهة تدعم RTL للعربية وLTR للإنجليزية، مع مظهر فاتح وداكن بأسلوب Apple.</p>
+          </section>
+        </div>
+        <div class="help-empty" id="help-empty" hidden data-i18n-ar="لا توجد نتائج مطابقة." data-i18n-en="No matching results.">لا توجد نتائج مطابقة.</div>
       </div>
     </div>
   </div>
@@ -976,6 +1126,9 @@
       'افتح ملفاً أولاً': 'Open a file first',
       'التنسيق غير مدعوم لهذه اللغة بعد': 'Formatting is not supported for this language yet',
       'الكود منسق بالفعل': 'The code is already formatted',
+      'تحريك السطر للأعلى': 'Move line up',
+      'تحريك السطر للأسفل': 'Move line down',
+      'نسخ السطر': 'Duplicate line',
       'تم تنسيق الكود': 'Code formatted',
       'تعذر التنسيق': 'Formatting failed',
       'اسم الملف أو مساره': 'File name or path',
@@ -1135,7 +1288,29 @@
       'تم النقل إلى ': 'Moved to ',
       'استعادة النسخة الاحتياطية المحفوظة في ': 'Restore backup saved at ',
       'ملف جديد هنا': 'New file here',
-      'مجلد جديد هنا': 'New folder here'
+      'مجلد جديد هنا': 'New folder here',
+      'اسم المشروع': 'Project name',
+      'سيتم إنشاء ملف باسم المشروع فوراً': 'A file named after the project will be created immediately',
+      'سيتم استبدال ملفات المجلد المحلي بمشروع جديد. هل تريد المتابعة؟': 'New project will replace the files in the local folder. Continue?',
+      'تم فتح المجلد من الطرفية': 'Opened the folder from the terminal',
+      'تمت مزامنة المشروع مع المجلد المحلي': 'Project synced with the local folder',
+      'تعذرت المزامنة مع المجلد المحلي': 'Could not sync with the local folder',
+      'جارٍ المزامنة…': 'Syncing…',
+      'تعذرت المزامنة': 'Sync failed',
+      'مجلد محلي متصل': 'Local folder connected',
+      'مزامنة المجلد المحلي': 'Sync local folder',
+      'دليل الاستخدام': 'Help & guide',
+      'مشروع جديد': 'New project',
+      'فتح مشروع': 'Open project',
+      'حفظ ملف المشروع': 'Save project file',
+      'تم إنشاء مشروع جديد': 'New project created',
+      'تم فتح المشروع': 'Project opened',
+      'لم يتم العثور على ملفات نصية في المجلد': 'No text files were found in the folder',
+      'نقل الملف النشط': 'Move active file',
+      'نقل إلى مجلد': 'Move to folder',
+      'المجلد الهدف': 'Target folder',
+      'اتركه فارغاً للجذر': 'Leave empty for the project root',
+      'مثال: scripts': 'Example: scripts'
     };
     const TRANSLATION_KEYS = Object.keys(EN_MAP).sort(function (a, b) { return b.length - a.length; });
 
@@ -1174,6 +1349,7 @@
       const languageSelect = $('#setting-language');
       if (languageSelect) languageSelect.value = lang;
       if (state) { updateStatus(); renderProblems(); renderConsole(false); }
+      updateLocalStatus();
       if (typeof refreshInspectStatus === 'function') refreshInspectStatus();
     }
 
@@ -1184,6 +1360,7 @@
       tabSize: 2,
       wordWrap: false,
       autoSave: true,
+      autoComplete: true,
       livePreview: false,
       pistonEndpoint: 'https://emkc.org/api/v2/piston',
       pistonKey: ''
@@ -1338,6 +1515,8 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
         'const let var function return if else for while do switch case break continue class extends new this super import export default from async await try catch finally throw typeof instanceof in of delete void yield static get set null undefined true false NaN Infinity console document window globalThis Math JSON Object Array String Number Boolean Promise Map Set WeakMap Symbol Date RegExp Error setTimeout setInterval clearTimeout clearInterval fetch localStorage sessionStorage require module exports process querySelector querySelectorAll addEventListener getElementById',
         [
           ['log', 'console.log($0);'],
+          ['clg', 'console.log($0);'],
+          ['clog', 'console.log($0);'],
           ['warn', 'console.warn($0);'],
           ['error', 'console.error($0);'],
           ['fn', 'function name(args) {\n  $0\n}'],
@@ -1360,6 +1539,11 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
       typescript: mk(
         'interface type enum namespace declare implements readonly public private protected abstract as satisfies unknown never any void string number boolean object bigint symbol const let var function return if else for while do switch case break continue class extends new this super import export default from async await try catch finally throw typeof instanceof in of delete yield static get set null undefined true false console document window Promise Array Record Partial Pick Omit',
         [
+          ['log', 'console.log($0);'],
+          ['clg', 'console.log($0);'],
+          ['clog', 'console.log($0);'],
+          ['warn', 'console.warn($0);'],
+          ['error', 'console.error($0);'],
           ['interface', 'interface Name {\n  id: number;\n  $0\n}'],
           ['type', 'type Name = {\n  $0\n};'],
           ['fn', 'function name(args: string): void {\n  $0\n}'],
@@ -1662,6 +1846,8 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
         'function return if else for while class const let var true false null none print import export public private static void int float double string',
         [
           ['print', 'print($0)'],
+          ['log', 'console.log($0);'],
+          ['clg', 'console.log($0);'],
           ['if', 'if (condition) {\n  $0\n}'],
           ['for', 'for (item in items) {\n  $0\n}']
         ]
@@ -1906,6 +2092,9 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
     let hintTimer = null;
     let persistTimer = null;
     let liveTimer = null;
+    let syncTimer = null;
+    let syncPending = false;
+    const localBridge = { enabled: false, root: '', name: '', busy: false, error: '' };
     let paletteItems = [];
     let paletteIndex = 0;
     let problems = [];
@@ -1992,6 +2181,7 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
         state.dirty.clear();
         updateStatus();
         renderTabs();
+        if (localBridge.enabled) scheduleLocalSync();
         if (showToast) toast('تم حفظ المشروع محلياً', 'ok');
       } catch (error) {
         toast('تعذر الحفظ: ' + error.message, 'error');
@@ -2002,6 +2192,87 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
       clearTimeout(persistTimer);
       if (!state.settings.autoSave) return;
       persistTimer = setTimeout(function () { persist(false); }, 900);
+    }
+
+    function updateLocalStatus() {
+      const chip = $('#local-status');
+      const text = $('#local-status-text');
+      const button = $('#btn-local-sync');
+      if (chip) chip.hidden = !localBridge.enabled;
+      if (button) button.hidden = !localBridge.enabled;
+      if (!localBridge.enabled || !text) return;
+      text.textContent = localBridge.busy
+        ? tr('جارٍ المزامنة…')
+        : localBridge.error ? tr('تعذرت المزامنة') : tr('مجلد محلي متصل');
+      if (chip) chip.title = localBridge.root || '';
+    }
+
+    function scheduleLocalSync() {
+      if (!localBridge.enabled) return;
+      clearTimeout(syncTimer);
+      syncTimer = setTimeout(function () { syncLocalProject(false); }, 600);
+    }
+
+    async function syncLocalProject(showToast) {
+      if (!localBridge.enabled || !state) return;
+      if (localBridge.busy) { syncPending = true; return; }
+      localBridge.busy = true;
+      updateLocalStatus();
+      try {
+        const response = await fetch('/__codex/api/project', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ files: state.files, folders: state.folders })
+        });
+        if (!response.ok) throw new Error('HTTP ' + response.status);
+        localBridge.error = '';
+        if (showToast) toast(tr('تمت مزامنة المشروع مع المجلد المحلي'), 'ok');
+      } catch (error) {
+        localBridge.error = error.message || String(error);
+        if (showToast) toast(tr('تعذرت المزامنة مع المجلد المحلي'), 'error');
+      } finally {
+        localBridge.busy = false;
+        updateLocalStatus();
+        if (syncPending) {
+          syncPending = false;
+          syncLocalProject(false);
+        }
+      }
+    }
+
+    async function initLocalBridge() {
+      if (window.location.protocol === 'file:') return;
+      try {
+        const response = await fetch('/__codex-launch.json', { cache: 'no-store' });
+        if (!response.ok) return;
+        const info = await response.json();
+        if (!info || !info.bridge) return;
+        localBridge.enabled = true;
+        localBridge.root = info.root || '';
+        localBridge.name = info.name || 'project';
+        const requestedFile = typeof info.file === 'string' ? info.file : '';
+        updateLocalStatus();
+        const projectResponse = await fetch('/__codex/api/project', { cache: 'no-store' });
+        const project = await projectResponse.json();
+        if (project && project.files && Object.keys(project.files).length) {
+          const openRequested = !!requestedFile && project.files[requestedFile] !== undefined;
+          backupCurrentProject();
+          applyProjectData({ files: project.files, folders: project.folders || [] }, openRequested
+            ? { active: requestedFile, openTabs: Object.keys(project.files) }
+            : {});
+          persist(false);
+          applySettings();
+          renderAll();
+          const target = openRequested ? requestedFile : state.active;
+          if (target) openFile(target, { keepMobileView: true });
+          else { editor.setValue(''); showEmpty(true); }
+          toast(tr('تم فتح المجلد من الطرفية'), 'ok');
+        }
+      } catch (error) {
+        localBridge.enabled = false;
+        localBridge.error = error.message || String(error);
+        updateLocalStatus();
+      }
     }
 
     /* ============================================================
@@ -2079,7 +2350,51 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
       };
     }
 
+    const SMART_SNIPPET_KEYS = new Set(['log', 'clg', 'clog', 'warn', 'error', 'debug', 'dbg']);
+    const SMART_SNIPPET_ALIASES = { clg: 'log', clog: 'log', debug: 'log', dbg: 'log' };
+
+    function smartSnippetFor(lang, word) {
+      const lower = String(word || '').toLowerCase();
+      if (!SMART_SNIPPET_KEYS.has(lower)) return null;
+      const key = SMART_SNIPPET_ALIASES[lower] || lower;
+      const sources = [LANG_DATA[lang], LANG_DATA.javascript, LANG_DATA.generic];
+      for (const source of sources) {
+        const match = ((source && source.snippets) || []).find(function (snippet) { return snippet[0].toLowerCase() === key; });
+        if (match) return match[1];
+      }
+      return null;
+    }
+
+    function maybeExpandSmartSnippet(cm, change) {
+      if (!state || state.settings.autoComplete === false) return false;
+      if (!change || change.origin !== '+input') return false;
+      const inserted = change.text.join('\n');
+      if (inserted.length !== 1 || !/[A-Za-z_$]/.test(inserted)) return false;
+      const cursor = cm.getCursor();
+      const line = cm.getLine(cursor.line);
+      const before = line.slice(0, cursor.ch);
+      const wordMatch = /[A-Za-z_$][\w$]*$/.exec(before);
+      if (!wordMatch) return false;
+      const word = wordMatch[0];
+      const beforeWord = before.slice(0, wordMatch.index).replace(/\s+$/, '');
+      if (/\.|[\w$]/.test(beforeWord.charAt(beforeWord.length - 1) || '')) return false;
+      const after = line.slice(cursor.ch);
+      if (/[\w$]/.test(after.charAt(0) || '')) return false;
+      const token = cm.getTokenAt(cursor, true);
+      if (token && token.type && /(comment|string|attribute)/.test(token.type)) return false;
+      const snippet = smartSnippetFor(dataLangForPath(state.active), word);
+      if (snippet === null) return false;
+      const from = CodeMirror.Pos(cursor.line, cursor.ch - word.length);
+      const marker = snippet.indexOf('$0');
+      const clean = snippet.replace(/\$0/g, '');
+      cm.replaceRange(clean, from, cursor, 'smartSnippet');
+      if (marker >= 0) cm.setCursor(cm.posFromIndex(cm.indexFromPos(from) + marker));
+      if (cm.state.completionActive && typeof cm.closeHint === 'function') cm.closeHint();
+      return true;
+    }
+
     function codexHint(cm) {
+      if (state && state.settings && state.settings.autoComplete === false) return null;
       const cursor = cm.getCursor();
       const line = cm.getLine(cursor.line);
       const before = line.slice(0, cursor.ch);
@@ -2106,10 +2421,15 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
       const items = [];
       const seen = new Set();
 
-      function transform(raw) {
-        if (!prefix) return raw;
-        if (prefix === '</') return '</' + raw.replace(/^</, '').replace(/>$/, '') + '>';
-        return raw.charAt(0) === '<' ? raw : '<' + raw;
+      const voidTags = new Set(['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr']);
+      function transform(raw, type) {
+        const tag = raw.replace(/^</, '').replace(/>$/, '').split(/\s/)[0].toLowerCase();
+        if (prefix === '</') return '</' + tag + '>';
+        if (prefix === '<' || (markup && type === 'keyword')) {
+          if (voidTags.has(tag)) return '<' + tag + '>';
+          return '<' + tag + '>$0</' + tag + '>';
+        }
+        return raw;
       }
 
       function add(raw, label, type, rank) {
@@ -2120,7 +2440,7 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
           const needle = word.toLowerCase();
           if (key.indexOf(needle) !== 0 && String(raw).toLowerCase().indexOf(needle) !== 0 && key.indexOf(needle) === -1) return;
         }
-        const text = transform(raw);
+        const text = transform(raw, type);
         seen.add(key);
         items.push({
           text: text,
@@ -2133,7 +2453,10 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
 
       data.keywords.forEach(function (keyword) { add(keyword, keyword, 'keyword', 0); });
       if (!prefix) {
-        (data.snippets || []).forEach(function (snippet) { add(snippet[1], snippet[0], 'snippet', 1); });
+        const sources = markup ? [data, LANG_DATA.javascript] : [data];
+        sources.forEach(function (source) {
+          (source.snippets || []).forEach(function (snippet) { add(snippet[1], snippet[0], 'snippet', 1); });
+        });
         if (word) {
           collectDocWords().forEach(function (documentWord) {
             if (documentWord.toLowerCase() !== word.toLowerCase()) add(documentWord, documentWord, 'word', 2);
@@ -2146,6 +2469,71 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
       return { list: items.slice(0, 80), from: from, to: to };
     }
 
+    function showCodexHints(cm) {
+      if (!cm || typeof cm.showHint !== 'function') return;
+      if (!state || state.settings.autoComplete === false) return;
+      if (cm.state.completionActive) cm.closeHint();
+      cm.showHint({ hint: codexHint, completeSingle: false, alignWithWord: true });
+    }
+
+    function selectedLineRange(cm) {
+      const from = cm.getCursor('from');
+      const to = cm.getCursor('to');
+      return { from: from.line, to: to.line, cursorFrom: from, cursorTo: to };
+    }
+
+    function moveEditorLines(delta) {
+      if (!editor) return;
+      const cm = editor;
+      const range = selectedLineRange(cm);
+      const targetFrom = range.from + delta;
+      const targetTo = range.to + delta;
+      if (targetFrom < 0 || targetTo >= cm.lineCount()) return;
+      const originalCount = cm.lineCount();
+      const lines = [];
+      for (let line = range.from; line <= range.to; line += 1) lines.push(cm.getLine(line));
+      const start = CodeMirror.Pos(range.from, 0);
+      const end = CodeMirror.Pos(Math.min(range.to + 1, originalCount), 0);
+      const insertAt = CodeMirror.Pos(delta < 0 ? targetFrom : range.to + 1, 0);
+      const offsetFrom = range.cursorFrom.line - range.from;
+      const offsetTo = range.cursorTo.line - range.from;
+      cm.operation(function () {
+        cm.replaceRange('', start, end);
+        const text = insertAt.line < cm.lineCount()
+          ? lines.join('\n') + '\n'
+          : (cm.lineCount() ? '\n' : '') + lines.join('\n');
+        cm.replaceRange(text, insertAt);
+        cm.setSelection(
+          CodeMirror.Pos(targetFrom + offsetFrom, range.cursorFrom.ch),
+          CodeMirror.Pos(targetFrom + offsetTo, range.cursorTo.ch)
+        );
+      });
+    }
+
+    function copyEditorLines(delta) {
+      if (!editor) return;
+      const cm = editor;
+      const range = selectedLineRange(cm);
+      const lines = [];
+      for (let line = range.from; line <= range.to; line += 1) lines.push(cm.getLine(line));
+      const size = lines.length;
+      const text = lines.join('\n') + '\n';
+      cm.operation(function () {
+        if (delta < 0) {
+          cm.replaceRange(text, CodeMirror.Pos(range.from, 0));
+        } else if (range.to + 1 >= cm.lineCount()) {
+          cm.replaceRange('\n' + text, CodeMirror.Pos(cm.lineCount(), 0));
+        } else {
+          cm.replaceRange(text, CodeMirror.Pos(range.to + 1, 0));
+        }
+        const shift = delta < 0 ? -size : size;
+        cm.setSelection(
+          CodeMirror.Pos(Math.max(0, range.cursorFrom.line + shift), range.cursorFrom.ch),
+          CodeMirror.Pos(Math.max(0, range.cursorTo.line + shift), range.cursorTo.ch)
+        );
+      });
+    }
+
     function initEditor() {
       editor = CodeMirror.fromTextArea($('#code-editor'), {
         lineNumbers: true,
@@ -2155,8 +2543,12 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
         indentUnit: state.settings.tabSize,
         indentWithTabs: false,
         lineWrapping: state.settings.wordWrap,
-        autoCloseBrackets: true,
-        autoCloseTags: true,
+        autoCloseBrackets: { pairs: "()[]{}''\"\"``", explode: true, triples: "'''\"\"\"", override: true },
+        autoCloseTags: {
+          whenOpening: true,
+          whenClosing: true,
+          indentTags: ['html', 'head', 'body', 'div', 'span', 'section', 'header', 'footer', 'nav', 'main', 'article', 'aside', 'ul', 'ol', 'li', 'table', 'thead', 'tbody', 'tr', 'td', 'form', 'script', 'style']
+        },
         matchBrackets: true,
         styleActiveLine: true,
         foldGutter: true,
@@ -2171,6 +2563,10 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
           'Ctrl-Enter': function () { runProject(); },
           'Cmd-Enter': function () { runProject(); },
           'Shift-Alt-F': function () { formatCode(); },
+          'Alt-Up': function () { moveEditorLines(-1); },
+          'Alt-Down': function () { moveEditorLines(1); },
+          'Shift-Alt-Up': function () { copyEditorLines(-1); },
+          'Shift-Alt-Down': function () { copyEditorLines(1); },
           'Ctrl-/': 'toggleComment',
           'Cmd-/': 'toggleComment',
           'Ctrl-F': 'find',
@@ -2204,19 +2600,29 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
         }
       });
 
-      editor.on('inputRead', function (cm, change) {
-        if (change.origin !== '+input') return;
-        const text = change.text.join('\n');
-        const last = text.slice(-1);
-        if (!/[A-Za-z0-9_$.\-<\/]/.test(last)) return;
-        const cursor = cm.getCursor();
-        const token = cm.getTokenAt(cursor, true);
-        if (token && token.type && /comment/.test(token.type)) return;
-        clearTimeout(hintTimer);
-        hintTimer = setTimeout(function () {
-          if (!cm.state.completionActive) cm.showHint({ hint: codexHint, completeSingle: false, alignWithWord: true });
-        }, 110);
-      });
+        editor.on('inputRead', function (cm, change) {
+          if (state.settings.autoComplete === false) return;
+          if (change.origin !== '+input') return;
+          const text = change.text.join('\n');
+          const last = text.slice(-1);
+          if (!/[A-Za-z0-9_$.\-<\/]/.test(last)) return;
+          if (maybeExpandSmartSnippet(cm, change)) return;
+          const cursor = cm.getCursor();
+          const token = cm.getTokenAt(cursor, true);
+          if (token && token.type && /comment/.test(token.type)) return;
+          clearTimeout(hintTimer);
+          hintTimer = setTimeout(function () { showCodexHints(cm); }, 0);
+        });
+
+        editor.on('keyup', function (cm, event) {
+          if (state.settings.autoComplete === false) return;
+          if (event.ctrlKey || event.metaKey || event.altKey) return;
+          if (!/^[A-Za-z0-9_$.\-<\/>]$/.test(event.key || '')) return;
+          clearTimeout(hintTimer);
+          hintTimer = setTimeout(function () {
+            if (!cm.state.completionActive) showCodexHints(cm);
+          }, 40);
+        });
 
       editor.setSize('100%', '100%');
     }
@@ -2290,6 +2696,20 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
       return true;
     }
 
+    async function movePathPrompt(path) {
+      const folders = state.folders.slice().sort();
+      const hint = tr('اتركه فارغاً للجذر') + (folders.length ? ' — ' + folders.join(', ') : '');
+      const value = await askText({
+        title: 'نقل إلى مجلد',
+        label: 'المجلد الهدف',
+        value: dirnamePath(path),
+        hint: hint,
+        placeholder: 'مثال: scripts'
+      });
+      if (value === null) return;
+      movePath(path, value);
+    }
+
     function createTreeRow(options) {
       const row = document.createElement('div');
       row.className = 'tree-row' + (options.active ? ' active' : '') + (options.expanded ? ' expanded' : '');
@@ -2319,25 +2739,27 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
       name.textContent = options.name;
       row.appendChild(name);
 
-      if (options.type === 'folder') {
-        const actions = document.createElement('span');
-        actions.className = 'tree-row-actions';
-        [['fa-file-circle-plus', tr('ملف جديد هنا'), function () { createFile(options.path); }],
-         ['fa-folder-plus', tr('مجلد جديد هنا'), function () { createFolder(options.path); }]].forEach(function (spec) {
-          const button = document.createElement('button');
-          button.type = 'button';
-          button.className = 'icon-btn';
-          button.title = spec[1];
-          button.innerHTML = '<i class="fa-solid ' + spec[0] + '"></i>';
-          button.addEventListener('click', function (event) {
-            event.stopPropagation();
-            setCurrentFolder(options.path);
-            spec[2]();
-          });
-          actions.appendChild(button);
+      const actions = document.createElement('span');
+      actions.className = 'tree-row-actions';
+      const actionSpecs = options.type === 'folder'
+        ? [['fa-file-circle-plus', tr('ملف جديد هنا'), function () { createFile(options.path); }],
+           ['fa-folder-plus', tr('مجلد جديد هنا'), function () { createFolder(options.path); }]]
+        : [];
+      actionSpecs.push(['fa-arrows-up-down-left-right', tr('نقل إلى مجلد'), function () { movePathPrompt(options.path); }]);
+      actionSpecs.forEach(function (spec) {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'icon-btn';
+        button.title = spec[1];
+        button.innerHTML = '<i class="fa-solid ' + spec[0] + '"></i>';
+        button.addEventListener('click', function (event) {
+          event.stopPropagation();
+          setCurrentFolder(options.type === 'folder' ? options.path : dirnamePath(options.path));
+          spec[2]();
         });
-        row.appendChild(actions);
-      }
+        actions.appendChild(button);
+      });
+      row.appendChild(actions);
 
       row.addEventListener('click', function () {
         if (options.type === 'folder') {
@@ -2811,6 +3233,7 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
           copyText(path).then(function () { toast('تم نسخ المسار', 'ok'); });
         });
       }
+      add('fa-solid fa-arrows-up-down-left-right', tr('نقل إلى مجلد'), function () { movePathPrompt(path); });
       add('fa-solid fa-pen', 'إعادة تسمية', function () { renamePath(path); });
       add('fa-solid fa-trash', 'حذف', function () { deletePath(path); }, true);
       menu.style.display = 'block';
@@ -2867,6 +3290,110 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
       toast('تم تنزيل نسخة JSON', 'ok');
     }
 
+    const PROJECT_TEMPLATES = {
+      blank: {
+        files: {
+          '%NAME%.html': '<!DOCTYPE html>\n<html lang="ar" dir="rtl">\n<head>\n  <meta charset="UTF-8">\n  <meta name="viewport" content="width=device-width, initial-scale=1">\n  <title>%NAME%</title>\n</head>\n<body>\n  <h1>Hello, %NAME%</h1>\n</body>\n</html>\n'
+        },
+        folders: []
+      },
+      web: {
+        files: {
+          '%NAME%.html': '<!DOCTYPE html>\n<html lang="ar" dir="rtl">\n<head>\n  <meta charset="UTF-8">\n  <meta name="viewport" content="width=device-width, initial-scale=1">\n  <title>%NAME%</title>\n  <link rel="stylesheet" href="%NAME%.css">\n</head>\n<body>\n  <main class="app">\n    <h1>مرحباً</h1>\n    <button id="go">اضغط هنا</button>\n  </main>\n  <script src="%NAME%.js"><\/script>\n</body>\n</html>\n',
+          '%NAME%.css': ':root {\n  color-scheme: light dark;\n}\n\nbody {\n  margin: 0;\n  font-family: system-ui, sans-serif;\n}\n\n.app {\n  max-width: 720px;\n  margin: 48px auto;\n  padding: 24px;\n}\n',
+          '%NAME%.js': 'const button = document.querySelector("#go");\nbutton?.addEventListener("click", () => {\n  console.log("Hello from %NAME%");\n});\n'
+        },
+        folders: []
+      },
+      python: {
+        files: {
+          '%NAME%.py': 'def main():\n    print("مرحباً من %NAME% / Hello from %NAME%")\n\n\nif __name__ == "__main__":\n    main()\n'
+        },
+        folders: []
+      },
+      notes: {
+        files: {
+          '%NAME%.md': '# %NAME%\n\nاكتب ملاحظاتك هنا.\n\n- [ ] مهمة أولى\n- [ ] مهمة ثانية\n',
+          '%NAME%-viewer.html': '<!DOCTYPE html>\n<html lang="ar" dir="rtl">\n<head>\n  <meta charset="UTF-8">\n  <title>%NAME%</title>\n</head>\n<body>\n  <pre id="notes"></pre>\n  <script>\n    fetch("%NAME%.md").then(r => r.text()).then(text => {\n      document.querySelector("#notes").textContent = text;\n    });\n  <\/script>\n</body>\n</html>\n'
+        },
+        folders: []
+      }
+    };
+
+    function projectSlug(value) {
+      const clean = String(value || '').trim()
+        .replace(/[^\w\u0600-\u06FF.\- ]+/g, '-')
+        .replace(/\s+/g, '-')
+        .replace(/^-+|-+$/g, '')
+        .replace(/\.(html?|py|md|css|js)$/i, '');
+      return normalizePath(clean) || 'my-project';
+    }
+
+    async function createNewProject(key) {
+      const answer = await askText({
+        title: 'اسم المشروع',
+        label: 'اسم المشروع',
+        value: 'my-project',
+        hint: 'سيتم إنشاء ملف باسم المشروع فوراً',
+        placeholder: 'my-project'
+      });
+      if (answer === null) return;
+      if (localBridge.enabled && !window.confirm(tr('سيتم استبدال ملفات المجلد المحلي بمشروع جديد. هل تريد المتابعة؟'))) return;
+      const slug = projectSlug(answer);
+      const template = PROJECT_TEMPLATES[key] || PROJECT_TEMPLATES.blank;
+      const files = {};
+      Object.keys(template.files).forEach(function (path) {
+        files[path.replace(/%NAME%/g, slug)] = template.files[path].replace(/%NAME%/g, slug);
+      });
+      const folders = template.folders.map(function (folder) { return folder.replace(/%NAME%/g, slug); });
+      const preferred = slug + '.html';
+      backupCurrentProject();
+      applyProjectData({ files: files, folders: folders }, {
+        openTabs: Object.keys(files),
+        active: files[preferred] !== undefined ? preferred : Object.keys(files)[0] || null
+      });
+      persist(false);
+      applySettings();
+      renderAll();
+      showEmpty(!state.active);
+      if (state.active) openFile(state.active, { keepMobileView: true });
+      else editor.setValue('');
+      closeAllModals();
+      toast(tr('تم إنشاء مشروع جديد'), 'ok');
+    }
+
+    async function openFolderAsProject(fileList) {
+      const files = Array.prototype.slice.call(fileList || []);
+      if (!files.length) return;
+      const binaryExt = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'ico', 'pdf', 'zip', 'gz', 'rar', '7z', 'mp3', 'mp4', 'woff', 'woff2', 'ttf', 'eot', 'exe', 'dll', 'bin', 'wasm', 'psd', 'ai', 'sketch'];
+      const collected = {};
+      let skipped = 0;
+      for (const file of files) {
+        if (file.size > 2 * 1024 * 1024 || binaryExt.indexOf(extOf(file.name)) !== -1) { skipped += 1; continue; }
+        const path = normalizePath(file.webkitRelativePath || file.name);
+        if (!path || collected[path] !== undefined) { skipped += 1; continue; }
+        try {
+          collected[path] = await file.text();
+        } catch (error) {
+          skipped += 1;
+        }
+      }
+      if (!Object.keys(collected).length) {
+        toast(tr('لم يتم العثور على ملفات نصية في المجلد'), 'error');
+        return;
+      }
+      backupCurrentProject();
+      applyProjectData({ files: collected, folders: deriveFolders(collected) });
+      persist(false);
+      applySettings();
+      renderAll();
+      showEmpty(!state.active);
+      if (state.active) openFile(state.active, { keepMobileView: true });
+      else editor.setValue('');
+      closeAllModals();
+      toast(tr('تم فتح المشروع') + (skipped ? ' — ' + tr('تم تجاهل') + ' ' + skipped : ''), 'ok');
+    }
+
     function backupCurrentProject() {
       try {
         localStorage.setItem(BACKUP_KEY, JSON.stringify({
@@ -2902,6 +3429,7 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
       }
       state.openTabs = options.openTabs || Object.keys(files).slice(0, 6);
       state.active = options.active || state.openTabs[0] || Object.keys(files)[0] || null;
+      state.currentFolder = '';
       state.expanded = Array.from(new Set(state.folders.concat(deriveFolders(files))));
       state.cursors = {};
       state.dirty = new Set();
@@ -4332,6 +4860,7 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
       const tab = $('#setting-tab');
       const wrap = $('#setting-wrap');
       const autosave = $('#setting-autosave');
+      const autocomplete = $('#setting-autocomplete');
       const live = $('#setting-live');
       const piston = $('#setting-piston');
       const pistonKey = $('#setting-piston-key');
@@ -4342,6 +4871,7 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
       if (tab) tab.value = String(s.tabSize);
       if (wrap) wrap.checked = !!s.wordWrap;
       if (autosave) autosave.checked = !!s.autoSave;
+      if (autocomplete) autocomplete.checked = s.autoComplete !== false;
       if (live) live.checked = !!s.livePreview;
       if (piston) piston.value = s.pistonEndpoint || '';
       if (pistonKey) pistonKey.value = s.pistonKey || '';
@@ -4543,11 +5073,17 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
         });
       });
       const actions = [
+        ['fa-solid fa-layer-plus', 'مشروع جديد', 'new project starter template', '', function () { openModal('new-project-modal'); }],
+        ['fa-solid fa-folder-open', 'فتح مشروع', 'open project file folder json', '', function () { openModal('open-project-modal'); }],
+        ['fa-solid fa-file-arrow-down', 'حفظ ملف المشروع', 'save project file json download', 'Ctrl+Shift+S', exportJson],
         ['fa-solid fa-play', 'تشغيل المشروع', 'run project execute', 'Ctrl+Enter', runProject],
         ['fa-solid fa-bolt', 'تشغيل الملف الحالي', 'run current file', '', runCurrentFile],
         ['fa-solid fa-eye', 'معاينة الملف الحالي', 'preview html css markdown', '', function () { previewCurrent(false); }],
         ['fa-solid fa-floppy-disk', 'حفظ المشروع', 'save', 'Ctrl+S', function () { persist(true); }],
         ['fa-solid fa-wand-magic-sparkles', 'تنسيق الكود', 'format beautify', 'Shift+Alt+F', formatCode],
+        ['fa-solid fa-arrow-up', 'تحريك السطر للأعلى', 'move line up alt up', 'Alt+Up', function () { moveEditorLines(-1); }],
+        ['fa-solid fa-arrow-down', 'تحريك السطر للأسفل', 'move line down alt down', 'Alt+Down', function () { moveEditorLines(1); }],
+        ['fa-solid fa-copy', 'نسخ السطر', 'copy duplicate line', 'Shift+Alt+Down', function () { copyEditorLines(1); }],
         ['fa-solid fa-file-circle-plus', 'ملف جديد', 'new file create', '', function () { createFile(); }],
         ['fa-solid fa-folder-plus', 'مجلد جديد', 'new folder create', '', function () { createFolder(); }],
         ['fa-solid fa-file-import', 'استيراد ملفات', 'import files', '', function () { $('#file-input').click(); }],
@@ -4558,6 +5094,7 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
         ['fa-solid fa-download', 'تصدير JSON', 'export download json', '', exportJson],
         ['fa-solid fa-circle-half-stroke', 'تبديل المظهر', 'theme dark light', '', toggleTheme],
         ['fa-solid fa-gear', 'الإعدادات', 'settings preferences', 'Ctrl+,', openSettings],
+        ['fa-solid fa-circle-question', 'دليل الاستخدام', 'help guide documentation', '', function () { openModal('help-modal'); }],
         ['fa-solid fa-keyboard', 'الاختصارات', 'shortcuts help', 'F1', function () { openModal('shortcuts-modal'); }],
         ['fa-solid fa-broom', 'مسح الكونسول', 'clear console logs', '', function () { clearConsole(); toast('تم مسح السجلات', 'ok'); }],
         ['fa-solid fa-magnifying-glass', tr('أدوات الفحص (Inspect)'), 'inspect dom tree picker', 'Ctrl+Shift+I', function () { switchDevTab('inspect'); }],
@@ -4651,6 +5188,18 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
       on('btn-run', 'click', runProject);
       on('mobile-run', 'click', runProject);
       on('btn-save', 'click', function () { persist(true); });
+      on('btn-local-sync', 'click', function () { syncLocalProject(true); });
+      on('btn-save-as', 'click', exportJson);
+      on('btn-new-project', 'click', function () { openModal('new-project-modal'); });
+      on('btn-open-project', 'click', function () { openModal('open-project-modal'); });
+      on('empty-new-project', 'click', function () { openModal('new-project-modal'); });
+      $$('.project-card[data-template]').forEach(function (card) {
+        card.addEventListener('click', function () { createNewProject(card.getAttribute('data-template')); });
+      });
+      on('open-project-file', 'click', function () { $('#json-input').click(); });
+      on('open-project-folder', 'click', function () { $('#project-folder-input').click(); });
+      on('open-project-merge', 'click', function () { $('#folder-input').click(); });
+      on('open-project-backup', 'click', restoreBackup);
       on('btn-format', 'click', formatCode);
       on('btn-share', 'click', shareProject);
       on('btn-export', 'click', exportZip);
@@ -4660,6 +5209,18 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
       on('btn-theme', 'click', toggleTheme);
       on('btn-settings', 'click', openSettings);
       on('btn-help', 'click', function () { openModal('shortcuts-modal'); });
+      on('btn-guide', 'click', function () { openModal('help-modal'); });
+      on('help-search', 'input', function (event) {
+        const query = String(event.target.value || '').trim().toLowerCase();
+        let visible = 0;
+        $$('.help-section').forEach(function (section) {
+          const match = !query || section.textContent.toLowerCase().indexOf(query) !== -1;
+          section.hidden = !match;
+          if (match) visible += 1;
+        });
+        const empty = $('#help-empty');
+        if (empty) empty.hidden = visible > 0;
+      });
       on('btn-sidebar-toggle', 'click', toggleSidebar);
       on('btn-new-file', 'click', function () { createFile(); });
       on('btn-new-folder', 'click', function () { createFolder(); });
@@ -4811,6 +5372,11 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
         persist(false);
         toast(event.target.checked ? 'تم تفعيل الحفظ التلقائي' : 'تم إيقاف الحفظ التلقائي', 'info');
       });
+      on('setting-autocomplete', 'change', function (event) {
+        state.settings.autoComplete = event.target.checked;
+        persist(false);
+        toast(event.target.checked ? 'تم تفعيل الإكمال التلقائي' : 'تم إيقاف الإكمال التلقائي', 'info');
+      });
       on('setting-live', 'change', function (event) {
         state.settings.livePreview = event.target.checked;
         persist(false);
@@ -4848,6 +5414,10 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
       });
       on('json-input', 'change', function (event) {
         importJsonFile(event.target.files && event.target.files[0]);
+        event.target.value = '';
+      });
+      on('project-folder-input', 'change', function (event) {
+        openFolderAsProject(event.target.files);
         event.target.value = '';
       });
 
@@ -4932,6 +5502,11 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
           persist(true);
           return;
         }
+        if (mod && event.shiftKey && key === 's') {
+          event.preventDefault();
+          exportJson();
+          return;
+        }
         if (mod && event.key === 'Enter') {
           if (editor && editor.hasFocus()) return;
           event.preventDefault();
@@ -4948,6 +5523,11 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
         }
         if (mod && event.shiftKey && key === 'e') { event.preventDefault(); exportZip(); return; }
         if (mod && event.shiftKey && key === 'i') { event.preventDefault(); switchDevTab('inspect'); return; }
+        if (mod && event.shiftKey && key === 'm') {
+          event.preventDefault();
+          if (state.active) movePathPrompt(state.active);
+          return;
+        }
         if (event.key === 'Escape') {
           hideContextMenu();
           if (document.querySelector('.modal-overlay.open')) {
@@ -4995,6 +5575,7 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
       if (isMobile()) switchMobileView('editor');
       else document.body.classList.remove('mobile-mode-files', 'mobile-mode-editor', 'mobile-mode-output');
       renderAll();
+      initLocalBridge();
       if (state.active) openFile(state.active);
       else { editor.setValue(''); showEmpty(true); }
 

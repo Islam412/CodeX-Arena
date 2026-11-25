@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -euo pipefail
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+if [ "$#" -gt 0 ] && [ -f "$1" ]; then
+  PROJECT_DIR="$(cd -- "$(dirname -- "$1")" && pwd)"
+  FILE_NAME="$(basename -- "$1")"
+  shift
+  exec node "$SCRIPT_DIR/server.js" "$PROJECT_DIR" "--file=$FILE_NAME" "$@"
+fi
+if [ "$#" -gt 0 ] && [ -d "$1" ]; then
+  PROJECT_DIR="$1"
+  shift
+else
+  PROJECT_DIR="$PWD"
+fi
+exec node "$SCRIPT_DIR/server.js" "$PROJECT_DIR" "$@"
