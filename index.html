@@ -1,13 +1,12 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl" data-theme="dark">
+<html lang="ar" dir="rtl" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="description" content="CodeX Arena PRO - محرر أكواد متطور مجاني يعمل داخل المتصفح ويدعم لغات البرمجة مع الإكمال التلقائي والمعاينة الحية ومشاركة المشروع.">
-  <title>CodeX Arena PRO — محرر أكواد متطور</title>
+  <meta name="description" content="CodeX Arena — محرر أكواد مجاني داخل المتصفح، بالعربية والإنجليزية، مع أخطاء تُظهر رقم السطر وأدوات فحص DOM. Free in-browser code editor with Arabic/English UI, line-numbered bilingual errors and DOM inspect tools.">
+  <title>CodeX Arena — محرر أكواد | Code editor</title>
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material-darker.min.css">
@@ -18,42 +17,61 @@
 
   <style>
     :root {
-      --bg: #0a0d14;
-      --bg2: #0d111a;
-      --panel: #111622;
-      --panel2: #0d121d;
-      --border: #1e2638;
-      --text: #e2e8f0;
-      --muted: #7c8aa5;
-      --accent: #00ffcc;
-      --blue: #00b0ff;
-      --purple: #7c3aed;
-      --danger: #ff0055;
-      --warn: #ffbb00;
-      --ok: #22c55e;
-      --hover: rgba(255, 255, 255, 0.055);
-      --shadow: 0 18px 50px rgba(0, 0, 0, 0.55);
-      --font-code: 'Fira Code', ui-monospace, monospace;
-      --font-ui: 'Tajawal', system-ui, sans-serif;
+      --canvas: #ffffff;
+      --parchment: #f5f5f7;
+      --pearl: #fafafc;
+      --bg: #f5f5f7;
+      --bg2: #ffffff;
+      --panel: #ffffff;
+      --panel2: #f5f5f7;
+      --border: #e0e0e0;
+      --divider: #f0f0f0;
+      --text: #1d1d1f;
+      --muted: #7a7a7a;
+      --accent: #0066cc;
+      --blue: #0066cc;
+      --blue-focus: #0071e3;
+      --blue-dark: #2997ff;
+      --danger: #d93025;
+      --warn: #a86200;
+      --ok: #248a3d;
+      --hover: rgba(0, 0, 0, 0.045);
+      --shadow: 0 3px 30px rgba(0, 0, 0, 0.16);
+      --toast-bg: #1d1d1f;
+      --toast-text: #ffffff;
+      --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", system-ui, "Noto Sans Arabic", sans-serif;
+      --font-ui: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, "Noto Sans Arabic", sans-serif;
+      --font-code: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
       --editor-font: 14px;
+      --radius-sm: 8px;
+      --radius-md: 11px;
+      --radius-lg: 18px;
+      --radius-pill: 999px;
     }
 
-    html[data-theme="light"] {
-      --bg: #e9eef6;
-      --bg2: #f7f9fc;
-      --panel: #ffffff;
-      --panel2: #f1f5f9;
-      --border: #d6dfeb;
-      --text: #1e293b;
-      --muted: #64748b;
-      --accent: #0f9d7a;
-      --blue: #2563eb;
-      --purple: #7c3aed;
-      --danger: #dc2626;
-      --warn: #b45309;
-      --ok: #15803d;
-      --hover: rgba(15, 23, 42, 0.06);
-      --shadow: 0 18px 50px rgba(30, 41, 59, 0.18);
+    html[data-theme="dark"] {
+      --canvas: #000000;
+      --parchment: #272729;
+      --pearl: #2a2a2c;
+      --bg: #000000;
+      --bg2: #1d1d1f;
+      --panel: #1d1d1f;
+      --panel2: #272729;
+      --border: #3a3a3c;
+      --divider: #2c2c2e;
+      --text: #f5f5f7;
+      --muted: #a1a1a6;
+      --accent: #2997ff;
+      --blue: #2997ff;
+      --blue-focus: #0a84ff;
+      --blue-dark: #2997ff;
+      --danger: #ff453a;
+      --warn: #ffd60a;
+      --ok: #30d158;
+      --hover: rgba(255, 255, 255, 0.07);
+      --shadow: 0 3px 30px rgba(0, 0, 0, 0.5);
+      --toast-bg: #f5f5f7;
+      --toast-text: #1d1d1f;
     }
 
     * { box-sizing: border-box; }
@@ -74,67 +92,66 @@
     ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 8px; }
     ::-webkit-scrollbar-track { background: transparent; }
 
-    /* Header */
+    /* Header — Apple global-nav: hairline chrome, one quiet blue accent */
     .app-header {
       flex: 0 0 auto;
-      height: 56px;
+      height: 52px;
       display: flex;
       align-items: center;
-      gap: 12px;
-      padding: 0 12px;
-      background: color-mix(in srgb, var(--panel) 92%, transparent);
-      border-bottom: 1px solid var(--border);
-      backdrop-filter: blur(12px);
+      gap: 14px;
+      padding: 0 20px;
+      background: color-mix(in srgb, var(--panel) 80%, transparent);
+      border-bottom: 1px solid var(--divider);
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
       z-index: 60;
     }
     .brand { display: flex; align-items: center; gap: 10px; white-space: nowrap; min-width: 0; }
     .brand-logo {
-      width: 34px; height: 34px; border-radius: 10px;
+      width: 30px; height: 30px; border-radius: var(--radius-sm);
       display: grid; place-items: center;
-      background: linear-gradient(135deg, var(--accent), var(--blue));
-      color: #04121a; font-size: 16px;
-      box-shadow: 0 0 18px rgba(0, 176, 255, 0.35);
+      background: var(--text); color: var(--canvas); font-size: 14px;
       flex: 0 0 auto;
     }
     .brand-name {
-      font-weight: 800; font-size: 1.05rem; letter-spacing: 0.2px;
-      background: linear-gradient(90deg, var(--accent), var(--blue));
-      -webkit-background-clip: text; background-clip: text;
-      color: transparent;
+      font-family: var(--font-display);
+      font-weight: 600; font-size: 21px; letter-spacing: -0.374px;
+      color: var(--text);
     }
     .brand-badge {
-      font-size: 0.65rem; font-weight: 700; color: var(--accent);
-      border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
-      background: color-mix(in srgb, var(--accent) 10%, transparent);
-      padding: 2px 7px; border-radius: 999px;
+      font-size: 12px; font-weight: 400; color: var(--muted);
+      background: var(--parchment); border: 1px solid var(--divider);
+      padding: 2px 9px; border-radius: var(--radius-pill);
     }
     .toolbar {
       margin-inline-start: auto;
-      display: flex; align-items: center; gap: 6px;
+      display: flex; align-items: center; gap: 7px;
       overflow-x: auto; scrollbar-width: none; padding: 4px 0;
     }
     .toolbar::-webkit-scrollbar { display: none; }
 
     .btn {
-      appearance: none; border: 1px solid var(--border);
-      background: var(--panel2); color: var(--text);
-      height: 34px; padding: 0 12px; border-radius: 8px;
+      appearance: none; border: 1px solid var(--divider);
+      background: var(--pearl); color: var(--text);
+      height: 32px; padding: 0 16px; border-radius: var(--radius-pill);
       display: inline-flex; align-items: center; justify-content: center; gap: 7px;
-      font-size: 0.82rem; font-weight: 700; cursor: pointer; white-space: nowrap;
-      transition: transform .15s ease, border-color .15s ease, background .15s ease, box-shadow .15s ease;
+      font-size: 14px; font-weight: 400; cursor: pointer; white-space: nowrap;
+      transition: transform .15s ease, background .15s ease, border-color .15s ease;
       flex: 0 0 auto;
     }
-    .btn:hover { border-color: var(--blue); transform: translateY(-1px); }
-    .btn:active { transform: translateY(0); }
-    .btn-primary {
-      background: linear-gradient(135deg, var(--blue), var(--purple));
-      border-color: transparent; color: #fff;
-      box-shadow: 0 8px 24px rgba(0, 176, 255, 0.28);
+    .btn:hover { background: var(--parchment); }
+    .btn:active { transform: scale(0.95); }
+    .btn:focus-visible, .icon-btn:focus-visible, .output-tab:focus-visible, .tree-row:focus-visible {
+      outline: 2px solid var(--blue-focus); outline-offset: 2px;
     }
-    .btn-primary:hover { box-shadow: 0 10px 28px rgba(0, 176, 255, 0.42); }
-    .btn-icon { width: 34px; padding: 0; }
-    .btn-danger { border-color: color-mix(in srgb, var(--danger) 55%, var(--border)); color: var(--danger); }
-    .btn.active { background: color-mix(in srgb, var(--accent) 16%, var(--panel2)); border-color: var(--accent); color: var(--accent); }
+    .btn-primary {
+      background: var(--blue); border-color: transparent; color: #fff;
+    }
+    .btn-primary:hover { background: var(--blue-focus); }
+    .btn-icon { width: 32px; padding: 0; border-radius: 50%; }
+    .btn-sm { height: 28px; padding: 0 12px; font-size: 13px; }
+    .btn-danger { border-color: transparent; color: var(--danger); }
+    .btn.active { background: var(--parchment); border-color: var(--blue); color: var(--blue); }
 
     /* Layout */
     .main-container { flex: 1 1 auto; display: flex; min-height: 0; position: relative; overflow: hidden; }
@@ -142,62 +159,83 @@
     /* Sidebar */
     .sidebar {
       flex: 0 0 258px; width: 258px; min-width: 0;
-      background: var(--panel);
-      border-inline-end: 1px solid var(--border);
+      background: var(--panel2);
+      border-inline-end: 1px solid var(--divider);
       display: flex; flex-direction: column; min-height: 0;
     }
     .sidebar.collapsed { display: none; }
-    .sidebar-header { padding: 10px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 8px; }
-    .sidebar-title { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: .78rem; font-weight: 800; color: var(--muted); }
+    .sidebar-header { padding: 12px 14px; border-bottom: 1px solid var(--divider); display: flex; flex-direction: column; gap: 10px; }
+    .sidebar-title { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 14px; font-weight: 600; color: var(--text); }
     .sidebar-title span { display: inline-flex; align-items: center; gap: 7px; }
     .sidebar-actions { display: flex; gap: 3px; }
     .icon-btn {
-      width: 28px; height: 28px; border: 0; border-radius: 7px;
+      width: 30px; height: 30px; border: 0; border-radius: 50%;
       background: transparent; color: var(--muted);
       display: inline-flex; align-items: center; justify-content: center;
       cursor: pointer; transition: background .15s, color .15s; flex: 0 0 auto;
     }
     .icon-btn:hover { background: var(--hover); color: var(--text); }
+    .icon-btn:active { transform: scale(0.95); }
     .search-box {
-      width: 100%; height: 32px; border-radius: 7px;
-      border: 1px solid var(--border); background: var(--bg2);
-      color: var(--text); padding: 0 10px; font-size: .78rem; outline: none;
+      width: 100%; height: 36px; border-radius: var(--radius-pill);
+      border: 1px solid var(--divider); background: var(--canvas);
+      color: var(--text); padding: 0 16px; font-size: 14px; outline: none;
     }
     .search-box:focus { border-color: var(--blue); }
-    .file-tree { flex: 1 1 auto; overflow: auto; padding: 6px; }
+    .tree-context {
+      display: flex; align-items: center; gap: 6px; padding: 6px 10px 8px;
+      border-bottom: 1px solid var(--divider); margin-bottom: 4px;
+    }
+    .tree-context-root {
+      width: 26px; height: 26px; flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center;
+      border: 0; border-radius: var(--radius-sm); background: transparent; color: var(--blue); cursor: pointer;
+    }
+    .tree-context-root:hover { background: var(--hover); }
+    .tree-context-path {
+      flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      font-family: var(--font-code); font-size: 12px; color: var(--muted); direction: ltr; text-align: left;
+    }
+    .tree-context-actions { display: flex; gap: 2px; flex: 0 0 auto; }
+    .file-tree { flex: 1 1 auto; overflow: auto; padding: 8px; }
+    .file-tree.drop-root { outline: 2px dashed var(--blue); outline-offset: -6px; background: rgba(0, 102, 204, .04); }
+    .tree-row.drop-target { background: rgba(0, 102, 204, .10); border-color: var(--blue); }
+    .tree-row.drop-root { border-style: dashed; border-color: var(--blue); }
+    .tree-row-actions { display: flex; gap: 2px; flex: 0 0 auto; opacity: 0; transition: opacity .15s; }
+    .tree-row:hover .tree-row-actions, .tree-row:focus-within .tree-row-actions { opacity: 1; }
+    .tree-row-actions .icon-btn { width: 24px; height: 24px; font-size: 11px; }
     .tree-row {
       display: flex; align-items: center; gap: 7px;
-      min-height: 29px; border-radius: 7px; cursor: pointer;
-      font-size: .82rem; color: var(--text); white-space: nowrap;
-      padding-inline: 8px; margin-bottom: 1px; border: 1px solid transparent;
+      min-height: 32px; border-radius: var(--radius-md); cursor: pointer;
+      font-size: 14px; color: var(--text); white-space: nowrap;
+      padding-inline: 10px; margin-bottom: 1px; border: 1px solid transparent;
     }
     .tree-row:hover { background: var(--hover); }
-    .tree-row.active { background: color-mix(in srgb, var(--blue) 16%, transparent); color: var(--blue); border-color: color-mix(in srgb, var(--blue) 28%, transparent); }
+    .tree-row.active { background: var(--hover); color: var(--blue); }
     .tree-row .chevron { width: 12px; font-size: .6rem; color: var(--muted); transition: transform .18s; flex: 0 0 auto; }
     .tree-row.expanded .chevron { transform: rotate(-90deg); }
     .tree-row .file-icon { width: 16px; text-align: center; flex: 0 0 auto; }
     .tree-row .name { overflow: hidden; text-overflow: ellipsis; flex: 1 1 auto; }
-    .tree-empty { padding: 22px 10px; text-align: center; color: var(--muted); font-size: .8rem; line-height: 1.8; }
+    .tree-empty { padding: 22px 10px; text-align: center; color: var(--muted); font-size: 14px; line-height: 1.6; }
 
     /* Workspace */
-    .workspace { flex: 1 1 auto; display: flex; flex-direction: column; min-width: 0; min-height: 0; background: var(--bg2); }
+    .workspace { flex: 1 1 auto; display: flex; flex-direction: column; min-width: 0; min-height: 0; background: var(--canvas); }
     .workspace-tabs {
       flex: 0 0 auto; display: flex; min-height: 38px;
-      background: var(--panel); border-bottom: 1px solid var(--border);
+      background: var(--panel2); border-bottom: 1px solid var(--divider);
       overflow-x: auto; scrollbar-width: thin;
     }
     .tab {
       display: flex; align-items: center; gap: 7px;
-      padding: 0 10px; min-width: 0; max-width: 210px;
-      font-size: .78rem; color: var(--muted);
-      background: var(--panel2); border-inline-end: 1px solid var(--border);
+      padding: 0 14px; min-width: 0; max-width: 210px;
+      font-size: 13px; color: var(--muted);
+      background: transparent; border-inline-end: 1px solid var(--divider);
       cursor: pointer; white-space: nowrap; user-select: none;
     }
-    .tab.active { background: var(--bg2); color: var(--text); box-shadow: inset 0 -2px 0 var(--accent); }
+    .tab.active { background: var(--canvas); color: var(--text); border-bottom: 2px solid var(--blue); }
     .tab .tab-name { overflow: hidden; text-overflow: ellipsis; }
     .tab.dirty .tab-name::after { content: '●'; color: var(--warn); font-size: .55rem; margin-inline-start: 5px; vertical-align: middle; }
     .tab-close {
-      width: 18px; height: 18px; border: 0; border-radius: 5px;
+      width: 20px; height: 20px; border: 0; border-radius: 50%;
       background: transparent; color: inherit; opacity: .55; cursor: pointer;
       display: grid; place-items: center; flex: 0 0 auto;
     }
@@ -207,15 +245,15 @@
 
     .status-bar {
       flex: 0 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 12px;
-      padding: 4px 10px; min-height: 28px;
-      background: var(--panel2); border-bottom: 1px solid var(--border);
-      color: var(--muted); font-size: .71rem;
+      padding: 4px 14px; min-height: 28px;
+      background: var(--parchment); border-bottom: 1px solid var(--divider);
+      color: var(--muted); font-size: 12px;
     }
     .status-left, .status-right { display: flex; align-items: center; gap: 10px; min-width: 0; }
     .status-left { overflow: hidden; }
     .status-right { flex-wrap: wrap; justify-content: flex-end; }
     .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--warn); flex: 0 0 auto; }
-    .status-dot.saved { background: var(--ok); box-shadow: 0 0 8px color-mix(in srgb, var(--ok) 70%, transparent); }
+    .status-dot.saved { background: var(--ok); }
     .status-chip { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
     .status-chip i { opacity: .8; }
 
@@ -230,58 +268,60 @@
     }
     .CodeMirror-scroll { min-height: 100%; }
     .CodeMirror-hints {
-      background: var(--panel); border: 1px solid var(--border);
-      border-radius: 9px; box-shadow: var(--shadow);
+      background: var(--canvas); border: 1px solid var(--border);
+      border-radius: var(--radius-md);
       padding: 4px; max-height: 230px;
-      font-family: var(--font-code); font-size: .8rem;
+      font-family: var(--font-code); font-size: 13px;
       direction: ltr; text-align: left;
     }
-    .CodeMirror-hint { color: var(--text); padding: 5px 9px; border-radius: 5px; }
+    .CodeMirror-hint { color: var(--text); padding: 5px 9px; border-radius: var(--radius-sm); }
     li.CodeMirror-hint-active { background: var(--blue); color: #fff; }
-    .CodeMirror-dialog { background: var(--panel); color: var(--text); border-color: var(--border); font-family: var(--font-ui); }
+    .CodeMirror-dialog { background: var(--canvas); color: var(--text); border-color: var(--border); font-family: var(--font-ui); }
     .CodeMirror-dialog input { color: var(--text); font-family: var(--font-code); }
 
     .empty-state {
       position: absolute; inset: 0; z-index: 5;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
-      gap: 12px; text-align: center; padding: 24px;
-      background: radial-gradient(circle at 50% 35%, color-mix(in srgb, var(--blue) 12%, transparent), transparent 55%), var(--bg2);
+      gap: 16px; text-align: center; padding: 24px;
+      background: var(--canvas);
     }
     .empty-state.hidden { display: none; }
     .empty-logo {
-      width: 64px; height: 64px; border-radius: 18px; display: grid; place-items: center;
-      font-size: 26px; color: #04121a;
-      background: linear-gradient(135deg, var(--accent), var(--blue));
-      box-shadow: 0 14px 40px rgba(0, 176, 255, 0.3);
+      width: 64px; height: 64px; border-radius: var(--radius-lg); display: grid; place-items: center;
+      font-size: 26px; color: var(--canvas);
+      background: var(--text);
     }
-    .empty-state h2 { margin: 4px 0 0; font-size: 1.25rem; }
-    .empty-state p { margin: 0; max-width: 430px; color: var(--muted); font-size: .86rem; line-height: 1.8; }
-    .empty-actions { display: flex; flex-wrap: wrap; gap: 7px; justify-content: center; margin-top: 6px; }
-    .empty-hints { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 8px; color: var(--muted); font-size: .72rem; }
-    .empty-hints span { font-family: var(--font-code); border: 1px solid var(--border); background: var(--panel); border-radius: 5px; padding: 2px 6px; color: var(--text); }
+    .empty-state h2 {
+      margin: 4px 0 0; font-family: var(--font-display);
+      font-size: 34px; font-weight: 600; letter-spacing: -0.374px; line-height: 1.1;
+    }
+    .empty-state p { margin: 0; max-width: 540px; color: var(--muted); font-size: 17px; line-height: 1.47; }
+    .empty-actions { display: flex; flex-wrap: wrap; gap: 9px; justify-content: center; margin-top: 8px; }
+    .empty-hints { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 10px; color: var(--muted); font-size: 12px; }
+    .empty-hints span { font-family: var(--font-code); border: 1px solid var(--divider); background: var(--parchment); border-radius: var(--radius-sm); padding: 3px 8px; color: var(--text); }
 
     /* Splitter */
-    .splitter { flex: 0 0 6px; width: 6px; cursor: col-resize; background: var(--border); opacity: .55; transition: opacity .15s, background .15s; }
-    .splitter:hover, body.resizing .splitter { opacity: 1; background: var(--blue); }
+    .splitter { flex: 0 0 1px; width: 1px; cursor: col-resize; background: var(--divider); transition: background .15s; }
+    .splitter:hover, body.resizing .splitter { background: var(--blue); }
     body.resizing { cursor: col-resize; user-select: none; }
 
     /* Output */
     .output-panel {
       flex: 0 0 42%; width: 42%; min-width: 250px; max-width: 72%;
-      background: var(--panel); border-inline-start: 1px solid var(--border);
+      background: var(--panel2); border-inline-start: 1px solid var(--divider);
       display: flex; flex-direction: column; min-height: 0;
     }
     .output-panel.fullscreen { position: fixed; inset: 0; z-index: 300; width: 100% !important; max-width: none; flex-basis: auto !important; border: 0; }
     .output-tabs {
       flex: 0 0 auto; display: flex; align-items: center; gap: 2px;
-      min-height: 38px; padding: 0 6px;
-      background: var(--panel2); border-bottom: 1px solid var(--border);
+      min-height: 40px; padding: 0 10px;
+      background: var(--parchment); border-bottom: 1px solid var(--divider);
       overflow-x: auto; scrollbar-width: none;
     }
     .output-tabs::-webkit-scrollbar { display: none; }
     .output-tab {
       appearance: none; border: 0; background: transparent; color: var(--muted);
-      height: 38px; padding: 0 11px; font-size: .78rem; font-weight: 700;
+      height: 40px; padding: 0 14px; font-size: 13px; font-weight: 400;
       display: inline-flex; align-items: center; gap: 6px; cursor: pointer;
       border-bottom: 2px solid transparent; white-space: nowrap;
     }
@@ -296,164 +336,217 @@
 
     .console-toolbar {
       flex: 0 0 auto; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
-      padding: 5px 7px; border-bottom: 1px solid var(--border); background: var(--panel);
+      padding: 6px 10px; border-bottom: 1px solid var(--divider); background: var(--canvas);
     }
     .console-filters { display: flex; align-items: center; gap: 3px; flex-wrap: wrap; }
     .console-filter {
-      display: inline-flex; align-items: center; gap: 4px; padding: 4px 7px;
-      border: 1px solid transparent; border-radius: 6px; background: transparent;
-      color: var(--muted); font-family: var(--font-ui); font-size: .67rem; font-weight: 700;
+      display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px;
+      border: 1px solid transparent; border-radius: var(--radius-pill); background: transparent;
+      color: var(--muted); font-family: var(--font-ui); font-size: 12px; font-weight: 400;
       cursor: pointer; white-space: nowrap;
     }
     .console-filter span {
-      min-width: 16px; padding: 0 4px; border-radius: 8px; background: var(--hover);
-      color: var(--muted); font-family: var(--font-code); font-size: .6rem; text-align: center;
+      min-width: 16px; padding: 0 5px; border-radius: var(--radius-pill); background: var(--parchment);
+      color: var(--muted); font-family: var(--font-code); font-size: 11px; text-align: center;
     }
     .console-filter:hover { background: var(--hover); color: var(--text); }
-    .console-filter.active { color: var(--blue); border-color: color-mix(in srgb, var(--blue) 32%, transparent); background: color-mix(in srgb, var(--blue) 12%, transparent); }
-    .console-filter.active span { color: var(--blue); background: color-mix(in srgb, var(--blue) 16%, transparent); }
+    .console-filter.active { color: var(--blue); background: var(--hover); }
+    .console-filter.active span { color: var(--blue); }
     .console-tools { display: flex; align-items: center; gap: 2px; margin-inline-start: auto; }
-    .console-search {
-      width: 150px; height: 26px; border: 1px solid var(--border); border-radius: 6px;
-      background: var(--bg2); color: var(--text); padding: 0 8px; font-size: .68rem; outline: none;
+    .console-search, .inspect-search {
+      width: 150px; height: 30px; border: 1px solid var(--divider); border-radius: var(--radius-pill);
+      background: var(--canvas); color: var(--text); padding: 0 14px; font-size: 12px; outline: none;
     }
-    .console-search:focus { border-color: var(--blue); }
+    .console-search:focus, .inspect-search:focus { border-color: var(--blue); }
     .console-logs {
-      flex: 1 1 auto; overflow: auto; padding: 7px;
+      flex: 1 1 auto; overflow: auto; padding: 9px;
       display: flex; flex-direction: column; gap: 4px;
-      font-family: var(--font-code); font-size: .78rem;
-      direction: ltr; text-align: left; background: var(--bg2);
+      font-family: var(--font-code); font-size: 13px;
+      direction: ltr; text-align: left; background: var(--canvas);
     }
-    .console-empty { margin: auto; padding: 22px; text-align: center; color: var(--muted); font-size: .78rem; line-height: 1.7; }
+    .console-empty { margin: auto; padding: 22px; text-align: center; color: var(--muted); font-size: 14px; line-height: 1.5; }
     .console-entry {
       display: grid; grid-template-columns: auto auto minmax(0, 1fr); gap: 7px; align-items: start;
-      padding: 4px 7px; border-radius: 5px; border-inline-start: 3px solid var(--blue);
-      background: var(--hover); color: var(--text);
+      padding: 6px 9px; border-radius: var(--radius-sm); border-inline-start: 3px solid var(--blue);
+      background: var(--parchment); color: var(--text);
     }
-    .console-entry .c-time { color: var(--muted); font-size: .62rem; white-space: nowrap; padding-top: 2px; }
-    .console-entry .c-level { width: 14px; padding-top: 2px; text-align: center; font-size: .65rem; color: var(--blue); }
+    .console-entry .c-time { color: var(--muted); font-size: 11px; white-space: nowrap; padding-top: 2px; }
+    .console-entry .c-level { width: 14px; padding-top: 2px; text-align: center; font-size: 12px; color: var(--blue); }
     .console-entry .c-body { min-width: 0; }
     .console-entry .c-text { white-space: pre-wrap; word-break: break-word; }
-    .console-entry details { margin-top: 3px; }
-    .console-entry summary { cursor: pointer; color: var(--blue); font-size: .68rem; }
+    .console-entry details { margin-top: 4px; }
+    .console-entry summary { cursor: pointer; color: var(--blue); font-size: 12px; }
     .console-entry pre {
-      margin: 5px 0 0; padding: 7px; border-radius: 5px; border: 1px solid var(--border);
-      background: var(--bg); color: var(--text); overflow: auto; max-height: 220px;
-      font-family: var(--font-code); font-size: .7rem; direction: ltr; text-align: left; white-space: pre;
+      margin: 6px 0 0; padding: 9px; border-radius: var(--radius-sm); border: 1px solid var(--divider);
+      background: var(--canvas); color: var(--text); overflow: auto; max-height: 220px;
+      font-family: var(--font-code); font-size: 12px; direction: ltr; text-align: left; white-space: pre;
     }
-    .console-entry.warn { border-color: var(--warn); background: color-mix(in srgb, var(--warn) 9%, transparent); }
+    .console-entry.warn { border-color: var(--warn); }
     .console-entry.warn .c-level { color: var(--warn); }
-    .console-entry.error { border-color: var(--danger); background: color-mix(in srgb, var(--danger) 9%, transparent); color: var(--danger); }
+    .console-entry.error { border-color: var(--danger); color: var(--danger); }
     .console-entry.error .c-level { color: var(--danger); }
     .console-entry.ok { border-color: var(--ok); }
     .console-entry.ok .c-level { color: var(--ok); }
     .console-entry.info { border-color: var(--muted); }
     .console-entry.info .c-level { color: var(--muted); }
-    .console-entry.input { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent); color: var(--accent); }
-    .console-entry.input .c-level { color: var(--accent); }
-    .console-input-row { flex: 0 0 auto; display: flex; align-items: center; border-top: 1px solid var(--border); background: var(--panel2); padding: 0 8px; }
-    .console-prompt-sign { color: var(--accent); font-family: var(--font-code); }
+    .console-entry.input { border-color: var(--blue); color: var(--blue); }
+    .console-entry.input .c-level { color: var(--blue); }
+    .console-input-row { flex: 0 0 auto; display: flex; align-items: center; border-top: 1px solid var(--divider); background: var(--parchment); padding: 0 10px; }
+    .console-prompt-sign { color: var(--blue); font-family: var(--font-code); }
     .console-input-row input {
       flex: 1 1 auto; border: 0; outline: none; background: transparent;
-      color: var(--text); padding: 9px 7px; font-family: var(--font-code); font-size: .8rem; direction: ltr;
+      color: var(--text); padding: 10px 8px; font-family: var(--font-code); font-size: 13px; direction: ltr;
     }
-    .console-run-btn { width: 28px; height: 28px; border: 0; border-radius: 5px; background: transparent; color: var(--accent); cursor: pointer; flex: 0 0 auto; }
+    .console-run-btn { width: 30px; height: 30px; border: 0; border-radius: 50%; background: transparent; color: var(--blue); cursor: pointer; flex: 0 0 auto; }
     .console-run-btn:hover { background: var(--hover); }
-    .problems-list { flex: 1 1 auto; overflow: auto; padding: 8px; background: var(--bg2); display: flex; flex-direction: column; gap: 5px; }
-    .problem-item { padding: 7px 9px; border-radius: 6px; font-family: var(--font-code); font-size: .76rem; border-inline-start: 3px solid var(--danger); background: color-mix(in srgb, var(--danger) 8%, transparent); color: var(--text); direction: ltr; text-align: left; white-space: pre-wrap; word-break: break-word; }
-    .problems-empty { padding: 24px; text-align: center; color: var(--muted); font-size: .82rem; }
+    .problems-list { flex: 1 1 auto; overflow: auto; padding: 10px; background: var(--canvas); display: flex; flex-direction: column; gap: 6px; }
+    .problem-item {
+      padding: 10px 12px; border-radius: var(--radius-md); font-size: 13px;
+      border-inline-start: 3px solid var(--danger); background: var(--parchment);
+      color: var(--text); cursor: pointer; white-space: pre-wrap; word-break: break-word;
+    }
+    .problem-item:hover { background: var(--hover); }
+    .problem-head { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-bottom: 5px; font-size: 12px; }
+    .problem-chip { display: inline-flex; align-items: center; gap: 4px; padding: 2px 9px; border-radius: var(--radius-pill); background: var(--canvas); border: 1px solid var(--divider); font-family: var(--font-code); }
+    .problem-chip.error { color: var(--danger); }
+    .problem-chip.warn { color: var(--warn); }
+    .problem-chip.info { color: var(--blue); }
+    .problem-message { font-family: var(--font-code); direction: ltr; text-align: left; line-height: 1.6; }
+    .problem-snippet { margin-top: 5px; font-family: var(--font-code); font-size: 12px; color: var(--muted); direction: ltr; text-align: left; }
+    .problems-empty { padding: 24px; text-align: center; color: var(--muted); font-size: 14px; }
+
+    /* Inspect tools */
+    .inspect-toolbar {
+      flex: 0 0 auto; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+      padding: 7px 10px; border-bottom: 1px solid var(--divider); background: var(--canvas);
+    }
+    .inspect-status { margin-inline-start: auto; color: var(--muted); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 45%; }
+    .inspect-main { flex: 1 1 auto; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); min-height: 0; }
+    .inspect-tree-pane { overflow: auto; padding: 8px; background: var(--canvas); border-inline-end: 1px solid var(--divider); direction: ltr; text-align: left; }
+    .inspect-details-pane { overflow: auto; padding: 14px; background: var(--parchment); font-size: 13px; }
+    .inspect-empty { padding: 22px 12px; text-align: center; color: var(--muted); font-size: 13px; line-height: 1.6; }
+    .inspect-node-row {
+      display: flex; align-items: center; gap: 6px; min-height: 24px; padding: 2px 6px;
+      border-radius: var(--radius-sm); cursor: pointer; font-family: var(--font-code); font-size: 12px;
+      color: var(--text); white-space: nowrap;
+    }
+    .inspect-node-row:hover { background: var(--hover); }
+    .inspect-node-row.selected { background: var(--blue); color: #fff; }
+    .inspect-arrow { width: 12px; flex: 0 0 auto; color: var(--muted); }
+    .inspect-node-row.selected .inspect-arrow { color: #fff; }
+    .inspect-tag { color: var(--blue); }
+    .inspect-node-row.selected .inspect-tag { color: #fff; }
+    .inspect-id { color: var(--ok); }
+    .inspect-class { color: var(--muted); }
+    .inspect-node-row.selected .inspect-id, .inspect-node-row.selected .inspect-class { color: #fff; }
+    .inspect-section { margin-bottom: 18px; }
+    .inspect-section h4 { margin: 0 0 8px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+    .inspect-kv { display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: 5px 10px; align-items: start; }
+    .inspect-kv dt { color: var(--muted); font-family: var(--font-code); font-size: 12px; }
+    .inspect-kv dd { margin: 0; font-family: var(--font-code); font-size: 12px; word-break: break-all; }
+    .inspect-code {
+      margin: 0; padding: 10px; border: 1px solid var(--divider); border-radius: var(--radius-sm);
+      background: var(--canvas); max-height: 240px; overflow: auto;
+      font-family: var(--font-code); font-size: 12px; line-height: 1.5; white-space: pre-wrap; word-break: break-word;
+    }
+    .inspect-pick-active { background: var(--blue) !important; color: #fff !important; border-color: transparent !important; }
 
     /* Footer & mobile nav */
     .app-footer {
       flex: 0 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 10px;
-      min-height: 24px; padding: 2px 10px; font-size: .68rem; color: var(--muted);
-      background: var(--panel); border-top: 1px solid var(--border);
+      min-height: 26px; padding: 2px 20px; font-size: 12px; color: var(--muted);
+      background: var(--parchment); border-top: 1px solid var(--divider);
       white-space: nowrap; overflow: hidden;
     }
     .app-footer span { overflow: hidden; text-overflow: ellipsis; }
-    .mobile-nav { display: none; flex: 0 0 auto; background: var(--panel); border-top: 1px solid var(--border); padding-bottom: env(safe-area-inset-bottom); z-index: 40; }
-    .mobile-nav-btn { flex: 1 1 0; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 7px 2px; border: 0; background: transparent; color: var(--muted); font-size: .68rem; font-weight: 700; cursor: pointer; }
+    .mobile-nav { display: none; flex: 0 0 auto; background: var(--parchment); border-top: 1px solid var(--divider); padding-bottom: env(safe-area-inset-bottom); z-index: 40; }
+    .mobile-nav-btn { flex: 1 1 0; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 8px 2px; border: 0; background: transparent; color: var(--muted); font-size: 12px; font-weight: 400; cursor: pointer; }
     .mobile-nav-btn i { font-size: 1rem; }
     .mobile-nav-btn.active { color: var(--blue); }
 
     /* Context menu */
-    .context-menu { position: fixed; display: none; z-index: 900; min-width: 190px; background: var(--panel); border: 1px solid var(--border); border-radius: 9px; box-shadow: var(--shadow); padding: 5px; }
-    .context-menu-item { display: flex; align-items: center; gap: 9px; width: 100%; padding: 8px 10px; border: 0; border-radius: 6px; background: transparent; color: var(--text); font-size: .82rem; text-align: start; cursor: pointer; }
+    .context-menu { position: fixed; display: none; z-index: 900; min-width: 190px; background: var(--canvas); border: 1px solid var(--divider); border-radius: var(--radius-md); box-shadow: var(--shadow); padding: 5px; }
+    .context-menu-item { display: flex; align-items: center; gap: 9px; width: 100%; padding: 8px 10px; border: 0; border-radius: var(--radius-sm); background: transparent; color: var(--text); font-size: 14px; text-align: start; cursor: pointer; }
     .context-menu-item:hover { background: var(--hover); }
     .context-menu-item.danger { color: var(--danger); }
 
     /* Modals */
-    .modal-overlay { position: fixed; inset: 0; z-index: 1000; display: none; align-items: flex-start; justify-content: center; padding: 8vh 14px 20px; background: rgba(3, 6, 12, 0.62); backdrop-filter: blur(5px); }
+    .modal-overlay { position: fixed; inset: 0; z-index: 1000; display: none; align-items: flex-start; justify-content: center; padding: 8vh 14px 20px; background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
     .modal-overlay.open { display: flex; }
-    .modal { width: 100%; max-width: 470px; background: var(--panel); border: 1px solid var(--border); border-radius: 15px; box-shadow: var(--shadow); overflow: hidden; animation: pop .16s ease-out; }
+    .modal { width: 100%; max-width: 470px; background: var(--canvas); border: 1px solid var(--divider); border-radius: var(--radius-lg); overflow: hidden; animation: pop .16s ease-out; }
     @keyframes pop { from { opacity: 0; transform: translateY(-8px) scale(.985); } to { opacity: 1; transform: none; } }
     .modal.wide { max-width: 620px; }
     .palette-modal { max-width: 580px; }
-    .modal-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 14px; border-bottom: 1px solid var(--border); }
-    .modal-header h3 { margin: 0; font-size: .95rem; display: inline-flex; align-items: center; gap: 8px; }
-    .modal-body { padding: 14px; max-height: 68vh; overflow: auto; }
-    .modal-footer { display: flex; align-items: center; justify-content: flex-end; gap: 7px; padding: 11px 14px; border-top: 1px solid var(--border); }
+    .modal-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 14px 18px; border-bottom: 1px solid var(--divider); }
+    .modal-header h3 { margin: 0; font-family: var(--font-display); font-size: 21px; font-weight: 600; letter-spacing: -0.374px; display: inline-flex; align-items: center; gap: 8px; }
+    .modal-body { padding: 18px; max-height: 68vh; overflow: auto; }
+    .modal-footer { display: flex; align-items: center; justify-content: flex-end; gap: 9px; padding: 12px 18px; border-top: 1px solid var(--divider); }
     .muted { color: var(--muted); }
-    .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 13px; }
+    .field { display: flex; flex-direction: column; gap: 7px; margin-bottom: 15px; }
     .field:last-child { margin-bottom: 0; }
-    .field-label { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: .8rem; font-weight: 700; color: var(--text); }
-    .field-hint { font-size: .72rem; color: var(--muted); line-height: 1.7; }
+    .field-label { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 14px; font-weight: 600; color: var(--text); }
+    .field-hint { font-size: 12px; color: var(--muted); line-height: 1.5; }
     .field-hint.danger { color: var(--danger); }
-    .text-input { width: 100%; min-height: 36px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg2); color: var(--text); padding: 8px 10px; font-size: .84rem; outline: none; resize: vertical; }
+    .text-input { width: 100%; min-height: 38px; border: 1px solid var(--divider); border-radius: var(--radius-md); background: var(--parchment); color: var(--text); padding: 8px 12px; font-size: 14px; outline: none; resize: vertical; }
     .text-input:focus { border-color: var(--blue); }
-    textarea.text-input { font-family: var(--font-code); direction: ltr; text-align: left; font-size: .76rem; }
-    select.text-input { height: 38px; padding: 0 8px; }
-    .switch-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 9px 0; border-bottom: 1px dashed var(--border); }
+    textarea.text-input { font-family: var(--font-code); direction: ltr; text-align: left; font-size: 13px; }
+    select.text-input { height: 40px; padding: 0 10px; }
+    .switch-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--divider); }
     .switch-row:last-of-type { border-bottom: 0; }
     .switch-row .switch-text { display: flex; flex-direction: column; gap: 2px; }
-    .switch-row small { color: var(--muted); font-size: .7rem; }
+    .switch-row small { color: var(--muted); font-size: 12px; }
     .switch { position: relative; width: 42px; height: 23px; flex: 0 0 auto; }
     .switch input { position: absolute; opacity: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
-    .switch span { position: absolute; inset: 0; border-radius: 999px; background: var(--border); transition: .18s; pointer-events: none; }
+    .switch span { position: absolute; inset: 0; border-radius: var(--radius-pill); background: var(--border); transition: .18s; pointer-events: none; }
     .switch span::after { content: ''; position: absolute; width: 17px; height: 17px; border-radius: 50%; top: 3px; inset-inline-start: 3px; background: #fff; transition: .18s; }
     .switch input:checked + span { background: var(--blue); }
     .switch input:checked + span::after { transform: translateX(-19px); }
     .range-row { display: flex; align-items: center; gap: 10px; }
     .range-row input[type="range"] { flex: 1 1 auto; accent-color: var(--blue); }
-    .range-value { font-family: var(--font-code); font-size: .78rem; color: var(--blue); min-width: 45px; text-align: center; }
-    .kbd { font-family: var(--font-code); font-size: .68rem; border: 1px solid var(--border); background: var(--bg2); border-radius: 5px; padding: 2px 6px; color: var(--muted); }
-    .shortcut-grid { display: grid; grid-template-columns: 1fr auto; gap: 9px 14px; align-items: center; font-size: .8rem; }
+    .range-value { font-family: var(--font-code); font-size: 13px; color: var(--blue); min-width: 45px; text-align: center; }
+    .kbd { font-family: var(--font-code); font-size: 12px; border: 1px solid var(--divider); background: var(--parchment); border-radius: var(--radius-sm); padding: 3px 8px; color: var(--muted); }
+    .shortcut-grid { display: grid; grid-template-columns: 1fr auto; gap: 11px 14px; align-items: center; font-size: 14px; }
     .shortcut-grid .kbd { justify-self: end; }
-    .share-actions { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 12px; }
+    .share-actions { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 14px; }
 
-    .palette-input { width: 100%; height: 50px; border: 0; border-bottom: 1px solid var(--border); background: transparent; color: var(--text); padding: 0 15px; font-size: .95rem; outline: none; }
+    .palette-input { width: 100%; height: 52px; border: 0; border-bottom: 1px solid var(--divider); background: transparent; color: var(--text); padding: 0 18px; font-size: 17px; outline: none; }
     .palette-list { max-height: 350px; overflow: auto; padding: 6px; }
-    .palette-item { display: flex; align-items: center; gap: 10px; width: 100%; padding: 9px 11px; border: 0; border-radius: 8px; background: transparent; color: var(--text); font-size: .84rem; text-align: start; cursor: pointer; }
+    .palette-item { display: flex; align-items: center; gap: 10px; width: 100%; padding: 9px 12px; border: 0; border-radius: var(--radius-md); background: transparent; color: var(--text); font-size: 14px; text-align: start; cursor: pointer; }
     .palette-item i { width: 18px; text-align: center; color: var(--muted); }
     .palette-item .kbd { margin-inline-start: auto; }
     .palette-item.active { background: var(--blue); color: #fff; }
     .palette-item.active i { color: #fff; }
-    .palette-empty { padding: 22px; text-align: center; color: var(--muted); font-size: .82rem; }
+    .palette-empty { padding: 22px; text-align: center; color: var(--muted); font-size: 14px; }
 
     #toasts { position: fixed; left: 50%; bottom: calc(18px + env(safe-area-inset-bottom)); transform: translateX(-50%); z-index: 2100; display: flex; flex-direction: column; align-items: center; gap: 8px; pointer-events: none; width: min(92vw, 520px); }
-    .toast { max-width: 100%; padding: 9px 15px; border-radius: 9px; background: var(--panel); border: 1px solid var(--border); border-inline-start: 4px solid var(--blue); color: var(--text); box-shadow: var(--shadow); font-size: .82rem; font-weight: 600; pointer-events: auto; animation: toastIn .18s ease-out; }
-    .toast.ok { border-inline-start-color: var(--ok); }
-    .toast.error { border-inline-start-color: var(--danger); }
-    .toast.info { border-inline-start-color: var(--blue); }
+    .toast { max-width: 100%; padding: 10px 20px; border-radius: var(--radius-pill); background: var(--toast-bg); color: var(--toast-text); font-size: 14px; font-weight: 400; pointer-events: auto; animation: toastIn .18s ease-out; }
+    .toast.ok { background: var(--ok); color: #fff; }
+    .toast.error { background: var(--danger); color: #fff; }
+    .toast.info { background: var(--toast-bg); color: var(--toast-text); }
     @keyframes toastIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 
     body.dragging-files::after {
-      content: 'أفلت الملفات لاستيرادها إلى المشروع';
+      content: var(--drag-label, "Drop files to import");
       position: fixed; inset: 10px; z-index: 2500;
       display: grid; place-items: center;
-      border: 3px dashed var(--blue); border-radius: 20px;
-      background: color-mix(in srgb, var(--bg) 78%, transparent);
-      color: var(--blue); font-size: 1.1rem; font-weight: 800;
+      border: 1px dashed var(--blue); border-radius: var(--radius-lg);
+      background: color-mix(in srgb, var(--canvas) 82%, transparent);
+      color: var(--blue); font-family: var(--font-display); font-size: 21px; font-weight: 600;
       pointer-events: none;
     }
 
     @media (max-width: 1180px) {
       .sidebar { flex-basis: 220px; width: 220px; }
+      .output-panel { flex-basis: 36%; width: 36%; min-width: 230px; }
       .btn .btn-label { display: none; }
-      .btn { padding: 0 9px; }
+      .btn { padding: 0 12px; }
+    }
+    @media (max-width: 980px) {
+      .inspect-main { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(120px, 40%) minmax(0, 1fr); }
+      .inspect-tree-pane { border-inline-end: 0; border-bottom: 1px solid var(--divider); }
     }
     @media (max-width: 900px) {
-      .app-header { height: 52px; padding: 0 8px; gap: 8px; }
+      .app-header { height: 48px; padding: 0 12px; gap: 8px; }
       .brand-badge { display: none; }
       .splitter { display: none; }
       .sidebar, .workspace, .output-panel { display: none; }
@@ -466,6 +559,12 @@
       .app-footer { display: none; }
       .modal-overlay { padding-top: 4vh; }
       .modal-body { max-height: 76vh; }
+      .tree-row { min-height: 38px; }
+      .tree-row-actions { opacity: 1; }
+      .icon-btn { width: 34px; height: 34px; }
+      .inspect-toolbar { flex-wrap: wrap; height: auto; padding: 8px; gap: 6px; }
+      .inspect-search { flex: 1 1 140px; }
+      .problem-message, .problem-snippet { font-size: 12px; }
     }
     @media (max-width: 620px) {
       .brand-name { font-size: .95rem; }
@@ -479,6 +578,20 @@
       .console-filter { padding: 3px 5px; font-size: .62rem; }
       .console-search { width: 96px; }
       .console-toolbar { padding: 4px 5px; gap: 4px; }
+      .app-header { padding: 0 8px; gap: 4px; }
+      .toolbar { gap: 2px; }
+      .btn { padding: 0 9px; }
+      .sidebar-header { padding: 10px; }
+      .tree-context { padding: 6px; }
+      .output-tabs { padding: 0 4px; overflow-x: auto; }
+      .output-tab { flex: 0 0 auto; }
+    }
+    @media (max-width: 420px) {
+      .brand-name { font-size: .86rem; }
+      .toolbar #btn-format, .toolbar #btn-share, .toolbar #btn-export, .toolbar #btn-help { display: none; }
+      .tree-context-path { font-size: 11px; }
+      .mobile-nav-btn { font-size: 11px; }
+      .problem-head { gap: 4px; }
     }
   </style>
 </head>
@@ -487,30 +600,31 @@
   <header class="app-header">
     <div class="brand">
       <div class="brand-logo"><i class="fa-solid fa-code"></i></div>
-      <span class="brand-name">CodeX Arena PRO</span>
-      <span class="brand-badge">v3</span>
+      <span class="brand-name">CodeX Arena</span>
+      <span class="brand-badge" data-i18n-ar="محرر أكواد" data-i18n-en="Code editor">محرر أكواد</span>
     </div>
 
     <div class="toolbar">
-      <button class="btn btn-primary" id="btn-run" title="تشغيل الملف الحالي (Ctrl+Enter)">
-        <i class="fa-solid fa-play"></i><span class="btn-label">تشغيل</span>
+      <button class="btn btn-primary" id="btn-run" title="Run (Ctrl+Enter)" data-title-ar="تشغيل (Ctrl+Enter)" data-title-en="Run (Ctrl+Enter)">
+        <i class="fa-solid fa-play"></i><span class="btn-label" data-i18n-ar="تشغيل" data-i18n-en="Run">تشغيل</span>
       </button>
-      <button class="btn" id="btn-save" title="حفظ المشروع محلياً (Ctrl+S)">
-        <i class="fa-solid fa-floppy-disk"></i><span class="btn-label">حفظ</span>
+      <button class="btn" id="btn-save" title="Save (Ctrl+S)" data-title-ar="حفظ (Ctrl+S)" data-title-en="Save (Ctrl+S)">
+        <i class="fa-solid fa-floppy-disk"></i><span class="btn-label" data-i18n-ar="حفظ" data-i18n-en="Save">حفظ</span>
       </button>
-      <button class="btn" id="btn-format" title="تنسيق الكود (Shift+Alt+F)">
-        <i class="fa-solid fa-wand-magic-sparkles"></i><span class="btn-label">تنسيق</span>
+      <button class="btn" id="btn-format" title="Format (Shift+Alt+F)" data-title-ar="تنسيق (Shift+Alt+F)" data-title-en="Format (Shift+Alt+F)">
+        <i class="fa-solid fa-wand-magic-sparkles"></i><span class="btn-label" data-i18n-ar="تنسيق" data-i18n-en="Format">تنسيق</span>
       </button>
-      <button class="btn" id="btn-share" title="مشاركة مجلد المشروع">
-        <i class="fa-solid fa-share-nodes"></i><span class="btn-label">مشاركة</span>
+      <button class="btn" id="btn-share" title="Share project" data-title-ar="مشاركة المشروع" data-title-en="Share project">
+        <i class="fa-solid fa-share-nodes"></i><span class="btn-label" data-i18n-ar="مشاركة" data-i18n-en="Share">مشاركة</span>
       </button>
-      <button class="btn btn-icon" id="btn-export" title="تصدير المشروع كـ ZIP"><i class="fa-solid fa-file-zipper"></i></button>
-      <button class="btn btn-icon" id="btn-import" title="استيراد ملفات"><i class="fa-solid fa-file-import"></i></button>
-      <button class="btn btn-icon" id="btn-palette" title="لوحة الأوامر (Ctrl+K)"><i class="fa-solid fa-terminal"></i></button>
-      <button class="btn btn-icon" id="btn-theme" title="تبديل الثيم"><i class="fa-solid fa-circle-half-stroke"></i></button>
-      <button class="btn btn-icon" id="btn-settings" title="الإعدادات (Ctrl+,)"><i class="fa-solid fa-gear"></i></button>
-      <button class="btn btn-icon" id="btn-help" title="الاختصارات (F1)"><i class="fa-solid fa-keyboard"></i></button>
-      <button class="btn btn-icon" id="btn-sidebar-toggle" title="إظهار/إخفاء الملفات (Ctrl+B)"><i class="fa-solid fa-table-columns"></i></button>
+      <button class="btn btn-icon" id="btn-export" title="Export ZIP" data-title-ar="تصدير ZIP" data-title-en="Export ZIP"><i class="fa-solid fa-file-zipper"></i></button>
+      <button class="btn btn-icon" id="btn-import" title="Import files" data-title-ar="استيراد ملفات" data-title-en="Import files"><i class="fa-solid fa-file-import"></i></button>
+      <button class="btn btn-icon" id="btn-palette" title="Command palette (Ctrl+K)" data-title-ar="لوحة الأوامر (Ctrl+K)" data-title-en="Command palette (Ctrl+K)"><i class="fa-solid fa-terminal"></i></button>
+      <button class="btn btn-icon" id="btn-language" title="العربية / English" data-title-ar="التبديل إلى الإنجليزية / Switch to English" data-title-en="التبديل إلى العربية / Switch to Arabic"><i class="fa-solid fa-language"></i></button>
+      <button class="btn btn-icon" id="btn-theme" title="Appearance" data-title-ar="تبديل المظهر" data-title-en="Switch appearance"><i class="fa-solid fa-circle-half-stroke"></i></button>
+      <button class="btn btn-icon" id="btn-settings" title="Settings (Ctrl+,)" data-title-ar="الإعدادات (Ctrl+,)" data-title-en="Settings (Ctrl+,)"><i class="fa-solid fa-gear"></i></button>
+      <button class="btn btn-icon" id="btn-help" title="Shortcuts (F1)" data-title-ar="الاختصارات (F1)" data-title-en="Shortcuts (F1)"><i class="fa-solid fa-keyboard"></i></button>
+      <button class="btn btn-icon" id="btn-sidebar-toggle" title="Toggle files (Ctrl+B)" data-title-ar="إظهار/إخفاء الملفات (Ctrl+B)" data-title-en="Toggle files (Ctrl+B)"><i class="fa-solid fa-table-columns"></i></button>
     </div>
   </header>
 
@@ -518,14 +632,22 @@
     <aside class="sidebar" id="sidebar-panel">
       <div class="sidebar-header">
         <div class="sidebar-title">
-          <span><i class="fa-solid fa-folder-tree"></i> ملفات المشروع</span>
+          <span><i class="fa-solid fa-folder-tree"></i> <span data-i18n-ar="ملفات المشروع" data-i18n-en="Project files">ملفات المشروع</span></span>
           <div class="sidebar-actions">
-            <button class="icon-btn" id="btn-new-file" title="ملف جديد"><i class="fa-solid fa-file-circle-plus"></i></button>
-            <button class="icon-btn" id="btn-new-folder" title="مجلد جديد"><i class="fa-solid fa-folder-plus"></i></button>
-            <button class="icon-btn" id="btn-import-side" title="استيراد ملفات/مجلد"><i class="fa-solid fa-upload"></i></button>
+            <button class="icon-btn" id="btn-new-file" title="New file" data-title-ar="ملف جديد" data-title-en="New file"><i class="fa-solid fa-file-circle-plus"></i></button>
+            <button class="icon-btn" id="btn-new-folder" title="New folder" data-title-ar="مجلد جديد" data-title-en="New folder"><i class="fa-solid fa-folder-plus"></i></button>
+            <button class="icon-btn" id="btn-import-side" title="Import files / folder" data-title-ar="استيراد ملفات/مجلد" data-title-en="Import files / folder"><i class="fa-solid fa-upload"></i></button>
           </div>
         </div>
-        <input class="search-box" id="tree-search" type="search" placeholder="بحث في الملفات…" autocomplete="off">
+        <input class="search-box" id="tree-search" type="search" data-ph-ar="بحث في الملفات…" data-ph-en="Search files…" placeholder="بحث في الملفات…" autocomplete="off">
+        <div class="tree-context" id="tree-context">
+          <button class="tree-context-root" id="btn-tree-root" type="button" title="Project root" data-title-ar="جذر المشروع" data-title-en="Project root"><i class="fa-solid fa-house"></i></button>
+          <span class="tree-context-path" id="tree-context-path">/</span>
+          <div class="tree-context-actions">
+            <button class="icon-btn" id="btn-tree-new-file" type="button" title="New file here" data-title-ar="ملف جديد هنا" data-title-en="New file here"><i class="fa-solid fa-file-circle-plus"></i></button>
+            <button class="icon-btn" id="btn-tree-new-folder" type="button" title="New folder here" data-title-ar="مجلد جديد هنا" data-title-en="New folder here"><i class="fa-solid fa-folder-plus"></i></button>
+          </div>
+        </div>
       </div>
       <div class="file-tree" id="file-tree"></div>
     </aside>
@@ -536,7 +658,7 @@
       <div class="status-bar">
         <div class="status-left">
           <span class="status-dot saved" id="status-dot"></span>
-          <span id="status-text">جاهز</span>
+          <span id="status-text">—</span>
         </div>
         <div class="status-right">
           <span class="status-chip" id="status-lang"><i class="fa-solid fa-code"></i> —</span>
@@ -548,64 +670,75 @@
       <div class="editor-wrapper" id="editor-wrapper">
         <div class="empty-state" id="empty-state">
           <div class="empty-logo"><i class="fa-solid fa-code"></i></div>
-          <h2>مرحباً في CodeX Arena PRO</h2>
-          <p>بيئة تطوير متكاملة تعمل بالكامل داخل المتصفح، مجانية 100%، وتدعم عشرات اللغات مع الإكمال التلقائي والمعاينة الحية ومشاركة المشروع.</p>
+          <h2 data-i18n-ar="مرحباً في CodeX Arena" data-i18n-en="Welcome to CodeX Arena">مرحباً في CodeX Arena</h2>
+          <p data-i18n-ar="بيئة تطوير متكاملة تعمل بالكامل داخل المتصفح، مجانية 100%، وتدعم عشرات اللغات مع الإكمال التلقائي والمعاينة الحية وأدوات الفحص والمشاركة." data-i18n-en="A complete development environment that runs entirely in your browser — free, with dozens of languages, autocomplete, live preview, inspect tools and sharing.">بيئة تطوير متكاملة تعمل بالكامل داخل المتصفح، مجانية 100%، وتدعم عشرات اللغات مع الإكمال التلقائي والمعاينة الحية وأدوات الفحص والمشاركة.</p>
           <div class="empty-actions">
-            <button class="btn btn-primary" id="empty-new-file"><i class="fa-solid fa-file-circle-plus"></i> ملف جديد</button>
-            <button class="btn" id="empty-import"><i class="fa-solid fa-upload"></i> استيراد مشروع</button>
-            <button class="btn" id="empty-palette"><i class="fa-solid fa-terminal"></i> لوحة الأوامر</button>
+            <button class="btn btn-primary" id="empty-new-file"><i class="fa-solid fa-file-circle-plus"></i> <span data-i18n-ar="ملف جديد" data-i18n-en="New file">ملف جديد</span></button>
+            <button class="btn" id="empty-import"><i class="fa-solid fa-upload"></i> <span data-i18n-ar="استيراد مشروع" data-i18n-en="Import project">استيراد مشروع</span></button>
+            <button class="btn" id="empty-palette"><i class="fa-solid fa-terminal"></i> <span data-i18n-ar="لوحة الأوامر" data-i18n-en="Command palette">لوحة الأوامر</span></button>
           </div>
-          <div class="empty-hints"><span>Ctrl+K</span> الأوامر <span>Ctrl+Enter</span> تشغيل <span>Ctrl+S</span> حفظ <span>Ctrl+Space</span> إكمال</div>
+          <div class="empty-hints"><span>Ctrl+K</span> <span data-i18n-ar="الأوامر" data-i18n-en="Commands">الأوامر</span> <span>Ctrl+Enter</span> <span data-i18n-ar="تشغيل" data-i18n-en="Run">تشغيل</span> <span>Ctrl+S</span> <span data-i18n-ar="حفظ" data-i18n-en="Save">حفظ</span> <span>Ctrl+Space</span> <span data-i18n-ar="إكمال" data-i18n-en="Autocomplete">إكمال</span></div>
         </div>
         <textarea id="code-editor" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea>
       </div>
     </section>
 
-    <div class="splitter" id="splitter" title="اسحب لتغيير الحجم"></div>
+    <div class="splitter" id="splitter" title="Drag to resize" data-title-ar="اسحب لتغيير الحجم" data-title-en="Drag to resize"></div>
 
     <aside class="output-panel" id="output-panel">
       <div class="output-tabs">
-        <button class="output-tab active" data-tab="preview"><i class="fa-solid fa-eye"></i><span class="tab-text">المعاينة</span></button>
-        <button class="output-tab" data-tab="console"><i class="fa-solid fa-terminal"></i><span class="tab-text">Console</span></button>
-        <button class="output-tab" data-tab="problems"><i class="fa-solid fa-triangle-exclamation"></i><span class="tab-text">المشاكل</span></button>
+        <button class="output-tab active" data-tab="preview"><i class="fa-solid fa-eye"></i><span class="tab-text" data-i18n-ar="المعاينة" data-i18n-en="Preview">المعاينة</span></button>
+        <button class="output-tab" data-tab="console"><i class="fa-solid fa-terminal"></i><span class="tab-text" data-i18n-ar="الكونسول" data-i18n-en="Console">Console</span></button>
+        <button class="output-tab" data-tab="problems"><i class="fa-solid fa-triangle-exclamation"></i><span class="tab-text" data-i18n-ar="المشاكل" data-i18n-en="Problems">المشاكل</span></button>
+        <button class="output-tab" data-tab="inspect"><i class="fa-solid fa-magnifying-glass"></i><span class="tab-text" data-i18n-ar="الفحص" data-i18n-en="Inspect">Inspect</span></button>
         <div class="output-actions">
-          <button class="icon-btn" id="btn-clear-console" title="مسح السجلات"><i class="fa-solid fa-broom"></i></button>
-          <button class="icon-btn" id="btn-open-preview" title="فتح المعاينة في نافذة جديدة"><i class="fa-solid fa-arrow-up-right-from-square"></i></button>
-          <button class="icon-btn" id="btn-fullscreen" title="ملء الشاشة"><i class="fa-solid fa-expand"></i></button>
+          <button class="icon-btn" id="btn-clear-console" title="Clear logs" data-title-ar="مسح السجلات" data-title-en="Clear logs"><i class="fa-solid fa-broom"></i></button>
+          <button class="icon-btn" id="btn-open-preview" title="Open preview in a new window" data-title-ar="فتح المعاينة في نافذة جديدة" data-title-en="Open preview in a new window"><i class="fa-solid fa-arrow-up-right-from-square"></i></button>
+          <button class="icon-btn" id="btn-fullscreen" title="Fullscreen" data-title-ar="ملء الشاشة" data-title-en="Fullscreen"><i class="fa-solid fa-expand"></i></button>
         </div>
       </div>
 
       <div class="output-content">
         <div class="output-view active" id="tab-preview">
-          <iframe id="preview-frame" title="معاينة المشروع" sandbox="allow-scripts allow-forms allow-modals allow-popups allow-downloads allow-pointer-lock"></iframe>
+          <iframe id="preview-frame" title="Project preview" sandbox="allow-scripts allow-forms allow-modals allow-popups allow-downloads allow-pointer-lock"></iframe>
         </div>
         <div class="output-view" id="tab-console">
           <div class="console-toolbar">
-            <div class="console-filters" role="group" aria-label="تصفية السجلات">
-              <button type="button" class="console-filter active" data-level="all">الكل <span id="console-count-all">0</span></button>
-              <button type="button" class="console-filter" data-level="error">أخطاء <span id="console-count-error">0</span></button>
-              <button type="button" class="console-filter" data-level="warn">تحذيرات <span id="console-count-warn">0</span></button>
-              <button type="button" class="console-filter" data-level="info">معلومات <span id="console-count-info">0</span></button>
-              <button type="button" class="console-filter" data-level="log">سجلات <span id="console-count-log">0</span></button>
+            <div class="console-filters" role="group" data-title-ar="تصفية السجلات" data-title-en="Filter logs" title="Filter logs">
+              <button type="button" class="console-filter active" data-level="all"><span data-i18n-ar="الكل" data-i18n-en="All">الكل</span> <span id="console-count-all">0</span></button>
+              <button type="button" class="console-filter" data-level="error"><span data-i18n-ar="أخطاء" data-i18n-en="Errors">أخطاء</span> <span id="console-count-error">0</span></button>
+              <button type="button" class="console-filter" data-level="warn"><span data-i18n-ar="تحذيرات" data-i18n-en="Warnings">تحذيرات</span> <span id="console-count-warn">0</span></button>
+              <button type="button" class="console-filter" data-level="info"><span data-i18n-ar="معلومات" data-i18n-en="Info">معلومات</span> <span id="console-count-info">0</span></button>
+              <button type="button" class="console-filter" data-level="log"><span data-i18n-ar="سجلات" data-i18n-en="Logs">سجلات</span> <span id="console-count-log">0</span></button>
             </div>
             <div class="console-tools">
-              <input id="console-filter-input" class="console-search" type="search" placeholder="بحث في السجلات…" autocomplete="off" spellcheck="false">
-              <button class="icon-btn" id="btn-console-copy" title="نسخ السجلات"><i class="fa-solid fa-copy"></i></button>
-              <button class="icon-btn" id="btn-console-clear" title="مسح السجلات"><i class="fa-solid fa-broom"></i></button>
+              <input id="console-filter-input" class="console-search" type="search" data-ph-ar="بحث في السجلات…" data-ph-en="Search logs…" placeholder="بحث في السجلات…" autocomplete="off" spellcheck="false">
+              <button class="icon-btn" id="btn-console-copy" title="Copy logs" data-title-ar="نسخ السجلات" data-title-en="Copy logs"><i class="fa-solid fa-copy"></i></button>
+              <button class="icon-btn" id="btn-console-clear" title="Clear logs" data-title-ar="مسح السجلات" data-title-en="Clear logs"><i class="fa-solid fa-broom"></i></button>
             </div>
           </div>
           <div class="console-logs" id="console-logs">
-            <div class="console-empty">لا توجد سجلات بعد — شغّل الكود أو اكتب في الطرفية بالأسفل.</div>
+            <div class="console-empty" id="console-empty"></div>
           </div>
           <div class="console-input-row">
             <span class="console-prompt-sign">&gt;</span>
-            <input id="console-prompt" type="text" placeholder="اكتب كود JavaScript واضغط Enter…" autocomplete="off" spellcheck="false">
-            <button class="console-run-btn" id="btn-console-run" type="button" title="تنفيذ الأمر (Enter)"><i class="fa-solid fa-play"></i></button>
+            <input id="console-prompt" type="text" data-ph-ar="اكتب كود JavaScript واضغط Enter…" data-ph-en="Type JavaScript and press Enter…" placeholder="اكتب كود JavaScript واضغط Enter…" autocomplete="off" spellcheck="false">
+            <button class="console-run-btn" id="btn-console-run" type="button" title="Run (Enter)" data-title-ar="تنفيذ الأمر (Enter)" data-title-en="Run command (Enter)"><i class="fa-solid fa-play"></i></button>
           </div>
         </div>
         <div class="output-view" id="tab-problems">
-          <div class="problems-list" id="problems-list">
-            <div class="problems-empty">لا توجد مشاكل حالياً — شغّل الكود لبدء الفحص.</div>
+          <div class="problems-list" id="problems-list"></div>
+        </div>
+        <div class="output-view" id="tab-inspect">
+          <div class="inspect-toolbar">
+            <button class="btn btn-sm" id="btn-pick-element" type="button" title="Pick element" data-title-ar="اختيار عنصر من المعاينة" data-title-en="Pick an element from the preview"><i class="fa-solid fa-mouse-pointer"></i> <span data-i18n-ar="اختيار عنصر" data-i18n-en="Pick element">اختيار عنصر</span></button>
+            <button class="btn btn-sm" id="btn-refresh-inspect" type="button" title="Refresh DOM" data-title-ar="تحديث شجرة DOM" data-title-en="Refresh DOM tree"><i class="fa-solid fa-rotate-right"></i> <span data-i18n-ar="تحديث" data-i18n-en="Refresh">تحديث</span></button>
+            <input id="inspect-search" class="inspect-search" type="search" data-ph-ar="فلترة العناصر…" data-ph-en="Filter elements…" placeholder="فلترة العناصر…" autocomplete="off" spellcheck="false">
+            <span class="inspect-status" id="inspect-status"></span>
+          </div>
+          <div class="inspect-main">
+            <div class="inspect-tree-pane" id="inspect-tree"></div>
+            <div class="inspect-details-pane" id="inspect-details"></div>
           </div>
         </div>
       </div>
@@ -613,16 +746,16 @@
   </main>
 
   <nav class="mobile-nav">
-    <button class="mobile-nav-btn" data-view="files"><i class="fa-solid fa-folder-tree"></i><span>الملفات</span></button>
-    <button class="mobile-nav-btn active" data-view="editor"><i class="fa-solid fa-code"></i><span>المحرر</span></button>
-    <button class="mobile-nav-btn" data-view="output"><i class="fa-solid fa-eye"></i><span>الناتج</span></button>
-    <button class="mobile-nav-btn" id="mobile-run"><i class="fa-solid fa-play"></i><span>تشغيل</span></button>
+    <button class="mobile-nav-btn" data-view="files"><i class="fa-solid fa-folder-tree"></i><span data-i18n-ar="الملفات" data-i18n-en="Files">الملفات</span></button>
+    <button class="mobile-nav-btn active" data-view="editor"><i class="fa-solid fa-code"></i><span data-i18n-ar="المحرر" data-i18n-en="Editor">المحرر</span></button>
+    <button class="mobile-nav-btn" data-view="output"><i class="fa-solid fa-eye"></i><span data-i18n-ar="الناتج" data-i18n-en="Output">الناتج</span></button>
+    <button class="mobile-nav-btn" id="mobile-run"><i class="fa-solid fa-play"></i><span data-i18n-ar="تشغيل" data-i18n-en="Run">تشغيل</span></button>
   </nav>
 
   <footer class="app-footer">
-    <span id="footer-files">0 ملف</span>
-    <span><i class="fa-solid fa-bolt"></i> CodeX Arena PRO Engine — مجاني ومفتوح</span>
-    <span>جميع الحقوق محفوظة @ مهندس Islam Hamdy</span>
+    <span id="footer-files">—</span>
+    <span><i class="fa-solid fa-bolt"></i> <span data-i18n-ar="محرك CodeX Arena — مجاني ومفتوح" data-i18n-en="CodeX Arena engine — free and open">محرك CodeX Arena — مجاني ومفتوح</span></span>
+    <span data-i18n-ar="جميع الحقوق محفوظة @ Islam Hamdy" data-i18n-en="All rights reserved @ Islam Hamdy">جميع الحقوق محفوظة @ Islam Hamdy</span>
   </footer>
 
   <div class="context-menu" id="context-menu"></div>
@@ -642,24 +775,24 @@
   <div class="modal-overlay" id="share-modal">
     <div class="modal">
       <div class="modal-header">
-        <h3><i class="fa-solid fa-share-nodes"></i> مشاركة مجلد المشروع</h3>
-        <button class="icon-btn" data-close title="إغلاق"><i class="fa-solid fa-xmark"></i></button>
+        <h3><i class="fa-solid fa-share-nodes"></i> <span data-i18n-ar="مشاركة مجلد المشروع" data-i18n-en="Share project folder">مشاركة مجلد المشروع</span></h3>
+        <button class="icon-btn" data-close title="Close" data-title-ar="إغلاق" data-title-en="Close"><i class="fa-solid fa-xmark"></i></button>
       </div>
       <div class="modal-body">
-        <p class="muted" style="margin-top:0;font-size:.82rem;line-height:1.8">
+        <p class="muted" data-i18n-ar="شارك كل ملفات ومجلدات المشروع برابط واحد يُفتح على أي جهاز. الرابط يعمل بدون سيرفر، ويمكنك أيضاً مشاركة المشروع كملف ZIP." data-i18n-en="Share every file and folder in one link that opens anywhere. No server needed — or export the project as a ZIP." style="margin-top:0;font-size:14px;line-height:1.6">
           شارك كل ملفات ومجلدات المشروع برابط واحد يُفتح على أي جهاز. الرابط يعمل بدون سيرفر، ويمكنك أيضاً مشاركة المشروع كملف ZIP.
         </p>
         <div class="field">
-          <label class="field-label" for="share-link">رابط المشاركة</label>
+          <label class="field-label" for="share-link" data-i18n-ar="رابط المشاركة" data-i18n-en="Share link">رابط المشاركة</label>
           <textarea id="share-link" class="text-input" rows="3" readonly spellcheck="false"></textarea>
           <div class="field-hint" id="share-size"></div>
           <div class="field-hint" id="share-note"></div>
         </div>
         <div class="share-actions">
-          <button class="btn btn-primary" id="btn-copy-link"><i class="fa-solid fa-copy"></i> نسخ الرابط</button>
-          <button class="btn" id="btn-native-share"><i class="fa-solid fa-share"></i> مشاركة</button>
-          <button class="btn" id="btn-share-zip"><i class="fa-solid fa-file-zipper"></i> مشاركة كـ ZIP</button>
-          <button class="btn" id="btn-share-json"><i class="fa-solid fa-download"></i> نسخة JSON</button>
+          <button class="btn btn-primary" id="btn-copy-link"><i class="fa-solid fa-copy"></i> <span data-i18n-ar="نسخ الرابط" data-i18n-en="Copy link">نسخ الرابط</span></button>
+          <button class="btn" id="btn-native-share"><i class="fa-solid fa-share"></i> <span data-i18n-ar="مشاركة" data-i18n-en="Share">مشاركة</span></button>
+          <button class="btn" id="btn-share-zip"><i class="fa-solid fa-file-zipper"></i> <span data-i18n-ar="مشاركة كـ ZIP" data-i18n-en="Share as ZIP">مشاركة كـ ZIP</span></button>
+          <button class="btn" id="btn-share-json"><i class="fa-solid fa-download"></i> <span data-i18n-ar="نسخة JSON" data-i18n-en="JSON copy">نسخة JSON</span></button>
         </div>
       </div>
     </div>
@@ -668,54 +801,62 @@
   <div class="modal-overlay" id="settings-modal">
     <div class="modal">
       <div class="modal-header">
-        <h3><i class="fa-solid fa-gear"></i> الإعدادات</h3>
-        <button class="icon-btn" data-close title="إغلاق"><i class="fa-solid fa-xmark"></i></button>
+        <h3><i class="fa-solid fa-gear"></i> <span data-i18n-ar="الإعدادات" data-i18n-en="Settings">الإعدادات</span></h3>
+        <button class="icon-btn" data-close title="Close" data-title-ar="إغلاق" data-title-en="Close"><i class="fa-solid fa-xmark"></i></button>
       </div>
       <div class="modal-body">
         <div class="field">
-          <label class="field-label" for="setting-theme">المظهر</label>
+          <label class="field-label" for="setting-language" data-i18n-ar="لغة الواجهة" data-i18n-en="Interface language">لغة الواجهة</label>
+          <select class="text-input" id="setting-language">
+            <option value="ar">العربية</option>
+            <option value="en">English</option>
+          </select>
+          <div class="field-hint" data-i18n-ar="الأخطاء تُعرض دائماً بالعربية والإنجليزية مع رقم السطر." data-i18n-en="Errors are always shown in Arabic and English with the line number.">الأخطاء تُعرض دائماً بالعربية والإنجليزية مع رقم السطر.</div>
+        </div>
+        <div class="field">
+          <label class="field-label" for="setting-theme" data-i18n-ar="المظهر" data-i18n-en="Appearance">المظهر</label>
           <select class="text-input" id="setting-theme">
-            <option value="dark">داكن (Material)</option>
-            <option value="light">فاتح (Eclipse)</option>
+            <option value="light" data-i18n-ar="فاتح (Apple)" data-i18n-en="Light (Apple)">فاتح (Apple)</option>
+            <option value="dark" data-i18n-ar="داكن" data-i18n-en="Dark">داكن</option>
           </select>
         </div>
         <div class="field">
-          <label class="field-label" for="setting-font">حجم خط المحرر <span class="range-value" id="setting-font-val">14px</span></label>
+          <label class="field-label" for="setting-font"><span data-i18n-ar="حجم خط المحرر" data-i18n-en="Editor font size">حجم خط المحرر</span> <span class="range-value" id="setting-font-val">14px</span></label>
           <div class="range-row"><input type="range" id="setting-font" min="12" max="22" step="1"></div>
         </div>
         <div class="field">
-          <label class="field-label" for="setting-tab">حجم المسافة البادئة</label>
+          <label class="field-label" for="setting-tab" data-i18n-ar="حجم المسافة البادئة" data-i18n-en="Indent size">حجم المسافة البادئة</label>
           <select class="text-input" id="setting-tab">
-            <option value="2">مسافتان</option>
-            <option value="4">4 مسافات</option>
-            <option value="8">8 مسافات</option>
+            <option value="2" data-i18n-ar="مسافتان" data-i18n-en="2 spaces">مسافتان</option>
+            <option value="4" data-i18n-ar="4 مسافات" data-i18n-en="4 spaces">4 مسافات</option>
+            <option value="8" data-i18n-ar="8 مسافات" data-i18n-en="8 spaces">8 مسافات</option>
           </select>
         </div>
         <div class="switch-row">
-          <div class="switch-text"><strong>التفاف الأسطر</strong><small>عرض الأسطر الطويلة دون تمرير أفقي</small></div>
+          <div class="switch-text"><strong data-i18n-ar="التفاف الأسطر" data-i18n-en="Word wrap">التفاف الأسطر</strong><small data-i18n-ar="عرض الأسطر الطويلة دون تمرير أفقي" data-i18n-en="Show long lines without horizontal scrolling">عرض الأسطر الطويلة دون تمرير أفقي</small></div>
           <label class="switch"><input type="checkbox" id="setting-wrap"><span></span></label>
         </div>
         <div class="switch-row">
-          <div class="switch-text"><strong>الحفظ التلقائي</strong><small>حفظ المشروع في المتصفح بعد كل تعديل</small></div>
+          <div class="switch-text"><strong data-i18n-ar="الحفظ التلقائي" data-i18n-en="Autosave">الحفظ التلقائي</strong><small data-i18n-ar="حفظ المشروع في المتصفح بعد كل تعديل" data-i18n-en="Save the project in the browser after each change">حفظ المشروع في المتصفح بعد كل تعديل</small></div>
           <label class="switch"><input type="checkbox" id="setting-autosave"><span></span></label>
         </div>
         <div class="switch-row">
-          <div class="switch-text"><strong>المعاينة التلقائية</strong><small>تحديث معاينة HTML/CSS/JS أثناء الكتابة</small></div>
+          <div class="switch-text"><strong data-i18n-ar="المعاينة التلقائية" data-i18n-en="Live preview">المعاينة التلقائية</strong><small data-i18n-ar="تحديث معاينة HTML/CSS/JS أثناء الكتابة" data-i18n-en="Update the HTML/CSS/JS preview while typing">تحديث معاينة HTML/CSS/JS أثناء الكتابة</small></div>
           <label class="switch"><input type="checkbox" id="setting-live"><span></span></label>
         </div>
         <div class="field" style="margin-top:14px">
-          <label class="field-label" for="setting-piston">عنوان Piston API</label>
+          <label class="field-label" for="setting-piston" data-i18n-ar="عنوان Piston API" data-i18n-en="Piston API endpoint">عنوان Piston API</label>
           <input class="text-input" id="setting-piston" type="url" dir="ltr" autocomplete="off" spellcheck="false" placeholder="https://emkc.org/api/v2/piston">
-          <div class="field-hint"><i class="fa-solid fa-circle-info"></i> الـ API العام لمحرك Piston أصبح محظوراً للاستخدام العام (401). ضع عنوان نسخة Piston خاصة بك، أو استخدم اللغات المحلية مثل JavaScript وPython.</div>
+          <div class="field-hint" data-i18n-ar="الـ API العام لمحرك Piston أصبح محظوراً للاستخدام العام (401). ضع عنوان نسخة Piston خاصة بك، أو استخدم اللغات المحلية مثل JavaScript وPython." data-i18n-en="The public Piston API now blocks public use (401). Add your own Piston endpoint, or use local languages such as JavaScript and Python."><i class="fa-solid fa-circle-info"></i> الـ API العام لمحرك Piston أصبح محظوراً للاستخدام العام (401). ضع عنوان نسخة Piston خاصة بك، أو استخدم اللغات المحلية مثل JavaScript وPython.</div>
         </div>
         <div class="field">
-          <label class="field-label" for="setting-piston-key">مفتاح Piston (اختياري)</label>
+          <label class="field-label" for="setting-piston-key" data-i18n-ar="مفتاح Piston (اختياري)" data-i18n-en="Piston key (optional)">مفتاح Piston (اختياري)</label>
           <input class="text-input" id="setting-piston-key" type="password" dir="ltr" autocomplete="off" spellcheck="false" placeholder="Authorization token">
-          <div class="field-hint"><i class="fa-solid fa-key"></i> يُرسل في ترويسة Authorization عند تشغيل اللغات السحابية. لا يُصدَّر داخل ZIP أو JSON.</div>
+          <div class="field-hint" data-i18n-ar="يُرسل في ترويسة Authorization عند تشغيل اللغات السحابية. لا يُصدَّر داخل ZIP أو JSON." data-i18n-en="Sent in the Authorization header for cloud languages. Never exported in ZIP or JSON."><i class="fa-solid fa-key"></i> يُرسل في ترويسة Authorization عند تشغيل اللغات السحابية. لا يُصدَّر داخل ZIP أو JSON.</div>
         </div>
         <div class="share-actions">
-          <button class="btn" id="btn-restore-backup"><i class="fa-solid fa-clock-rotate-left"></i> استعادة المشروع السابق</button>
-          <button class="btn btn-danger" id="btn-reset"><i class="fa-solid fa-trash-can"></i> إعادة ضبط المشروع</button>
+          <button class="btn" id="btn-restore-backup"><i class="fa-solid fa-clock-rotate-left"></i> <span data-i18n-ar="استعادة المشروع السابق" data-i18n-en="Restore previous project">استعادة المشروع السابق</span></button>
+          <button class="btn btn-danger" id="btn-reset"><i class="fa-solid fa-trash-can"></i> <span data-i18n-ar="إعادة ضبط المشروع" data-i18n-en="Reset project">إعادة ضبط المشروع</span></button>
         </div>
       </div>
     </div>
@@ -724,23 +865,24 @@
   <div class="modal-overlay" id="shortcuts-modal">
     <div class="modal">
       <div class="modal-header">
-        <h3><i class="fa-solid fa-keyboard"></i> اختصارات لوحة المفاتيح</h3>
-        <button class="icon-btn" data-close title="إغلاق"><i class="fa-solid fa-xmark"></i></button>
+        <h3><i class="fa-solid fa-keyboard"></i> <span data-i18n-ar="اختصارات لوحة المفاتيح" data-i18n-en="Keyboard shortcuts">اختصارات لوحة المفاتيح</span></h3>
+        <button class="icon-btn" data-close title="Close" data-title-ar="إغلاق" data-title-en="Close"><i class="fa-solid fa-xmark"></i></button>
       </div>
       <div class="modal-body">
         <div class="shortcut-grid">
-          <span>لوحة الأوامر</span><span class="kbd">Ctrl + K</span>
-          <span>تشغيل الملف الحالي</span><span class="kbd">Ctrl + Enter</span>
-          <span>حفظ المشروع</span><span class="kbd">Ctrl + S</span>
-          <span>تنسيق الكود</span><span class="kbd">Shift + Alt + F</span>
-          <span>فتح/إغلاق الملفات</span><span class="kbd">Ctrl + B</span>
-          <span>الإكمال التلقائي</span><span class="kbd">Ctrl + Space</span>
-          <span>بحث داخل الملف</span><span class="kbd">Ctrl + F</span>
-          <span>استبدال داخل الملف</span><span class="kbd">Ctrl + H</span>
-          <span>تعليق/إلغاء تعليق</span><span class="kbd">Ctrl + /</span>
-          <span>الإعدادات</span><span class="kbd">Ctrl + ,</span>
-          <span>الطرفية (Console)</span><span class="kbd">Ctrl + Shift + J</span>
-          <span>هذه النافذة</span><span class="kbd">F1</span>
+          <span data-i18n-ar="لوحة الأوامر" data-i18n-en="Command palette">لوحة الأوامر</span><span class="kbd">Ctrl + K</span>
+          <span data-i18n-ar="تشغيل الملف الحالي" data-i18n-en="Run current file">تشغيل الملف الحالي</span><span class="kbd">Ctrl + Enter</span>
+          <span data-i18n-ar="حفظ المشروع" data-i18n-en="Save project">حفظ المشروع</span><span class="kbd">Ctrl + S</span>
+          <span data-i18n-ar="تنسيق الكود" data-i18n-en="Format code">تنسيق الكود</span><span class="kbd">Shift + Alt + F</span>
+          <span data-i18n-ar="فتح/إغلاق الملفات" data-i18n-en="Toggle files">فتح/إغلاق الملفات</span><span class="kbd">Ctrl + B</span>
+          <span data-i18n-ar="الإكمال التلقائي" data-i18n-en="Autocomplete">الإكمال التلقائي</span><span class="kbd">Ctrl + Space</span>
+          <span data-i18n-ar="بحث داخل الملف" data-i18n-en="Find in file">بحث داخل الملف</span><span class="kbd">Ctrl + F</span>
+          <span data-i18n-ar="استبدال داخل الملف" data-i18n-en="Replace in file">استبدال داخل الملف</span><span class="kbd">Ctrl + H</span>
+          <span data-i18n-ar="تعليق/إلغاء تعليق" data-i18n-en="Toggle comment">تعليق/إلغاء تعليق</span><span class="kbd">Ctrl + /</span>
+          <span data-i18n-ar="الإعدادات" data-i18n-en="Settings">الإعدادات</span><span class="kbd">Ctrl + ,</span>
+          <span data-i18n-ar="الكونسول" data-i18n-en="Console">الكونسول</span><span class="kbd">Ctrl + Shift + J</span>
+          <span data-i18n-ar="أدوات الفحص (Inspect)" data-i18n-en="Inspect tools">أدوات الفحص (Inspect)</span><span class="kbd">Ctrl + Shift + I</span>
+          <span data-i18n-ar="هذه النافذة" data-i18n-en="This window">هذه النافذة</span><span class="kbd">F1</span>
         </div>
       </div>
     </div>
@@ -749,19 +891,19 @@
   <div class="modal-overlay" id="prompt-modal">
     <form class="modal" id="prompt-form">
       <div class="modal-header">
-        <h3 id="prompt-title">إدخال</h3>
-        <button type="button" class="icon-btn" data-close title="إغلاق"><i class="fa-solid fa-xmark"></i></button>
+        <h3 id="prompt-title">—</h3>
+        <button type="button" class="icon-btn" data-close title="Close" data-title-ar="إغلاق" data-title-en="Close"><i class="fa-solid fa-xmark"></i></button>
       </div>
       <div class="modal-body">
         <div class="field">
-          <label class="field-label" id="prompt-label" for="prompt-input">القيمة</label>
+          <label class="field-label" id="prompt-label" for="prompt-input">—</label>
           <input class="text-input" id="prompt-input" type="text" autocomplete="off" spellcheck="false">
           <div class="field-hint" id="prompt-hint"></div>
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn" data-close>إلغاء</button>
-        <button type="submit" class="btn btn-primary">تأكيد</button>
+        <button type="button" class="btn" data-close><span data-i18n-ar="إلغاء" data-i18n-en="Cancel">إلغاء</span></button>
+        <button type="submit" class="btn btn-primary"><span data-i18n-ar="تأكيد" data-i18n-en="Confirm">تأكيد</span></button>
       </div>
     </form>
   </div>
@@ -806,8 +948,238 @@
     const BACKUP_KEY = STORAGE_KEY + '_backup';
     const WELCOME_KEY = 'codex_arena_welcomed_v3';
 
+    const EN_MAP = {
+      'تعذر تحميل محرر CodeMirror — تحقق من اتصال الإنترنت ثم أعد تحميل الصفحة.': 'Could not load CodeMirror — check your connection and reload the page.',
+      'مرحباً بك! اضغط Ctrl+K للأوامر أو Ctrl+Enter للتشغيل.': 'Welcome! Press Ctrl+K for commands or Ctrl+Enter to run.',
+      'تم حفظ المشروع محلياً': 'Project saved locally',
+      'تعذر الحفظ': 'Could not save',
+      'تعذر تحميل دعم اللغة': 'Could not load language support',
+      'اختر ملفاً أو أنشئ ملفاً جديداً للبدء…': 'Open a file or create a new one to begin…',
+      'لا توجد ملفات مطابقة.': 'No matching files.',
+      'جرّب اسماً آخر أو أنشئ ملفاً جديداً.': 'Try another name or create a new file.',
+      'المشروع فارغ.': 'The project is empty.',
+      'ابدأ بإنشاء ملف جديد.': 'Start by creating a new file.',
+      'إغلاق': 'Close',
+      'ملف جديد': 'New file',
+      'تغييرات غير محفوظة…': 'Unsaved changes…',
+      'محفوظ محلياً': 'Saved locally',
+      'لا يوجد ملف مفتوح': 'No file open',
+      'سطر': 'line',
+      'حرف': 'characters',
+      'ملف': 'file',
+      'ملفات': 'files',
+      'مجلد': 'folder',
+      'مجلدات': 'folders',
+      'خطأ': 'Error',
+      'تحذير': 'Warning',
+      'معلومة': 'Info',
+      'افتح ملفاً أولاً': 'Open a file first',
+      'التنسيق غير مدعوم لهذه اللغة بعد': 'Formatting is not supported for this language yet',
+      'الكود منسق بالفعل': 'The code is already formatted',
+      'تم تنسيق الكود': 'Code formatted',
+      'تعذر التنسيق': 'Formatting failed',
+      'اسم الملف أو مساره': 'File name or path',
+      'مثال: src/utils.js — سيتم إنشاء المجلدات تلقائياً': 'Example: src/utils.js — folders are created automatically',
+      'مسار غير صالح': 'Invalid path',
+      'يوجد ملف أو مجلد بهذا الاسم': 'A file or folder with this name already exists',
+      'لا يمكن إنشاء ملف داخل ملف': 'Cannot create a file inside a file',
+      'تم إنشاء': 'Created',
+      'اسم المجلد أو مساره': 'Folder name or path',
+      'مثال: src/components': 'Example: src/components',
+      'المجلد موجود بالفعل': 'The folder already exists',
+      'لا يمكن إنشاء مجلد داخل ملف': 'Cannot create a folder inside a file',
+      'إعادة تسمية المجلد': 'Rename folder',
+      'إعادة تسمية الملف': 'Rename file',
+      'الاسم أو المسار الجديد': 'New name or path',
+      'يمكنك تغيير المسار أيضاً لنقل الملف أو المجلد': 'You can also change the path to move the file or folder',
+      'الاسم مستخدم بالفعل': 'Name already in use',
+      'لا يمكن نقل مجلد داخل نفسه': 'Cannot move a folder into itself',
+      'يوجد ملفات أو مجلدات في المسار الجديد': 'Files or folders already exist at the new path',
+      'تمت إعادة التسمية': 'Renamed',
+      'هل تريد حذف': 'Delete',
+      'سيتم حذف كل الملفات والمجلدات بداخله.': 'All files and folders inside it will be deleted.',
+      'تم الحذف': 'Deleted',
+      'ملف جديد هنا': 'New file here',
+      'مجلد جديد هنا': 'New folder here',
+      'فتح': 'Open',
+      'تنزيل الملف': 'Download file',
+      'نسخ المسار': 'Copy path',
+      'تم نسخ المسار': 'Path copied',
+      'إعادة تسمية': 'Rename',
+      'حذف': 'Delete',
+      'مكتبة ZIP لم تُحمّل بعد، حاول مرة أخرى': 'The ZIP library is not loaded yet — try again',
+      'تم تجهيز ملف ZIP': 'ZIP ready',
+      'تم تنزيل نسخة JSON': 'JSON downloaded',
+      'ملف المشروع غير صالح': 'Invalid project file',
+      'المشروع لا يحتوي على ملفات': 'The project has no files',
+      'لم يتم استيراد أي ملفات نصية': 'No text files were imported',
+      'لم يتم استيراد': 'Imported',
+      'تم استيراد': 'Imported',
+      'تم تجاهل': 'skipped',
+      'تم استيراد المشروع بنجاح': 'Project imported successfully',
+      'تعذر قراءة ملف JSON': 'Could not read the JSON file',
+      'Promise قيد التنفيذ…': 'Promise pending…',
+      'لا تتوفر معاينة لهذا النوع — استخدم زر التشغيل': 'No preview for this type — use the Run button',
+      'تم تحديث معاينة Markdown': 'Markdown preview updated',
+      'لا تتوفر معاينة لهذا الملف': 'No preview available for this file',
+      'تم تحديث المعاينة': 'Preview updated',
+      'هذا الملف غير قابل للمعاينة': 'This file cannot be previewed',
+      'تعذر إنشاء المعاينة': 'Could not create the preview',
+      'تم تشغيل': 'Ran',
+      'لا يوجد مشغّل لهذه اللغة بعد': 'No runner for this language yet',
+      'لا توجد سجلات مطابقة للتصفية الحالية.': 'No logs match the current filter.',
+      'لا توجد سجلات بعد — شغّل الكود أو اكتب في الطرفية بالأسفل.': 'No logs yet — run your code or type below.',
+      'عرض التفاصيل': 'Show details',
+      'لا توجد سجلات لنسخها': 'No logs to copy',
+      'تم نسخ السجلات': 'Logs copied',
+      'تعذر النسخ': 'Copy failed',
+      'لا توجد مشاكل حالياً — شغّل الكود لبدء الفحص.': 'No problems yet — run your code to start checking.',
+      'اضغط لفتح الملف': 'Click to open the file',
+      'تعذر تحميل Pyodide': 'Could not load Pyodide',
+      'تجهيز Python (Pyodide)… قد يستغرق التحميل الأول بعض الثواني.': 'Preparing Python (Pyodide)… the first load may take a few seconds.',
+      'تشغيل': 'Running',
+      'تحقق من الاتصال بالإنترنت': 'check your internet connection',
+      'تعذر تحميل Python': 'Could not load Python',
+      'انتهى التنفيذ بنجاح': 'Finished successfully',
+      'حدث خطأ أثناء تشغيل Python': 'Error while running Python',
+      'لا يوجد مشغّل سحابي لهذه اللغة': 'No cloud runner for this language',
+      'أنت غير متصل بالإنترنت': 'You are offline',
+      'إرسال الكود إلى Piston': 'Sending code to Piston',
+      'الـ API العام مغلق الآن؛ أضف عنوان Piston خاصاً بك من الإعدادات.': 'The public API is blocked now; add your own Piston endpoint in Settings.',
+      'فشل التنفيذ': 'Execution failed',
+      'انتهى التنفيذ بالرمز': 'Finished with exit code',
+      'ثانية': 'seconds',
+      'انتهى التنفيذ': 'Execution finished',
+      'تعذر تشغيل الكود': 'Could not run the code',
+      'مكتبة المشاركة لم تُحمّل، أعد تحميل الصفحة': 'Sharing library not loaded — reload the page',
+      'حجم الرابط': 'Link size',
+      'أنت تفتح الصفحة محلياً (file://). الرابط سيحتاج نفس الملف عند الطرف الآخر، أو استخدم ZIP بدلاً منه.': 'You opened this page locally (file://). The other device needs the same file, or use ZIP instead.',
+      'يحتوي الرابط على نسخة مضغوطة من كل ملفات المشروع. استخدم ZIP للمشاريع الكبيرة أو الثنائية.': 'The link contains a compressed copy of all project files. Use ZIP for large or binary projects.',
+      'تم نسخ رابط المشروع': 'Project link copied',
+      'مشروعي': 'My project',
+      'جرّب مشروعي على CodeX Arena PRO': 'Try my project on CodeX Arena',
+      'تعذر إنشاء ZIP': 'Could not create ZIP',
+      'الرابط فارغ أو تالف': 'The link is empty or corrupted',
+      'تم فتح المشروع المشارك — احفظ نسخة إذا أردت الاحتفاظ به': 'Shared project opened — save a copy to keep it',
+      'تعذر فتح رابط المشاركة': 'Could not open the share link',
+      'إدخال': 'Input',
+      'القيمة': 'Value',
+      'سيتم استبدال المشروع الحالي بالمشروع الافتراضي. هل أنت متأكد؟': 'This will replace the current project with the default one. Are you sure?',
+      'تمت إعادة ضبط المشروع': 'Project reset',
+      'لا توجد نسخة احتياطية سابقة': 'No previous backup found',
+      'وقت غير معروف': 'unknown time',
+      'استعادة النسخة الاحتياطية المحفوظة في': 'Restore the backup saved at',
+      'تمت استعادة النسخة الاحتياطية': 'Backup restored',
+      'تعذر الاستعادة': 'Restore failed',
+      'تم تفعيل المظهر الفاتح': 'Light appearance enabled',
+      'تم تفعيل المظهر الداكن': 'Dark appearance enabled',
+      'لم يتم العثور على ملفات قابلة للاستيراد': 'No importable files found',
+      'فتح:': 'Open:',
+      'تشغيل المشروع': 'Run project',
+      'تشغيل الملف الحالي': 'Run current file',
+      'معاينة الملف الحالي': 'Preview current file',
+      'حفظ المشروع': 'Save project',
+      'تنسيق الكود': 'Format code',
+      'ملف جديد': 'New file',
+      'مجلد جديد': 'New folder',
+      'استيراد ملفات': 'Import files',
+      'استيراد مجلد': 'Import folder',
+      'استيراد مشروع JSON': 'Import JSON project',
+      'مشاركة المشروع': 'Share project',
+      'تصدير ZIP': 'Export ZIP',
+      'تصدير JSON': 'Export JSON',
+      'تبديل المظهر': 'Switch appearance',
+      'الإعدادات': 'Settings',
+      'الاختصارات': 'Shortcuts',
+      'مسح الكونسول': 'Clear console',
+      'تم مسح السجلات': 'Logs cleared',
+      'ملء شاشة الناتج': 'Fullscreen output',
+      'استعادة النسخة السابقة': 'Restore previous version',
+      'إعادة ضبط المشروع': 'Reset project',
+      'لا توجد أوامر مطابقة': 'No matching commands',
+      'تم تفعيل الحفظ التلقائي': 'Autosave enabled',
+      'تم إيقاف الحفظ التلقائي': 'Autosave disabled',
+      'تم تفعيل المعاينة التلقائية': 'Live preview enabled',
+      'تم إيقاف المعاينة التلقائية': 'Live preview disabled',
+      'عنوان Piston يجب أن يبدأ بـ http:// أو https://': 'Piston endpoint must start with http:// or https://',
+      'تم تحديث عنوان Piston': 'Piston endpoint updated',
+      'تم حفظ مفتاح Piston': 'Piston key saved',
+      'تم مسح مفتاح Piston': 'Piston key cleared',
+      'تبديل اللغة': 'Language switched',
+      'أفلت الملفات لاستيرادها إلى المشروع': 'Drop files to import',
+      'اختيار عنصر': 'Pick element',
+      'إلغاء الاختيار': 'Cancel pick',
+      'تحديث شجرة DOM': 'Refresh DOM tree',
+      'تم تحديث شجرة DOM': 'DOM tree refreshed',
+      'شجرة DOM': 'DOM tree',
+      'تفاصيل العنصر': 'Element details',
+      'الوسم': 'Tag',
+      'المعرّف': 'ID',
+      'الأصناف': 'Classes',
+      'المسار': 'Path',
+      'الخصائص': 'Attributes',
+      'الأنماط المحسوبة': 'Computed styles',
+      'القياسات': 'Metrics',
+      'النص': 'Text',
+      'HTML خارجي': 'Outer HTML',
+      'لا يوجد عنصر محدد — اضغط "اختيار عنصر" ثم انقر على عنصر في المعاينة.': 'No element selected — click "Pick element" then click an element in the preview.',
+      'شغّل المعاينة أولاً لفحص DOM.': 'Run the preview first to inspect the DOM.',
+      'اختيار عنصر من المعاينة': 'Pick an element from the preview',
+      'جارٍ الاختيار… انقر على عنصر في المعاينة': 'Picking… click an element in the preview',
+      'المعاينة جاهزة': 'Preview ready',
+      'لا توجد معاينة حالية — شغّل ملف HTML أولاً': 'No preview yet — run an HTML file first',
+      'اضغط لفتح الملف والانتقال إلى السطر': 'Click to open the file and jump to the line',
+      'الهدف ملف وليس مجلداً': 'The target is a file, not a folder',
+      'يوجد ملف أو مجلد بالاسم نفسه في المجلد الهدف': 'A file or folder with this name already exists in the target folder',
+      'جذر المشروع': 'Project root',
+      'تم النقل إلى ': 'Moved to ',
+      'استعادة النسخة الاحتياطية المحفوظة في ': 'Restore backup saved at ',
+      'ملف جديد هنا': 'New file here',
+      'مجلد جديد هنا': 'New folder here'
+    };
+    const TRANSLATION_KEYS = Object.keys(EN_MAP).sort(function (a, b) { return b.length - a.length; });
+
+    function currentLang() {
+      return state && state.settings && state.settings.language === 'en' ? 'en' : 'ar';
+    }
+
+    function tr(value) {
+      if (currentLang() === 'ar' || typeof value !== 'string') return value;
+      let output = value;
+      TRANSLATION_KEYS.forEach(function (key) {
+        if (output.indexOf(key) !== -1) output = output.split(key).join(EN_MAP[key]);
+      });
+      return output;
+    }
+
+    function dual(ar, en) { return String(ar) + ' / ' + String(en); }
+
+    function applyLanguage() {
+      const lang = currentLang();
+      document.documentElement.lang = lang;
+      document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+      $$('[data-i18n-ar]').forEach(function (node) {
+        const value = node.getAttribute('data-i18n-' + lang);
+        if (value !== null) node.textContent = value;
+      });
+      $$('[data-title-ar]').forEach(function (node) {
+        const value = node.getAttribute('data-title-' + lang);
+        if (value !== null) node.title = value;
+      });
+      $$('[data-ph-ar]').forEach(function (node) {
+        const value = node.getAttribute('data-ph-' + lang);
+        if (value !== null) node.placeholder = value;
+      });
+      document.body.style.setProperty('--drag-label', lang === 'ar' ? '"أفلت الملفات لاستيرادها إلى المشروع"' : '"Drop files to import"');
+      const languageSelect = $('#setting-language');
+      if (languageSelect) languageSelect.value = lang;
+      if (state) { updateStatus(); renderProblems(); renderConsole(false); }
+      if (typeof refreshInspectStatus === 'function') refreshInspectStatus();
+    }
+
     const DEFAULT_SETTINGS = {
-      theme: 'dark',
+      language: 'ar',
+      theme: 'light',
       fontSize: 14,
       tabSize: 2,
       wordWrap: false,
@@ -1380,6 +1752,11 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
       return dot > 0 ? base.slice(dot + 1).toLowerCase() : '';
     }
     function baseName(path) { return String(path || '').split('/').pop(); }
+    function dirnamePath(path) {
+      const clean = String(path || '');
+      const index = clean.lastIndexOf('/');
+      return index === -1 ? '' : clean.slice(0, index);
+    }
     function escapeHtml(value) {
       return String(value).replace(/[&<>"']/g, function (ch) {
         return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch];
@@ -1549,6 +1926,7 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
         folders: ['styles', 'scripts', 'python'],
         openTabs: ['index.html', 'styles/style.css', 'scripts/app.js', 'python/main.py'],
         active: 'index.html',
+        currentFolder: '',
         expanded: ['styles', 'scripts', 'python'],
         settings: Object.assign({}, DEFAULT_SETTINGS),
         cursors: {},
@@ -1573,6 +1951,7 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
           folders: folders.length ? folders : base.folders,
           openTabs: openTabs,
           active: active,
+          currentFolder: typeof data.currentFolder === 'string' ? normalizePath(data.currentFolder) : '',
           expanded: Array.isArray(data.expanded) ? data.expanded : base.expanded,
           settings: Object.assign({}, DEFAULT_SETTINGS, data.settings || {}),
           cursors: data.cursors && typeof data.cursors === 'object' ? data.cursors : {},
@@ -1588,7 +1967,8 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
         app: 'CodeX Arena PRO',
         version: 3,
         files: state.files,
-        folders: state.folders
+        folders: state.folders,
+        currentFolder: state.currentFolder || ''
       };
       if (includeSettings !== false) {
         const settings = Object.assign({}, state.settings);
@@ -1781,7 +2161,7 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
         styleActiveLine: true,
         foldGutter: true,
         gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
-        placeholder: 'اختر ملفاً أو أنشئ ملفاً جديداً للبدء…',
+        placeholder: tr('اختر ملفاً أو أنشئ ملفاً جديداً للبدء…'),
         hintOptions: { hint: codexHint, completeSingle: false, alignWithWord: true },
         extraKeys: {
           'Ctrl-Space': 'autocomplete',
@@ -1844,6 +2224,72 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
     /* ============================================================
        Rendering
        ============================================================ */
+    function renderTreeContext() {
+      const path = $('#tree-context-path');
+      if (path) path.textContent = state.currentFolder ? state.currentFolder + '/' : '/';
+    }
+
+    function setCurrentFolder(folder) {
+      const normalized = folder ? normalizePath(folder) : '';
+      if (normalized && state.files[normalized] !== undefined) return;
+      state.currentFolder = normalized;
+      renderTreeContext();
+    }
+
+    function currentFolderForCreation() {
+      return state.currentFolder || (state.active ? dirnamePath(state.active) : '');
+    }
+
+    function movePath(source, targetFolder) {
+      const from = normalizePath(source);
+      const to = normalizePath(targetFolder || '');
+      if (!from || from === to) return false;
+      const sourceIsFolder = state.files[from] === undefined && isFolderPath(from);
+      if (state.files[from] === undefined && !sourceIsFolder) return false;
+      if (sourceIsFolder && (to === from || to.indexOf(from + '/') === 0)) {
+        toast(tr('لا يمكن نقل مجلد داخل نفسه') + ' / Cannot move a folder into itself', 'error');
+        return false;
+      }
+      if (state.files[to] !== undefined) {
+        toast(tr('الهدف ملف وليس مجلداً') + ' / The target is a file', 'error');
+        return false;
+      }
+      const inside = function (path) { return path === from || path.indexOf(from + '/') === 0; };
+      const relocated = function (path) {
+        if (to) return to + '/' + (sourceIsFolder ? path.slice(from.length) : baseName(path));
+        if (sourceIsFolder) return path;
+        return baseName(path);
+      };
+      const movingFiles = Object.keys(state.files).filter(inside);
+      const movingFolders = state.folders.filter(inside);
+      const nextPaths = movingFiles.map(relocated).concat(movingFolders.map(relocated));
+      const occupied = nextPaths.some(function (path) {
+        return (state.files[path] !== undefined && !inside(path)) || (state.folders.indexOf(path) !== -1 && !inside(path));
+      });
+      if (occupied) {
+        toast(tr('يوجد ملف أو مجلد بالاسم نفسه في المجلد الهدف') + ' / Name conflict in target folder', 'error');
+        return false;
+      }
+      const rewrite = function (path) { return inside(path) ? relocated(path) : path; };
+      const nextFiles = {};
+      Object.keys(state.files).forEach(function (path) { nextFiles[rewrite(path)] = state.files[path]; });
+      state.files = nextFiles;
+      state.folders = Array.from(new Set(state.folders.map(rewrite).filter(Boolean)));
+      state.openTabs = state.openTabs.map(rewrite);
+      state.expanded = state.expanded.map(rewrite);
+      state.active = rewrite(state.active);
+      if (state.currentFolder && inside(state.currentFolder)) state.currentFolder = relocated(state.currentFolder);
+      const nextCursors = {};
+      Object.keys(state.cursors).forEach(function (path) { nextCursors[rewrite(path)] = state.cursors[path]; });
+      state.cursors = nextCursors;
+      state.dirty = new Set(Array.from(state.dirty).map(rewrite));
+      nextPaths.forEach(function (path) { ensureParents(path); });
+      persist(false);
+      renderAll();
+      toast(tr('تم النقل إلى ') + (to || tr('جذر المشروع')), 'ok');
+      return true;
+    }
+
     function createTreeRow(options) {
       const row = document.createElement('div');
       row.className = 'tree-row' + (options.active ? ' active' : '') + (options.expanded ? ' expanded' : '');
@@ -1851,6 +2297,7 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
       row.title = options.path;
       row.setAttribute('data-path', options.path);
       row.setAttribute('data-type', options.type);
+      row.setAttribute('draggable', 'true');
 
       const chevron = document.createElement(options.type === 'folder' ? 'i' : 'span');
       chevron.className = options.type === 'folder' ? 'fa-solid fa-chevron-down chevron' : 'chevron';
@@ -1872,13 +2319,58 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
       name.textContent = options.name;
       row.appendChild(name);
 
+      if (options.type === 'folder') {
+        const actions = document.createElement('span');
+        actions.className = 'tree-row-actions';
+        [['fa-file-circle-plus', tr('ملف جديد هنا'), function () { createFile(options.path); }],
+         ['fa-folder-plus', tr('مجلد جديد هنا'), function () { createFolder(options.path); }]].forEach(function (spec) {
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.className = 'icon-btn';
+          button.title = spec[1];
+          button.innerHTML = '<i class="fa-solid ' + spec[0] + '"></i>';
+          button.addEventListener('click', function (event) {
+            event.stopPropagation();
+            setCurrentFolder(options.path);
+            spec[2]();
+          });
+          actions.appendChild(button);
+        });
+        row.appendChild(actions);
+      }
+
       row.addEventListener('click', function () {
-        if (options.type === 'folder') toggleFolder(options.path);
-        else openFile(options.path);
+        if (options.type === 'folder') {
+          setCurrentFolder(options.path);
+          toggleFolder(options.path);
+        } else {
+          setCurrentFolder(dirnamePath(options.path));
+          openFile(options.path);
+        }
       });
       row.addEventListener('contextmenu', function (event) {
         event.preventDefault();
         showContextMenu(event.clientX, event.clientY, options.path, options.type);
+      });
+      row.addEventListener('dragstart', function (event) {
+        event.dataTransfer.setData('text/plain', options.path);
+        event.dataTransfer.effectAllowed = 'move';
+      });
+      row.addEventListener('dragover', function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        event.dataTransfer.dropEffect = 'move';
+        row.classList.add('drop-target');
+      });
+      row.addEventListener('dragleave', function () { row.classList.remove('drop-target'); });
+      row.addEventListener('drop', function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        row.classList.remove('drop-target');
+        const source = event.dataTransfer.getData('text/plain');
+        const target = options.type === 'folder' ? options.path : dirnamePath(options.path);
+        setCurrentFolder(target);
+        movePath(source, target);
       });
       return row;
     }
@@ -1908,13 +2400,14 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
       if (!container) return;
       const query = String(filter || '').trim().toLowerCase();
       container.innerHTML = '';
+      renderTreeContext();
 
       if (query) {
         const matches = Object.keys(state.files).filter(function (path) {
           return path.toLowerCase().indexOf(query) !== -1;
         }).sort();
         if (!matches.length) {
-          container.innerHTML = '<div class="tree-empty">لا توجد ملفات مطابقة.<br>جرّب اسماً آخر أو أنشئ ملفاً جديداً.</div>';
+          container.innerHTML = '<div class="tree-empty">' + tr('لا توجد ملفات مطابقة.') + '<br>' + tr('جرّب اسماً آخر أو أنشئ ملفاً جديداً.') + '</div>';
           return;
         }
         matches.forEach(function (path) {
@@ -1925,7 +2418,7 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
 
       const root = buildTreeModel();
       if (!root.children.size) {
-        container.innerHTML = '<div class="tree-empty">المشروع فارغ.<br>ابدأ بإنشاء ملف جديد.</div>';
+        container.innerHTML = '<div class="tree-empty">' + tr('المشروع فارغ.') + '<br>' + tr('ابدأ بإنشاء ملف جديد.') + '</div>';
         return;
       }
 
@@ -1976,7 +2469,7 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
         const close = document.createElement('button');
         close.className = 'tab-close';
         close.type = 'button';
-        close.title = 'إغلاق';
+        close.title = tr('إغلاق');
         close.innerHTML = '<i class="fa-solid fa-xmark"></i>';
         close.addEventListener('click', function (event) {
           event.stopPropagation();
@@ -1991,7 +2484,7 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
       const add = document.createElement('button');
       add.className = 'tab-add';
       add.type = 'button';
-      add.title = 'ملف جديد';
+      add.title = tr('ملف جديد');
       add.innerHTML = '<i class="fa-solid fa-plus"></i>';
       add.addEventListener('click', function () { createFile(); });
       container.appendChild(add);
@@ -2010,7 +2503,7 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
       const dot = $('#status-dot');
       if (dot) dot.className = 'status-dot' + (dirty ? '' : ' saved');
       const statusText = $('#status-text');
-      if (statusText) statusText.textContent = state.active ? (dirty ? 'تغييرات غير محفوظة…' : 'محفوظ محلياً') : 'لا يوجد ملف مفتوح';
+      if (statusText) statusText.textContent = tr(state.active ? (dirty ? 'تغييرات غير محفوظة…' : 'محفوظ محلياً') : 'لا يوجد ملف مفتوح');
 
       if (state.active && editor) {
         const cursor = editor.getCursor();
@@ -2019,7 +2512,7 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
         const sizeNode = $('#status-size');
         if (langNode) langNode.innerHTML = '<i class="fa-solid fa-code"></i> ' + langLabel(state.active);
         if (posNode) posNode.innerHTML = '<i class="fa-solid fa-location-dot"></i> Ln ' + (cursor.line + 1) + ', Col ' + (cursor.ch + 1);
-        if (sizeNode) sizeNode.innerHTML = '<i class="fa-solid fa-ruler"></i> ' + editor.lineCount() + ' سطر · ' + editor.getValue().length.toLocaleString('en-US') + ' حرف';
+        if (sizeNode) sizeNode.innerHTML = '<i class="fa-solid fa-ruler"></i> ' + editor.lineCount() + ' ' + tr('سطر') + ' · ' + editor.getValue().length.toLocaleString('en-US') + ' ' + tr('حرف');
       } else {
         if ($('#status-lang')) $('#status-lang').innerHTML = '<i class="fa-solid fa-code"></i> —';
         if ($('#status-position')) $('#status-position').innerHTML = '<i class="fa-solid fa-location-dot"></i> Ln 1, Col 1';
@@ -2027,7 +2520,7 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
       }
 
       const footer = $('#footer-files');
-      if (footer) footer.textContent = Object.keys(state.files).length + ' ملف · ' + state.folders.length + ' مجلد';
+      if (footer) footer.textContent = Object.keys(state.files).length + ' ' + tr('ملف') + ' · ' + state.folders.length + ' ' + tr('مجلد');
     }
 
     function showEmpty(show) {
@@ -2149,7 +2642,8 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
        File operations
        ============================================================ */
     async function createFile(defaultDir) {
-      const suggestion = defaultDir ? defaultDir.replace(/\/?$/, '/') : '';
+      const folder = defaultDir !== undefined ? defaultDir : currentFolderForCreation();
+      const suggestion = folder ? folder.replace(/\/?$/, '/') : '';
       const value = await askText({
         title: 'ملف جديد',
         label: 'اسم الملف أو مساره',
@@ -2173,6 +2667,7 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
       }
       ensureParents(path);
       state.files[path] = '';
+      setCurrentFolder(dirnamePath(path));
       state.openTabs.push(path);
       persist(false);
       renderAll();
@@ -2181,7 +2676,8 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
     }
 
     async function createFolder(defaultDir) {
-      const suggestion = defaultDir ? defaultDir.replace(/\/?$/, '/') : '';
+      const folder = defaultDir !== undefined ? defaultDir : currentFolderForCreation();
+      const suggestion = folder ? folder.replace(/\/?$/, '/') : '';
       const value = await askText({
         title: 'مجلد جديد',
         label: 'اسم المجلد أو مساره',
@@ -2204,6 +2700,7 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
         }
       }
       ensureParents(path);
+      setCurrentFolder(path);
       if (state.folders.indexOf(path) === -1) state.folders.push(path);
       if (state.expanded.indexOf(path) === -1) state.expanded.push(path);
       persist(false);
@@ -2486,9 +2983,51 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
     let consoleHistoryIndex = -1;
 
     const CONSOLE_BRIDGE = `<script>(function(){
+      var offset = window.__codexLineOffset || 0;
+      function lineText(line){
+        if(!line) return '';
+        var text = String(window.__codexSource || '').split('\\n')[line - 1];
+        return text ? text.trim().slice(0, 240) : '';
+      }
+      function findLocation(stack, line, column){
+        var patterns = [
+          /__codex_entry__:(\\d+):(\\d+)/i,
+          /<anonymous>:(\\d+):(\\d+)/i,
+          /(?:[^\\s():]+\\.(?:js|mjs|cjs|jsx|ts|html|htm)):(\\d+):(\\d+)/i,
+          /:(\\d+):(\\d+)/
+        ];
+        for(var i=0;i<patterns.length;i++){
+          var match = patterns[i].exec(stack || '');
+          if(match){
+            return { line: Math.max(1, parseInt(match[1],10) - offset), column: parseInt(match[2],10) || 0 };
+          }
+        }
+        line = parseInt(line,10) || 0;
+        return line ? { line: Math.max(1, line - offset), column: parseInt(column,10) || 0 } : { line: 0, column: 0 };
+      }
+      function errorText(name, message, loc){
+        var ar = 'خطأ غير مُعالج: ' + name + ': ' + message;
+        var en = 'Uncaught ' + name + ': ' + message;
+        if(loc.line){
+          ar += ' (سطر ' + loc.line + (loc.column ? '، عمود ' + loc.column : '') + ')';
+          en += ' (line ' + loc.line + (loc.column ? ', column ' + loc.column : '') + ')';
+        }
+        return ar + ' / ' + en;
+      }
       function serialize(value){
         try{
-          if(value instanceof Error) return { text: 'Uncaught ' + (value.name || 'Error') + ': ' + value.message, detail: value.stack || '' };
+          if(value && typeof value === 'object' && typeof value.text === 'string' && typeof value.detail === 'string'){
+            return {
+              text: value.text, detail: value.detail,
+              line: parseInt(value.line,10) || 0, column: parseInt(value.column,10) || 0,
+              source: String(value.source || ''), bilingual: !!value.bilingual
+            };
+          }
+          if(value instanceof Error){
+            var loc = findLocation(value.stack);
+            var snippet = lineText(loc.line);
+            return { text: errorText(value.name || 'Error', value.message, loc), detail: (value.stack || '') + (snippet ? '\\n> ' + snippet : ''), line: loc.line, column: loc.column, source: snippet, bilingual: true };
+          }
           if(typeof value === 'undefined') return { text: 'undefined', detail: '' };
           if(value === null) return { text: 'null', detail: '' };
           if(typeof value === 'string') return { text: value, detail: '' };
@@ -2502,9 +3041,14 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
           return { text: String(value), detail: '' };
         }catch(error){ return { text: String(value), detail: '' }; }
       }
-      function emit(type, args){
+      function emit(type, args, meta){
         var parts = Array.prototype.map.call(args, serialize);
-        try{ parent.postMessage({ __codexConsole: true, type: type, args: parts }, '*'); }catch(error){}
+        var info = meta || parts[0] || {};
+        try{ parent.postMessage({
+          __codexConsole: true, type: type, args: parts,
+          line: info.line || 0, column: info.column || 0,
+          source: info.source || '', bilingual: !!info.bilingual
+        }, '*'); }catch(error){}
         var out = document.getElementById('codex-console-out');
         if(out){
           var line = document.createElement('div');
@@ -2524,25 +3068,147 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
         };
       });
       window.addEventListener('error', function(event){
-        emit('error', [event.error || (event.message + (event.lineno ? ' (line ' + event.lineno + ')' : ''))]);
+        var loc = findLocation(event.error && event.error.stack, event.lineno, event.colno);
+        var name = (event.error && event.error.name) || 'Error';
+        var message = (event.error && event.error.message) || event.message || '';
+        var snippet = lineText(loc.line);
+        emit('error', [{
+          text: errorText(name, message, loc),
+          detail: (event.error && event.error.stack) || (message + ' (' + (event.filename || '') + ':' + event.lineno + ')') + (snippet ? '\\n> ' + snippet : ''),
+          line: loc.line, column: loc.column, source: snippet, bilingual: true
+        }], loc);
       });
       window.addEventListener('unhandledrejection', function(event){
-        emit('error', [event.reason || 'Unhandled rejection']);
+        var reason = event.reason;
+        if(reason instanceof Error){ emit('error', [reason]); return; }
+        emit('error', [{ text: 'رفض غير مُعالج: ' + String(reason) + ' / Unhandled rejection: ' + String(reason), detail: '', bilingual: true }]);
       });
       window.addEventListener('message', function(event){
-        if(!event.data || !event.data.__codexEval) return;
+        var data = event.data;
+        if(!data || !data.__codexEval) return;
         try{
-          var result = (0, eval)(event.data.code);
+          var result = (0, eval)(data.code);
           if(result && typeof result.then === 'function'){
-            emit('info', ['Promise قيد التنفيذ…']);
+            emit('info', [{ text: 'Promise قيد التنفيذ… / Promise pending…', detail: '' }]);
             result.then(function(value){ emit('log', [value]); }, function(error){ emit('error', [error]); });
           } else {
             emit('log', [result]);
           }
-        }catch(error){
-          emit('error', [error]);
+        }catch(error){ emit('error', [error]); }
+      });
+
+      var pickerActive = false;
+      var overlay = null;
+      function ensureOverlay(){
+        if(overlay) return overlay;
+        overlay = document.createElement('div');
+        overlay.style.cssText = 'position:fixed;z-index:2147483647;pointer-events:none;border:2px solid #0071e3;background:rgba(0,102,204,.08);transition:top .05s,left .05s,width .05s,height .05s';
+        (document.body || document.documentElement).appendChild(overlay);
+        return overlay;
+      }
+      function hideOverlay(){ if(overlay) overlay.style.display = 'none'; }
+      function mark(el){
+        if(!el || !el.getBoundingClientRect) return;
+        var rect = el.getBoundingClientRect();
+        var box = ensureOverlay();
+        box.style.display = 'block';
+        box.style.top = rect.top + 'px';
+        box.style.left = rect.left + 'px';
+        box.style.width = rect.width + 'px';
+        box.style.height = rect.height + 'px';
+      }
+      function classNameOf(el){
+        var value = el.className;
+        if(value && typeof value === 'object' && value.baseVal !== undefined) value = value.baseVal;
+        return String(value || '');
+      }
+      function cssPath(el){
+        if(!el || !el.tagName) return '';
+        var parts = [];
+        var node = el;
+        while(node && node.tagName && node.tagName.toLowerCase() !== 'html' && parts.length < 12){
+          var tag = node.tagName.toLowerCase();
+          var segment = tag;
+          if(node.id){ segment += '#' + node.id; parts.unshift(segment); break; }
+          var classes = classNameOf(node).trim().split(/\\s+/).filter(Boolean).slice(0, 2);
+          if(classes.length) segment += '.' + classes.join('.');
+          var parent = node.parentElement;
+          if(parent){
+            var siblings = Array.prototype.filter.call(parent.children, function(child){ return child.tagName === node.tagName; });
+            if(siblings.length > 1) segment += ':nth-of-type(' + (siblings.indexOf(node) + 1) + ')';
+          }
+          parts.unshift(segment);
+          node = parent;
+        }
+        return parts.join(' > ');
+      }
+      function nodeInfo(el){
+        if(!el || !el.tagName) return null;
+        var computed = window.getComputedStyle(el);
+        var rect = el.getBoundingClientRect();
+        var keys = ['display','position','color','background-color','font-size','font-family','width','height','margin','padding','border','z-index','opacity'];
+        var styles = {};
+        keys.forEach(function(key){ styles[key] = computed.getPropertyValue(key); });
+        return {
+          tag: el.tagName.toLowerCase(),
+          id: el.id || '',
+          cls: classNameOf(el),
+          path: cssPath(el),
+          attrs: Array.prototype.map.call(el.attributes || [], function(attr){ return [attr.name, attr.value.slice(0, 300)]; }),
+          text: String(el.textContent || '').trim().slice(0, 300),
+          html: String(el.outerHTML || '').slice(0, 5000),
+          rect: { width: Math.round(rect.width), height: Math.round(rect.height), top: Math.round(rect.top), left: Math.round(rect.left) },
+          styles: styles
+        };
+      }
+      function treeOf(node, depth){
+        if(!node || depth > 10) return null;
+        var children = [];
+        for(var i=0;i<node.children.length;i++){
+          var child = treeOf(node.children[i], depth + 1);
+          if(child) children.push(child);
+        }
+        var tag = node.tagName ? node.tagName.toLowerCase() : '';
+        var label = tag;
+        if(node.id) label += '#' + node.id;
+        var classes = classNameOf(node).trim().split(/\\s+/).filter(Boolean).slice(0, 2);
+        if(classes.length) label += '.' + classes.join('.');
+        return { label: label, path: cssPath(node), text: children.length ? '' : String(node.textContent || '').trim().slice(0, 40), children: children };
+      }
+      function reply(action, data){
+        try{ parent.postMessage({ __codexInspect: true, action: action, data: data }, '*'); }catch(error){}
+      }
+      window.addEventListener('message', function(event){
+        var data = event.data;
+        if(!data || !data.__codexInspect) return;
+        if(data.action === 'tree'){
+          if(document.body) reply('tree', treeOf(document.body, 0));
+          else reply('empty', {});
+        } else if(data.action === 'pick-start'){
+          pickerActive = true;
+          reply('status', { picking: true });
+        } else if(data.action === 'pick-stop'){
+          pickerActive = false;
+          hideOverlay();
+          reply('status', { picking: false });
+        } else if(data.action === 'select'){
+          var target = null;
+          try{ target = document.querySelector(data.data && data.data.selector); }catch(error){}
+          if(target){ mark(target); reply('select', nodeInfo(target)); }
         }
       });
+      document.addEventListener('mousemove', function(event){
+        if(!pickerActive || !event.target || event.target.nodeType !== 1) return;
+        mark(event.target);
+        reply('hover', nodeInfo(event.target));
+      }, true);
+      document.addEventListener('click', function(event){
+        if(!pickerActive) return;
+        event.preventDefault();
+        event.stopPropagation();
+        pickerActive = false;
+        if(event.target && event.target.nodeType === 1) reply('select', nodeInfo(event.target));
+      }, true);
     })();<\/script>`;
 
     function resolveLocalRef(ref, basePath) {
@@ -2573,9 +3239,17 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
       return output;
     }
 
-    function injectBridge(html) {
-      if (/<head[^>]*>/i.test(html)) return html.replace(/<head([^>]*)>/i, '<head$1>\n' + CONSOLE_BRIDGE);
-      return CONSOLE_BRIDGE + html;
+    function bridgeConfig(options) {
+      const source = String((options && options.source) || '');
+      const offset = (options && options.offset) || 0;
+      const encodedSource = JSON.stringify(source).replace(/<\/script/gi, '<\\/script');
+      return '<script>window.__codexSource = ' + encodedSource + '; window.__codexLineOffset = ' + offset + ';<\/script>\n' + CONSOLE_BRIDGE;
+    }
+
+    function injectBridge(html, options) {
+      const bridge = bridgeConfig(options);
+      if (/<head[^>]*>/i.test(html)) return html.replace(/<head([^>]*)>/i, '<head$1>\n' + bridge);
+      return bridge + html;
     }
 
     function demoPage(body, extraHead) {
@@ -2592,7 +3266,7 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
       const code = state.files[entry] || '';
 
       if (ext === 'html' || ext === 'htm') {
-        return injectBridge(inlineAssets(code, entry));
+        return injectBridge(inlineAssets(code, entry), { source: code });
       }
 
       if (ext === 'css' || ext === 'scss' || ext === 'less') {
@@ -2602,27 +3276,27 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
           '<div class="demo-row"><span class="tag">وسم</span><span class="tag">آخر</span></div>' +
           '<div class="demo-grid"><div>بطاقة 1</div><div>بطاقة 2</div><div>بطاقة 3</div></div>' +
           '<p><a href="#">رابط تجريبي</a> — نص عادي للمعاينة.</p></div>';
-        return '<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8">' +
+        return injectBridge('<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8">' +
           '<meta name="viewport" content="width=device-width, initial-scale=1">' +
-          '<style>' + code + '</style></head><body>' + body + '</body></html>';
+          '<style>' + code + '</style></head><body>' + body + '</body></html>', { source: code });
       }
 
       if (ext === 'js' || ext === 'mjs' || ext === 'cjs' || ext === 'jsx') {
         const body = '<div class="demo-card"><h1>تشغيل JavaScript</h1>' +
           '<p>ملف: <strong>' + escapeHtml(entry) + '</strong></p>' +
           '<div id="codex-console-out"></div></div>';
-        return demoPage(
-          body + '<script>\ntry {\n' + safeScript(code) + '\n} catch (error) { console.error(error && error.stack ? error.stack : error); }\n<\/script>',
-          '<style>.demo-card{max-width:820px;margin:0 auto;padding:20px;border-radius:14px;background:#fff;box-shadow:0 10px 30px rgba(2,6,23,.08)}</style>' + CONSOLE_BRIDGE
-        );
+        return injectBridge(demoPage(
+          body + '<script>\ntry {\n' + safeScript(code) + '\n//# sourceURL=__codex_entry__\n} catch (error) { console.error(error); }\n<\/script>',
+          '<style>.demo-card{max-width:820px;margin:0 auto;padding:20px;border-radius:14px;background:#fff;box-shadow:0 10px 30px rgba(2,6,23,.08)}</style>'
+        ), { source: code, offset: 2 });
       }
 
       if (ext === 'svg') {
-        return '<!DOCTYPE html><html><head><meta charset="UTF-8"><style>html,body{margin:0;min-height:100%;display:grid;place-items:center;background:#fff}</style></head><body>' + CONSOLE_BRIDGE + code + '</body></html>';
+        return injectBridge('<!DOCTYPE html><html><head><meta charset="UTF-8"><style>html,body{margin:0;min-height:100%;display:grid;place-items:center;background:#fff}</style></head><body>' + code + '</body></html>', { source: code });
       }
 
       if (ext === 'md' || ext === 'markdown') {
-        return buildMarkdownDoc(code);
+        return injectBridge(buildMarkdownDoc(code), { source: code });
       }
 
       return null;
@@ -2663,10 +3337,131 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
       document.head.appendChild(script);
     }
 
+    const inspectState = { tree: null, selected: null, picking: false, filter: '' };
+
     function setPreview(html) {
       const frame = $('#preview-frame');
       if (!frame) return;
+      inspectState.tree = null;
+      inspectState.selected = null;
       frame.srcdoc = html;
+      setTimeout(function () {
+        if ($('#tab-inspect') && $('#tab-inspect').classList.contains('active')) refreshInspect();
+        refreshInspectStatus();
+      }, 250);
+    }
+
+    function postInspect(action, data) {
+      const frame = $('#preview-frame');
+      if (!frame || !frame.contentWindow || !frame.getAttribute('srcdoc')) return;
+      frame.contentWindow.postMessage({ __codexInspect: true, action: action, data: data || {} }, '*');
+    }
+
+    function refreshInspect() {
+      postInspect('tree');
+      const details = $('#inspect-details');
+      if (details) details.textContent = tr('لا يوجد عنصر محدد — اضغط "اختيار عنصر" ثم انقر على عنصر في المعاينة.');
+      refreshInspectStatus();
+    }
+
+    function refreshInspectStatus() {
+      const status = $('#inspect-status');
+      if (!status) return;
+      const frame = $('#preview-frame');
+      const hasFrame = !!(frame && frame.getAttribute('srcdoc'));
+      status.textContent = inspectState.picking
+        ? tr('جارٍ الاختيار… انقر على عنصر في المعاينة')
+        : hasFrame ? tr('المعاينة جاهزة') : tr('لا توجد معاينة حالية — شغّل ملف HTML أولاً');
+      const button = $('#btn-pick-element');
+      if (button) button.classList.toggle('active', inspectState.picking);
+    }
+
+    function inspectNodeMatches(node, filter) {
+      if (!filter) return true;
+      const haystack = [node.label, node.text, node.path].join(' ').toLowerCase();
+      if (haystack.indexOf(filter) !== -1) return true;
+      return (node.children || []).some(function (child) { return inspectNodeMatches(child, filter); });
+    }
+
+    function renderInspectTree() {
+      const container = $('#inspect-tree');
+      if (!container) return;
+      container.innerHTML = '';
+      if (!inspectState.tree) {
+        container.textContent = tr('شغّل المعاينة أولاً لفحص DOM.');
+        return;
+      }
+      const filter = inspectState.filter.trim().toLowerCase();
+      function walk(node, depth) {
+        if (!inspectNodeMatches(node, filter)) return;
+        const row = document.createElement('button');
+        row.type = 'button';
+        row.className = 'inspect-node-row';
+        row.style.paddingLeft = (8 + depth * 14) + 'px';
+        row.textContent = (depth ? '› ' : '') + node.label + (node.text ? ' — ' + node.text : '');
+        row.title = node.path || '';
+        row.addEventListener('click', function () { postInspect('select', { selector: node.path }); });
+        container.appendChild(row);
+        (node.children || []).forEach(function (child) { walk(child, depth + 1); });
+      }
+      walk(inspectState.tree, 0);
+    }
+
+    function renderInspectDetails(info) {
+      const container = $('#inspect-details');
+      if (!container) return;
+      container.innerHTML = '';
+      if (!info) {
+        container.textContent = tr('لا يوجد عنصر محدد — اضغط "اختيار عنصر" ثم انقر على عنصر في المعاينة.');
+        return;
+      }
+      const title = document.createElement('div');
+      title.className = 'inspect-code';
+      title.textContent = '<' + info.tag + (info.id ? ' #' + info.id : '') + (info.cls ? ' .' + String(info.cls).trim().split(/\s+/).slice(0, 3).join('.') : '') + '>';
+      container.appendChild(title);
+
+      const list = document.createElement('dl');
+      list.className = 'inspect-kv';
+      function addRow(key, value) {
+        const dt = document.createElement('dt');
+        dt.textContent = key;
+        const dd = document.createElement('dd');
+        dd.textContent = String(value || '—');
+        dd.style.whiteSpace = 'pre-wrap';
+        list.appendChild(dt);
+        list.appendChild(dd);
+      }
+      addRow(tr('المسار'), info.path);
+      addRow(tr('القياسات'), info.rect ? Math.round(info.rect.width) + '×' + Math.round(info.rect.height) + ' px' : '—');
+      addRow(tr('النص'), info.text);
+      addRow(tr('الأنماط المحسوبة'), Object.keys(info.styles || {}).map(function (key) { return key + ': ' + info.styles[key]; }).join('\n'));
+      addRow(tr('الخصائص'), (info.attrs || []).map(function (pair) { return pair[0] + '="' + pair[1] + '"'; }).join('\n'));
+      container.appendChild(list);
+
+      const code = document.createElement('pre');
+      code.className = 'inspect-code';
+      code.textContent = info.html || '';
+      container.appendChild(code);
+    }
+
+    function handleInspectMessage(data) {
+      if (data.action === 'tree') {
+        inspectState.tree = data.data || null;
+        renderInspectTree();
+      } else if (data.action === 'select') {
+        inspectState.selected = data.data || null;
+        inspectState.picking = false;
+        renderInspectDetails(inspectState.selected);
+        refreshInspectStatus();
+      } else if (data.action === 'hover') {
+        renderInspectDetails(data.data);
+      } else if (data.action === 'status') {
+        inspectState.picking = !!(data.data && data.data.picking);
+        refreshInspectStatus();
+      } else if (data.action === 'empty') {
+        inspectState.tree = null;
+        renderInspectTree();
+      }
     }
 
     function previewCurrent(silent) {
@@ -2716,6 +3511,25 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
       return Object.keys(state.files).find(function (path) { return ['html', 'htm'].indexOf(extOf(path)) !== -1; }) || null;
     }
 
+    function checkJsSyntax(path) {
+      const code = state.files[path] || '';
+      try {
+        new Function(code);
+        return true;
+      } catch (error) {
+        const rawLoc = extractLocation(error && error.stack ? error.stack : error && error.message ? error.message : '');
+        const loc = { line: rawLoc.line ? Math.max(1, rawLoc.line - 2) : 0, column: rawLoc.column || 0 };
+        const detail = error && error.message ? error.message : String(error);
+        const snippet = sourceLine(loc.line, path);
+        const message = bilingualError('خطأ صياغة JavaScript: ' + detail, 'JavaScript syntax error: ' + detail, loc, snippet);
+        logConsole('error', message, error && error.stack ? error.stack : '', { bilingual: true });
+        addProblem('error', message, path, { line: loc.line, column: loc.column, source: snippet, detail: detail, bilingual: true });
+        switchDevTab('problems');
+        toast('يوجد خطأ في الكود / code has errors', 'error');
+        return false;
+      }
+    }
+
     function runProject() {
       if (!state.active) { toast('افتح ملفاً أولاً', 'info'); return; }
       if (isMobile()) switchMobileView('output');
@@ -2725,9 +3539,10 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
         return;
       }
       if (ext === 'js' || ext === 'mjs' || ext === 'cjs' || ext === 'jsx') {
+        if (!checkJsSyntax(state.active)) return;
         const entry = findHtmlEntry();
         if (entry) {
-          setPreview(injectBridge(inlineAssets(state.files[entry], entry)));
+          setPreview(injectBridge(inlineAssets(state.files[entry], entry), { source: state.files[entry] }));
           switchDevTab('preview');
           toast('تم تشغيل ' + entry, 'ok');
         } else {
@@ -2766,6 +3581,7 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
         const output = $('#console-logs');
         if (output) output.scrollTop = output.scrollHeight;
       }
+      if (tab === 'inspect') refreshInspect();
       if (isMobile()) switchMobileView('output');
     }
 
@@ -2811,9 +3627,9 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
       if (!visible.length) {
         const empty = document.createElement('div');
         empty.className = 'console-empty';
-        empty.textContent = consoleEntries.length
+        empty.textContent = tr(consoleEntries.length
           ? 'لا توجد سجلات مطابقة للتصفية الحالية.'
-          : 'لا توجد سجلات بعد — شغّل الكود أو اكتب في الطرفية بالأسفل.';
+          : 'لا توجد سجلات بعد — شغّل الكود أو اكتب في الطرفية بالأسفل.');
         output.appendChild(empty);
       } else {
         visible.forEach(function (entry) {
@@ -2838,7 +3654,7 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
           if (entry.detail) {
             const details = document.createElement('details');
             const summary = document.createElement('summary');
-            summary.textContent = 'عرض التفاصيل';
+            summary.textContent = tr('عرض التفاصيل');
             const pre = document.createElement('pre');
             pre.textContent = entry.detail;
             details.appendChild(summary);
@@ -2856,13 +3672,17 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
       if (scrollToEnd && stick) output.scrollTop = output.scrollHeight;
     }
 
-    function logConsole(type, message, detail) {
+    function logConsole(type, message, detail, options) {
       const normalized = type || 'log';
+      const raw = String(message);
+      const translated = tr(raw);
+      const isBilingual = !!(options && options.bilingual);
+      const text = isBilingual ? raw : (normalized === 'error' && translated !== raw ? dual(raw, translated) : translated);
       const entry = {
         seq: ++consoleSeq,
         type: normalized,
         level: consoleLevelFor(normalized),
-        text: String(message),
+        text: text,
         detail: detail ? String(detail) : '',
         time: new Date()
       };
@@ -2921,9 +3741,13 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
         const info = describeConsoleValue(result);
         logConsole('log', info.text, info.detail);
       } catch (error) {
-        const message = error && error.message ? 'Uncaught ' + (error.name || 'Error') + ': ' + error.message : String(error);
-        logConsole('error', message, error && error.stack ? error.stack : '');
-        addProblem('error', message, state.active);
+        const name = (error && error.name) || 'Error';
+        const detail = error && error.message ? error.message : String(error);
+        const loc = extractLocation(error && error.stack ? error.stack : detail);
+        const snippet = sourceLine(loc.line, state.active);
+        const message = bilingualError('خطأ غير مُعالج: ' + name + ': ' + detail, 'Uncaught ' + name + ': ' + detail, loc, snippet);
+        logConsole('error', message, error && error.stack ? error.stack : '', { bilingual: true });
+        addProblem('error', message, state.active, { line: loc.line, column: loc.column, source: snippet, detail: error && error.stack ? error.stack : '', bilingual: true });
       }
     }
 
@@ -2950,8 +3774,80 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
       copyText(text).then(function () { toast('تم نسخ السجلات', 'ok'); }).catch(function () { toast('تعذر النسخ', 'error'); });
     }
 
-    function addProblem(severity, message, path) {
-      problems.push({ severity: severity || 'error', message: String(message), path: path || state.active || '' });
+    function extractLocation(value) {
+      const text = String(value || '');
+      const patterns = [
+        /__codex_entry__:(\d+):(\d+)/i,
+        /<anonymous>:(\d+):(\d+)/i,
+        /:(\d+):(\d+)/,
+        /(?:line|سطر)\s*(\d+)/i
+      ];
+      for (let index = 0; index < patterns.length; index += 1) {
+        const match = patterns[index].exec(text);
+        if (match) return { line: parseInt(match[1], 10) || 0, column: parseInt(match[2], 10) || 0 };
+      }
+      return { line: 0, column: 0 };
+    }
+
+    function sourceLine(line, path) {
+      if (!line) return '';
+      const content = path && state.files[path] !== undefined ? state.files[path] : (editor ? editor.getValue() : '');
+      const text = String(content || '').split('\n')[line - 1];
+      return text ? text.trim().slice(0, 240) : '';
+    }
+
+    function bilingualError(ar, en, location, source) {
+      const loc = location || {};
+      let suffix = '';
+      if (loc.line) {
+        suffix = ' (سطر ' + loc.line + (loc.column ? '، عمود ' + loc.column : '') + ') / (line ' +
+          loc.line + (loc.column ? ', column ' + loc.column : '') + ')';
+      }
+      const snippet = source ? '\n> ' + String(source).slice(0, 240) : '';
+      return ar + ' / ' + en + suffix + snippet;
+    }
+
+    function reportRuntimeError(raw, path) {
+      const message = String(raw || '').trim();
+      const loc = extractLocation(message);
+      const snippet = sourceLine(loc.line, path);
+      const ar = 'خطأ تنفيذ' + (loc.line ? ' في السطر ' + loc.line : '') + ': ' + message;
+      const en = 'Runtime error' + (loc.line ? ' at line ' + loc.line : '') + ': ' + message;
+      const text = ar + ' / ' + en + (snippet ? '\n> ' + snippet : '');
+      logConsole('error', text, message, { bilingual: true });
+      addProblem('error', text, path || state.active, { line: loc.line, column: loc.column, source: snippet, detail: message, bilingual: true });
+      return text;
+    }
+
+    function jumpToProblem(problem) {
+      if (!problem) return;
+      if (problem.path && state.files[problem.path] !== undefined) openFile(problem.path);
+      if (editor && problem.line > 0) {
+        try {
+          const line = Math.min(Math.max(problem.line, 1), editor.lineCount());
+          const column = Math.min(Math.max((problem.column || 1) - 1, 0), editor.getLine(line - 1).length);
+          editor.setCursor({ line: line - 1, ch: column });
+          editor.scrollIntoView({ from: { line: line - 1, ch: column }, to: { line: line - 1, ch: column } }, 120);
+          editor.focus();
+        } catch (error) {
+          logConsole('warn', 'تعذر الانتقال إلى السطر / Unable to jump to line');
+        }
+      }
+      switchDevTab('problems');
+    }
+
+    function addProblem(severity, message, path, options) {
+      const opts = options || {};
+      problems.push({
+        severity: severity || 'error',
+        message: String(message),
+        path: path || state.active || '',
+        line: opts.line || 0,
+        column: opts.column || 0,
+        source: opts.source || '',
+        detail: opts.detail || '',
+        bilingual: !!opts.bilingual
+      });
       if (problems.length > 120) problems.shift();
       renderProblems();
     }
@@ -2961,18 +3857,48 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
       if (!list) return;
       list.innerHTML = '';
       if (!problems.length) {
-        list.innerHTML = '<div class="problems-empty">لا توجد مشاكل حالياً — شغّل الكود لبدء الفحص.</div>';
+        list.innerHTML = '<div class="problems-empty">' + tr('لا توجد مشاكل حالياً — شغّل الكود لبدء الفحص.') + '</div>';
         return;
       }
       problems.forEach(function (problem) {
         const item = document.createElement('div');
         item.className = 'problem-item';
-        item.style.borderInlineStartColor = problem.severity === 'warn' ? 'var(--warn)' : 'var(--danger)';
-        item.textContent = (problem.path ? problem.path + ': ' : '') + problem.message;
-        item.title = 'اضغط لفتح الملف';
-        item.addEventListener('click', function () {
-          if (problem.path && state.files[problem.path] !== undefined) openFile(problem.path);
-        });
+        item.style.borderInlineStartColor = problem.severity === 'warn' ? 'var(--warn)' : problem.severity === 'info' ? 'var(--accent)' : 'var(--danger)';
+        item.title = tr('اضغط لفتح الملف والانتقال إلى السطر');
+
+        const head = document.createElement('div');
+        head.className = 'problem-head';
+        const chip = document.createElement('span');
+        chip.className = 'problem-chip ' + problem.severity;
+        chip.textContent = tr(problem.severity === 'warn' ? 'تحذير' : problem.severity === 'info' ? 'معلومة' : 'خطأ');
+        head.appendChild(chip);
+        if (problem.path) {
+          const pathChip = document.createElement('span');
+          pathChip.className = 'problem-chip';
+          pathChip.textContent = problem.path;
+          head.appendChild(pathChip);
+        }
+        if (problem.line) {
+          const badge = document.createElement('span');
+          badge.className = 'problem-chip';
+          badge.textContent = tr('سطر') + ' ' + problem.line + ' / line ' + problem.line;
+          head.appendChild(badge);
+        }
+        item.appendChild(head);
+
+        const message = document.createElement('div');
+        message.className = 'problem-message';
+        message.textContent = problem.bilingual ? problem.message : tr(problem.message);
+        item.appendChild(message);
+
+        if (problem.source) {
+          const snippet = document.createElement('code');
+          snippet.className = 'problem-snippet';
+          snippet.textContent = String(problem.source).slice(0, 240);
+          item.appendChild(snippet);
+        }
+
+        item.addEventListener('click', function () { jumpToProblem(problem); });
         list.appendChild(item);
       });
     }
@@ -3002,7 +3928,7 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
         pyodide = instance;
         pyodideReady = true;
         pyodide.setStdout({ batched: function (text) { if (text) logConsole('log', text); } });
-        pyodide.setStderr({ batched: function (text) { if (text) logConsole('error', text); } });
+        pyodide.setStderr({ batched: function (text) { if (text) reportRuntimeError(text, state.active); } });
         return pyodide;
       }).catch(function (error) {
         pyodideLoading = null;
@@ -3025,8 +3951,7 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
       try {
         runtime = await loadPyodideOnce();
       } catch (error) {
-        logConsole('error', error.message);
-        addProblem('error', error.message + ' — تحقق من الاتصال بالإنترنت.', path);
+        reportRuntimeError((error && error.message ? error.message : String(error)) + ' — تحقق من الاتصال بالإنترنت / check your connection.', path);
         toast('تعذر تحميل Python', 'error');
         return;
       }
@@ -3061,9 +3986,7 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
         if (result !== undefined && result !== null) logConsole('log', String(result));
         logConsole('ok', 'انتهى التنفيذ بنجاح');
       } catch (error) {
-        const message = error && error.message ? error.message : String(error);
-        logConsole('error', message);
-        addProblem('error', message, path);
+        const message = reportRuntimeError(error && error.message ? error.message : String(error), path);
         setPreview('<pre style="color:#b91c1c;background:#fff;padding:16px;white-space:pre-wrap;font:13px/1.6 ui-monospace,monospace">' + escapeHtml(message) + '</pre>');
         toast('حدث خطأ أثناء تشغيل Python', 'error');
       }
@@ -3150,16 +4073,13 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
         if (compile.stderr) logConsole('warn', compile.stderr);
         if (run.stdout) logConsole('log', run.stdout);
         if (run.stderr) {
-          logConsole('error', run.stderr);
-          addProblem('error', run.stderr.trim(), path);
+          reportRuntimeError(run.stderr, path);
         }
         if (run.code === 0 && !run.stderr) logConsole('ok', 'انتهى التنفيذ بنجاح (exit 0)');
         else logConsole('info', 'انتهى التنفيذ بالرمز ' + run.code + ' في ' + (run.wall_time || 0) + ' ثانية.');
         toast('انتهى التنفيذ', run.code === 0 ? 'ok' : 'info');
       } catch (error) {
-        const message = error && error.message ? error.message : String(error);
-        logConsole('error', message);
-        addProblem('error', message, path);
+        reportRuntimeError(error && error.message ? error.message : String(error), path);
         toast('تعذر تشغيل الكود', 'error');
       }
     }
@@ -3318,12 +4238,12 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
         const label = $('#prompt-label');
         const hint = $('#prompt-hint');
         const input = $('#prompt-input');
-        if (title) title.textContent = options.title || 'إدخال';
-        if (label) label.textContent = options.label || 'القيمة';
-        if (hint) hint.textContent = options.hint || '';
+        if (title) title.textContent = tr(options.title || 'إدخال');
+        if (label) label.textContent = tr(options.label || 'القيمة');
+        if (hint) hint.textContent = tr(options.hint || '');
         if (input) {
           input.value = options.value || '';
-          input.placeholder = options.placeholder || '';
+          input.placeholder = tr(options.placeholder || '');
         }
         openModal('prompt-modal');
         setTimeout(function () { if (input) { input.focus(); input.select(); } }, 40);
@@ -3342,7 +4262,7 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
       if (!container) return;
       const item = document.createElement('div');
       item.className = 'toast ' + (type || 'info');
-      item.textContent = message;
+      item.textContent = tr(message);
       container.appendChild(item);
       while (container.children.length > 4) container.removeChild(container.firstChild);
       setTimeout(function () {
@@ -3354,7 +4274,7 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
     }
 
     function resetProject() {
-      if (!window.confirm('سيتم استبدال المشروع الحالي بالمشروع الافتراضي. هل أنت متأكد؟')) return;
+      if (!window.confirm(tr('سيتم استبدال المشروع الحالي بالمشروع الافتراضي. هل أنت متأكد؟'))) return;
       backupCurrentProject();
       state.files = Object.assign({}, DEFAULT_FILES);
       state.folders = ['styles', 'scripts', 'python'];
@@ -3380,8 +4300,8 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
         toast('لا توجد نسخة احتياطية سابقة', 'info');
         return;
       }
-      const when = backup.at ? new Date(backup.at).toLocaleString('ar-EG') : 'وقت غير معروف';
-      if (!window.confirm('استعادة النسخة الاحتياطية المحفوظة في ' + when + '؟')) return;
+      const when = backup.at ? new Date(backup.at).toLocaleString(currentLang() === 'ar' ? 'ar-EG' : 'en-GB') : tr('وقت غير معروف');
+      if (!window.confirm(tr('استعادة النسخة الاحتياطية المحفوظة في ') + ' ' + when + '؟')) return;
       try {
         backupCurrentProject();
         applyProjectData(backup.project);
@@ -3405,6 +4325,7 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
 
     function syncSettingsUI() {
       const s = state.settings;
+      const language = $('#setting-language');
       const theme = $('#setting-theme');
       const font = $('#setting-font');
       const fontVal = $('#setting-font-val');
@@ -3414,6 +4335,7 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
       const live = $('#setting-live');
       const piston = $('#setting-piston');
       const pistonKey = $('#setting-piston-key');
+      if (language) language.value = currentLang();
       if (theme) theme.value = s.theme;
       if (font) font.value = s.fontSize;
       if (fontVal) fontVal.textContent = s.fontSize + 'px';
@@ -3428,6 +4350,7 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
     function applySettings() {
       const s = state.settings;
       document.documentElement.setAttribute('data-theme', s.theme === 'light' ? 'light' : 'dark');
+      applyLanguage();
       if (editor) {
         editor.setOption('theme', s.theme === 'light' ? 'eclipse' : 'material-darker');
         editor.setOption('tabSize', s.tabSize);
@@ -3613,7 +4536,7 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
       Object.keys(state.files).sort().forEach(function (path) {
         commands.push({
           icon: 'fa-solid fa-file-code',
-          label: 'فتح: ' + path,
+          label: tr('فتح:') + ' ' + path,
           keywords: 'open file ' + path,
           kbd: '',
           run: function () { openFile(path); }
@@ -3637,12 +4560,13 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
         ['fa-solid fa-gear', 'الإعدادات', 'settings preferences', 'Ctrl+,', openSettings],
         ['fa-solid fa-keyboard', 'الاختصارات', 'shortcuts help', 'F1', function () { openModal('shortcuts-modal'); }],
         ['fa-solid fa-broom', 'مسح الكونسول', 'clear console logs', '', function () { clearConsole(); toast('تم مسح السجلات', 'ok'); }],
+        ['fa-solid fa-magnifying-glass', tr('أدوات الفحص (Inspect)'), 'inspect dom tree picker', 'Ctrl+Shift+I', function () { switchDevTab('inspect'); }],
         ['fa-solid fa-expand', 'ملء شاشة الناتج', 'fullscreen output', '', toggleFullscreen],
         ['fa-solid fa-clock-rotate-left', 'استعادة النسخة السابقة', 'restore backup', '', restoreBackup],
         ['fa-solid fa-trash-can', 'إعادة ضبط المشروع', 'reset project', '', resetProject]
       ];
       actions.forEach(function (action) {
-        commands.push({ icon: action[0], label: action[1], keywords: action[2], kbd: action[3], run: action[4] });
+        commands.push({ icon: action[0], label: tr(action[1]), keywords: action[2], kbd: action[3], run: action[4] });
       });
       return commands;
     }
@@ -3757,9 +4681,45 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
         treeSearch.addEventListener('input', function () { renderTree(treeSearch.value); });
       }
 
+      on('btn-tree-root', 'click', function () { setCurrentFolder(''); });
+      on('btn-tree-new-file', 'click', function () { createFile(); });
+      on('btn-tree-new-folder', 'click', function () { createFolder(); });
+      const fileTree = $('#file-tree');
+      if (fileTree) {
+        fileTree.addEventListener('dragover', function (event) {
+          event.preventDefault();
+          event.dataTransfer.dropEffect = 'move';
+          fileTree.classList.add('drop-root');
+        });
+        fileTree.addEventListener('dragleave', function (event) {
+          if (!fileTree.contains(event.relatedTarget)) fileTree.classList.remove('drop-root');
+        });
+        fileTree.addEventListener('drop', function (event) {
+          event.preventDefault();
+          fileTree.classList.remove('drop-root');
+          const source = event.dataTransfer.getData('text/plain');
+          if (source) { setCurrentFolder(''); movePath(source, ''); }
+        });
+      }
+
       $$('.output-tab').forEach(function (button) {
         button.addEventListener('click', function () { switchDevTab(button.getAttribute('data-tab')); });
       });
+
+      on('btn-pick-element', 'click', function () {
+        inspectState.picking = !inspectState.picking;
+        postInspect(inspectState.picking ? 'pick-start' : 'pick-stop');
+        refreshInspectStatus();
+      });
+      on('btn-refresh-inspect', 'click', function () { refreshInspect(); });
+      const inspectSearch = $('#inspect-search');
+      if (inspectSearch) {
+        inspectSearch.addEventListener('input', function () {
+          inspectState.filter = inspectSearch.value || '';
+          renderInspectTree();
+        });
+      }
+      refreshInspectStatus();
 
       $$('.mobile-nav-btn[data-view]').forEach(function (button) {
         button.addEventListener('click', function () { switchMobileView(button.getAttribute('data-view')); });
@@ -3813,6 +4773,18 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
         });
       }
 
+      on('btn-language', 'click', function () {
+        state.settings.language = currentLang() === 'ar' ? 'en' : 'ar';
+        applySettings();
+        persist(false);
+        toast(tr('تبديل اللغة'), 'info');
+      });
+      on('setting-language', 'change', function (event) {
+        state.settings.language = event.target.value === 'en' ? 'en' : 'ar';
+        applySettings();
+        persist(false);
+        toast(tr('تبديل اللغة'), 'info');
+      });
       on('setting-theme', 'change', function (event) {
         state.settings.theme = event.target.value === 'light' ? 'light' : 'dark';
         applySettings();
@@ -3920,17 +4892,29 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
 
       window.addEventListener('message', function (event) {
         const data = event.data;
-        if (!data || !data.__codexConsole) return;
+        if (!data) return;
         const frame = $('#preview-frame');
         if (frame && event.source && event.source !== frame.contentWindow) return;
+        if (data.__codexInspect) { handleInspectMessage(data); return; }
+        if (!data.__codexConsole) return;
         const args = (data.args || []).map(function (arg) {
-          if (arg && typeof arg === 'object') return { text: String(arg.text), detail: arg.detail ? String(arg.detail) : '' };
-          return { text: String(arg), detail: '' };
+          if (arg && typeof arg === 'object') {
+            return { text: String(arg.text), detail: arg.detail ? String(arg.detail) : '', line: parseInt(arg.line, 10) || 0, column: parseInt(arg.column, 10) || 0, source: String(arg.source || '') };
+          }
+          return { text: String(arg), detail: '', line: 0, column: 0, source: '' };
         });
         const text = args.map(function (arg) { return arg.text; }).join(' ');
         const detail = args.map(function (arg) { return arg.detail; }).filter(Boolean).join('\n');
-        logConsole(data.type || 'log', text, detail);
-        if (data.type === 'error') addProblem('error', text, state.active);
+        const first = args[0] || {};
+        const loc = extractLocation(detail + '\n' + text);
+        const line = parseInt(data.line, 10) || first.line || loc.line;
+        const column = parseInt(data.column, 10) || first.column || loc.column;
+        const source = String(data.source || first.source || sourceLine(line, state.active));
+        const type = data.type || 'log';
+        logConsole(type, text, detail, { bilingual: !!data.bilingual });
+        if (type === 'error' || type === 'warn') {
+          addProblem(type, text, state.active, { line: line, column: column, source: source, detail: detail, bilingual: !!data.bilingual });
+        }
       });
 
       document.addEventListener('keydown', function (event) {
@@ -3963,6 +4947,7 @@ print(f"مساحة دائرة نصف قطرها 3 = {area(3):.2f}")`,
           return;
         }
         if (mod && event.shiftKey && key === 'e') { event.preventDefault(); exportZip(); return; }
+        if (mod && event.shiftKey && key === 'i') { event.preventDefault(); switchDevTab('inspect'); return; }
         if (event.key === 'Escape') {
           hideContextMenu();
           if (document.querySelector('.modal-overlay.open')) {

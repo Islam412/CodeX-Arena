@@ -2,7 +2,7 @@
 
 # 🚀 CodeX Arena
 
-**A modern, responsive web-based code editor and execution engine featuring a Cyberpunk Neon Glassmorphism UI.**
+**A modern, responsive web-based code editor and execution engine with an Apple-inspired UI, bilingual Arabic/English interface, and real-time error reporting with line numbers.**
 
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-Vercel-brightgreen?style=for-the-badge&logo=vercel)](https://codex-arena-iota.vercel.app/)
 [![GitHub Repository](https://img.shields.io/badge/GitHub-Repository-blue?style=for-the-badge&logo=github)](https://github.com/Islam412/CodeX-Arena/tree/main)
@@ -25,19 +25,21 @@
 
 ## ✨ Features
 
-- **🎨 Cyberpunk Neon Glassmorphism UI:** A futuristic interface built with semi-transparent frosted glass textures and vibrant glowing accents.
-- **📁 Drag-and-Drop File System:** Organize, create, and manage your project files easily with an intuitive sidebar layout.
+- **🎨 Apple-inspired UI:** Clean typography, a restrained Apple color palette, hairline borders and light/dark themes.
+- **Arabic / English Interface:** Switch languages from the header or settings. Error messages are always shown in both languages.
+- **📁 Easy File & Folder Management:** Create files and folders inside any folder from the breadcrumb bar or inline row actions, then drag and drop items between folders and the project root.
 - **🔍 Fast Search & Tree Filtering:** Search through your files instantly using quick search filters.
 - **⚡ Smart Autocomplete & Syntax Highlighting:** Enhanced code editing experience with autocomplete and contextual code hints.
-- **🛠️ Built-in Developer Tools:** Interactive JavaScript Console (REPL) and DOM inspector to inspect output and debug code in real time.
+- **🛠️ Built-in Developer Tools:** Interactive JavaScript Console (REPL), Problems panel with exact line numbers and source snippets, plus a DOM Inspector with element picker, tree and computed styles.
 - **🖱️ Custom Context Menus:** Native-feel right-click menus for quick file operations (Rename, Delete, Create).
+- **Responsive Layout:** Sidebar drawer and full-screen output views on phones, with touch-friendly controls on tablets and desktops.
 
 ---
 
 ## 🛠️ Tech Stack
 
 - **Frontend:** HTML5, CSS3, JavaScript (ES6+)
-- **Styling:** Custom CSS (Glassmorphism, Neon Glow Effects) / Tailwind CSS
+- **Styling:** Custom CSS with Apple-inspired design tokens, responsive layouts and light/dark themes
 - **Deployment & Hosting:** Vercel
 
 ---
